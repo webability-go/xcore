@@ -53,6 +53,14 @@ const (
   MetaUnused                 = -1       // a "not used anymore" param to be freed
 )
 
+type XTemplateParam struct {
+  paramtype int
+  data string
+  children *XTemplateData
+}
+
+type XTemplateData []XTemplateParam
+
 type XTemplate struct {
   Name string
   Root *XTemplateData
@@ -73,14 +81,6 @@ func (t *XTemplate)LoadFile(file string) error {
 func (t *XTemplate)LoadString(data string) error {
   return t.compile(data)
 }
-
-type XTemplateParam struct {
-  paramtype int
-  data string
-  children *XTemplateData
-}
-
-type XTemplateData []XTemplateParam
 
 func (t *XTemplate)compile(data string) error {
   // build, compile return result
@@ -229,4 +229,8 @@ func (c *XTemplateData) Execute ( data interface{} ) string {
   }
   // return the page string
   return strings.Join(injected, "")
+}
+
+func (t *XTemplate) Print() string {
+  return fmt.Sprint(t)
 }

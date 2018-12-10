@@ -41,10 +41,11 @@ func (c *XCache)Set(key string, indata interface{}) {
   c.mutex.Unlock()
 }
 
-// second parameter is "invalid"
+// second boolean returned parameter is "invalid"
 // if the object does not exist in memory, returns nil, false
 // if the object does exist and is good, returns object, false
 // if the object does exist and is invalid, returns nil, true
+// Objects can become invalid when the expiration date has passed, or when the original source is newer (file type cache)
 func (c *XCache)Get(key string) (interface{}, bool) {
   c.mutex.Lock()
   if x, ok := (*c).items[key]; ok {

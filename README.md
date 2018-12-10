@@ -12,7 +12,7 @@ For GO, the actual existing code includes:
 TO DO:
 ======
 - XCache set of functions
-- XLanguage parser and user
+- XLanguage comments in code and manual
 - XTemplate parser, compiler and injector
 
 Version Changes Control
@@ -20,7 +20,7 @@ Version Changes Control
 
 V0.0.2 - 2018-??-??
 -----------------------
-- Creation of XLanguage with all set of functions
+- Creation of XLanguage with all set of functions.
 - Creation of XTemplate with all set of functions, compiler and injector, support for errors
 
 V0.0.1 - 2018-11-14

@@ -29,7 +29,7 @@ func TestXLanguage(t *testing.T) {
     t.Errorf("Set/Get/Del is not working correctly")
   }
   
-  // Test 1: creates from string
+  // Test 3: creates from XML string
   lang, err := xcore.NewXLanguageFromXMLString(`
 <?xml version="1.0" encoding="UTF-8"?>
 <language id="language-demo" lang="en">
@@ -44,8 +44,20 @@ func TestXLanguage(t *testing.T) {
   if tr != "Welcome to" {
     t.Errorf("NewXLanguageFromXMLString is not working correctly")
   }
-}
 
+  // Test 4: creates from Flat string
+  lang, err = xcore.NewXLanguageFromString(`
+entry1=Welcome to
+entry2=XCore
+`)
+  
+  fmt.Println(lang, err)
+  
+  tr = lang.Get("entry2")
+  if tr != "XCore" {
+    t.Errorf("NewXLanguageFromString is not working correctly")
+  }
+}
 
 
 

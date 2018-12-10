@@ -2,6 +2,8 @@ package xcore
 
 import (
   "fmt"
+  "strings"
+  "bufio"
   "os"
   "io/ioutil"
   "encoding/xml"
@@ -20,7 +22,7 @@ where NAMEOFLANGUAGE is the name of your table entry, for example "homepate", "u
       ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
       ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
 
-Text format is:
+Flat Text format is:
 ENTRYNAME=ENTRYVALUE
 ENTRYNAME=ENTRYVALUE
 where ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
@@ -31,13 +33,20 @@ There is no name of table or language in this format (you "know" what you are lo
 The advantage to use XML forma is to have more control over your language, and eventyally add attributes into your entry, 
 for instance translated="yes/no", verified="yes/no", and any other data that your system could insert
 
-There are 4 functions to create the language from a file or string, and 2 functions to get/set values
+Create a new XLanguage empty structure:
 
-- NewXLanguage: to create an empty XLanguage structure
-- NewXLanguageFromXMLFile: 
-- NewXLanguageFromXMLString: 
-- NewXLanguageFromFile: 
-- NewXLanguageFromString: 
+- NewXLanguage
+
+There are 4 functions to create the language from a file or string, flat text or XML text:
+
+- NewXLanguageFromXMLFile
+- NewXLanguageFromXMLString
+- NewXLanguageFromFile
+- NewXLanguageFromString
+
+Then you can use the set of basic access functions:
+
+- Set/Get/Del/SetName/SetLanguage/GetName/GetLanguage
 
 */
 
@@ -110,19 +119,19 @@ func (l *XLanguage)LoadXMLFile(file string) error {
 
 func (l *XLanguage)LoadXMLString(data string) error {
   // Temporal structures for XML loading
-  type xlanguageentrytemp struct {
-    ID    string    `xml:"id,attr"`
+  type xentry struct {
+    Id    string    `xml:"id,attr"`
     Entry string    `xml:",chardata"`
   }
 
-  type xlanguagetemp struct {
+  type xlang struct {
     Name     string  `xml:"id,attr"`
     Language string  `xml:"lang,attr"`
-    Entries  []xlanguageentrytemp `xml:"entry"`
+    Entries  []xentry `xml:"entry"`
   }
 
   // Unmarshal
-  temp := &xlanguagetemp{}
+  temp := &xlang{}
   err := xml.Unmarshal([]byte(data), temp)
   if err != nil { return err }
   
@@ -130,22 +139,46 @@ func (l *XLanguage)LoadXMLString(data string) error {
   l.Name = temp.Name
   l.Language = temp.Language
   for _, e := range temp.Entries {
-    l.Entries[e.ID] = e.Entry
+    l.Entries[e.Id] = e.Entry
   }
   return nil
 }
 
 func (l *XLanguage)LoadFile(file string) error {
-  xmlFile, _ := os.Open(file)
-  defer xmlFile.Close()
-  byteValue, _ := ioutil.ReadAll(xmlFile)
-  
-  fmt.Println(byteValue)
-  
-  return nil
+  flatFile, err := os.Open(file)
+  if err != nil { return err }
+  data, err := ioutil.ReadAll(flatFile)
+  if err != nil { return err }
+  err = flatFile.Close()
+  if err != nil { return err }
+  return l.LoadString(string(data))
 }
 
 func (l *XLanguage)LoadString(data string) error {
+  scanner := bufio.NewScanner(strings.NewReader(data))
+  for scanner.Scan() {
+    line := scanner.Text()
+    posequal := strings.Index(line, "=")
+
+    // we ignore empty and comments lines, no key=value lines too
+    if len(line) == 0 || line[0] == '#' || line[0] == ';' || posequal < 0 {
+      continue
+    }
+
+    // we separate the key. if there is no key, we ignore the data
+    key := strings.TrimSpace(line[:posequal])
+    if len(key) == 0 { continue }
+
+    // we capture the value if it exists. If not, the key entry is initialized with a nil value
+    value := ""
+    if len(line) > posequal {
+      value = strings.TrimSpace(line[posequal+1:])
+    }
+    l.Entries[key] = value
+  }
+  if err := scanner.Err(); err != nil {
+    return err
+  }
   return nil
 }
 
