@@ -52,7 +52,7 @@ type XLanguage struct {
    Creates an empty Language structure with a name and a language
 */
 func NewXLanguage(name string, lang string) *XLanguage {
-  return &XLanguage{Name: name, Language: lang}
+  return &XLanguage{Name: name, Language: lang, Entries: make(map[string]string) }
 }
 
 /* NewXLanguageFromXMLFile:
@@ -60,7 +60,7 @@ func NewXLanguage(name string, lang string) *XLanguage {
    Returns nil if there is an error
 */
 func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
-  lang := &XLanguage{}
+  lang := &XLanguage{Entries: make(map[string]string)}
   err := lang.LoadXMLFile(file)
   if err != nil {
     return nil, err
@@ -68,65 +68,117 @@ func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
   return lang, nil
 }
 
-func NewXLanguageFromXML(xml string) (*XLanguage, error) {
-  lang := &XLanguage{}
-  err := lang.LoadXML(xml)
+func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
+  lang := &XLanguage{Entries: make(map[string]string)}
+  err := lang.LoadXMLString(xml)
   if err != nil {
     return nil, err
   }
   return lang, nil
 }
 
-func NewXLanguageFromFile(data string) *XLanguage {
-  return &XLanguage{}.LoadString(data)
+func NewXLanguageFromFile(file string) (*XLanguage, error) {
+  l := &XLanguage{Entries: make(map[string]string)}
+  err := l.LoadFile(file)
+  if err != nil {
+    return nil, err
+  }
+  return l, nil
 }
 
-
-// Temporal structures for XML loading
-type xlanguageentrytemp struct {
-  ID    string    `xml:"id,attr"`
-  Entry string    `xml:",chardata"`
-}
-
-type xlanguagetemp struct {
-  Entries []XLanguageEntry `xml:"entry"`
+func NewXLanguageFromString(data string) (*XLanguage, error) {
+  l := &XLanguage{Entries: make(map[string]string)}
+  err := l.LoadString(data)
+  if err != nil {
+    return nil, err
+  }
+  return l, nil
 }
 
 /* LoadXMLFile:
    Loads a language from an XML file and replace the content of the XLanguage structure with the new data
 */
 func (l *XLanguage)LoadXMLFile(file string) error {
+  xmlFile, err := os.Open(file)
+  if err != nil { return err }
+  data, err := ioutil.ReadAll(xmlFile)
+  if err != nil { return err }
+  err = xmlFile.Close()
+  if err != nil { return err }
+  return l.LoadXMLString(string(data))
+}
+
+func (l *XLanguage)LoadXMLString(data string) error {
+  // Temporal structures for XML loading
+  type xlanguageentrytemp struct {
+    ID    string    `xml:"id,attr"`
+    Entry string    `xml:",chardata"`
+  }
+
+  type xlanguagetemp struct {
+    Name     string  `xml:"id,attr"`
+    Language string  `xml:"lang,attr"`
+    Entries  []xlanguageentrytemp `xml:"entry"`
+  }
+
+  // Unmarshal
+  temp := &xlanguagetemp{}
+  err := xml.Unmarshal([]byte(data), temp)
+  if err != nil { return err }
+  
+  // Scan to our XLanguage Object
+  l.Name = temp.Name
+  l.Language = temp.Language
+  for _, e := range temp.Entries {
+    l.Entries[e.ID] = e.Entry
+  }
+  return nil
+}
+
+func (l *XLanguage)LoadFile(file string) error {
   xmlFile, _ := os.Open(file)
   defer xmlFile.Close()
   byteValue, _ := ioutil.ReadAll(xmlFile)
-  xml.Unmarshal(byteValue, l)
-  // Build the map entry
   
+  fmt.Println(byteValue)
+  
+  return nil
 }
 
-func (l *XLanguage)LoadString(data string) {
-  xml.Unmarshal(data, l)
+func (l *XLanguage)LoadString(data string) error {
+  return nil
 }
 
-func (l *XLanguage) LoadXML(data string) {
-  xml.Unmarshal(data, l)
+func (l *XLanguage)SetName(name string) {
+  l.Name = name
 }
 
-func (l *XLanguage)Get(entry string) string {
-  for _, v := range l.Entries {
-    if v.ID == entry {
-      return v.Entry
-  }
-  return ""
+func (l *XLanguage)SetLanguage(lang string) {
+  l.Language = lang
+}
+
+func (l *XLanguage)GetName() string {
+  return l.Name
+}
+
+func (l *XLanguage)GetLanguage() string {
+  return l.Language
 }
 
 func (l *XLanguage)Set(entry string, value string) {
-  e := &XLanguageEntry{ID: entry, Entry: value}
-  l.Entries := append(l.Entries, e)
+  l.Entries[entry] = value
+}
+
+func (l *XLanguage)Get(entry string) string {
+  v, ok := l.Entries[entry]
+  if ok { return v }
+  return ""
+}
+
+func (l *XLanguage)Del(entry string) {
+  delete(l.Entries, entry)
 }
 
 func (l *XLanguage) Print() string {
   return fmt.Sprint(l)
 }
-
-
