@@ -266,16 +266,19 @@ func (t *XTemplate)GetTemplate(name string) *XTemplate {
   return t.SubTemplates[name]
 }
 
-func (t *XTemplate)Execute(data XDataset) string {
+func (t *XTemplate)Execute(data XDatasetDef) string {
   // Does data has a language ?
-  lang, ok := data["#"]
-  var language *XLanguage = nil
-  if ok { language = lang.(*XLanguage) }
-  stack := []XDataset{data}
-  return t.injector(stack, language)
+  if data != nil {
+    lang := data.Get("#")
+    var language *XLanguage = nil
+    if lang != nil { language = lang.(*XLanguage) }
+    stack := &XDatasetCollection{data}
+    return t.injector(stack, language)
+  }
+  return t.injector(nil, nil)
 }
 
-func (t *XTemplate)injector ( data []XDataset, language *XLanguage ) string {
+func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage ) string {
   var injected []string
   for _, v := range *t.Root {
     switch v.paramtype {
@@ -293,41 +296,45 @@ func (t *XTemplate)injector ( data []XDataset, language *XLanguage ) string {
         if subt != nil {
           // if v.data is a substructure into data, then we stack the data and inject new stacked data
           
-          substr := subt.injector(data, language)
+          substr := subt.injector(datacol, language)
           injected = append(injected, substr)
         }
       case MetaVariable:
-        value := searchValue(v.data, data)
-        injected = append(injected, value)
+        d := datacol.GetDataString(v.data)
+        injected = append(injected, d)
       case MetaRange:    // Range (loop over subset)
 
         // ***** subtemplate depends on first, last, loop # counter, key, condition etc
         subt := t.GetTemplate(v.data)
 
         if subt != nil {
-          value := searchRangeValue(v.data, data)
-          for _, ds := range value {
-            // if v.data is a substructure into data, then we stack the data and inject new stacked data
-            data = append(data, ds)
-            substr := subt.injector(data, language)
-            injected = append(injected, substr)
-            // unstack ds
-            data = data[:len(data)-1]
+          // ****** We have to check the correct type of the collection
+          
+          cl := datacol.GetDataRange(v.data)
+          if cl != nil {
+            for i := 0; i < cl.Count(); i++ {
+              // if v.data is a substructure into data, then we stack the data and inject new stacked data
+              datacol.Push(cl.Get(i))
+              substr := subt.injector(datacol, language)
+              injected = append(injected, substr)
+              // unstack extra data
+              datacol.Pop()
+            }
           }
         }
       case MetaCondition:
 
         // ***** subtemplate depends on condition completion
         subt := t.GetTemplate(v.data)
-        value := searchConditionValue(v.data, data)
+        value := searchConditionValue(v.data, datacol)
 
         // if v.data is a substructure into data, then we stack the data and inject new stacked data
         if value != "" {
-          substr := subt.injector(data, language)
+          substr := subt.injector(datacol, language)
           injected = append(injected, substr)
         }
       case MetaDump:
-        substr := dump(data[0])
+        substr := datacol.Get(0).Print()
         injected = append(injected, substr)
       default:
         injected = append(injected, "THE METALANGUAGE FROM OUTERSPACE IS NOT SUPPORTED: " + fmt.Sprint(v.paramtype))
@@ -337,58 +344,35 @@ func (t *XTemplate)injector ( data []XDataset, language *XLanguage ) string {
   return strings.Join(injected, "")
 }
 
-func searchRangeValue(id string, data []XDataset) XRangeDataset {
+
+func searchConditionValue(id string, data XDatasetCollectionDef) string {
   // scan data for each dataset in order top to bottom
-  for i := len(data)-1; i >= 0; i-- {
-    val := scanValue(id, data[i])
-    if val != nil {
-      return val.(XRangeDataset)
-    }
-  }
-  return nil
+  v := data.GetDataString(id)
+  return v
 }
 
-func searchConditionValue(id string, data []XDataset) string {
-  // scan data for each dataset in order top to bottom
-  for i := len(data)-1; i >= 0; i-- {
-    val := scanValue(id, data[i])
-    if val != nil {
-      return buildValue(val)
-    }
-  }
-  return ""
-}
-
-func searchValue(id string, data []XDataset) string {
-  // scan data for each dataset in order top to bottom
-  for i := len(data)-1; i >= 0; i-- {
-    val := scanValue(id, data[i])
-    if val != nil {
-      return buildValue(val)
-    }
-  }
-  return ""
-}
-
-func scanValue(id string, data XDataset) interface{} {
+/*
+func scanValue(id string, data *XDatasetDef) interface{} {
   // scan data for the id
   possup := strings.Index(id, ">")
   if possup >= 0 {
     first := id[:possup]
     // check limits: first == "", second part == ""
-    if entry, ok := data[first]; ok {
+    entry := data.Get(first)
+    if entry != nil {
       // if entry IS map[string]interface{} entonces podemos seguir en la estructura
       // Check also if it's a function that returns a map[string]interface{}
       return scanValue(id[possup+1:], entry.(XDataset))
     }
     return nil
   } else {
-    if entry, ok := data[id]; ok {
+    if entry, ok := data.Get(id); ok {
       return entry
     }
   }
   return nil
 }
+*/
 
 func buildValue(data interface{}) string {
   // if data is string, return data
@@ -397,10 +381,6 @@ func buildValue(data interface{}) string {
   return fmt.Sprint(data)
 }
 
-func (t *XTemplate) Print() string {
+func (t *XTemplate)Print() string {
   return fmt.Sprint(t)
-}
-
-func dump(data XDataset) string {
-  return "DUMP OF DATASET"
 }

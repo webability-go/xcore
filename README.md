@@ -15,9 +15,8 @@ TO DO:
 - XCache: comments in code, manual
 - XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
 - XLanguage comments in code and manual
-- XTemplate injector
 - XTemplate must concatenate strings after compilation
-- Implements functions as data entry for template Exectute (simple data or loop funcions, can get backs anything, creates an interface)
+- Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
 - Implements 2 parameters for &&, 3 parameters for @@ and ??
 - Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
 
@@ -29,6 +28,8 @@ V0.0.2 - 2018-??-??
 - Creation of XCache with all set of functions.
 - Creation of XLanguage with all set of functions.
 - Creation of XTemplate with all set of functions. Basic work done
+- Creation of a set of interfaces that XTemplate need to execute and inject the template, 
+- Creation of a basic XDataset and colection based on interfaces to build a set of data for the template. 
 
 V0.0.1 - 2018-11-14
 -----------------------
