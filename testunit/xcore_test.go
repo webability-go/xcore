@@ -86,7 +86,7 @@ func TestLanguageParam(t *testing.T) {
   fmt.Println(tmpl)
   fmt.Println(tmpl.Root)
   
-  data := xcore.XDataset{}
+  data := &xcore.XDataset{}
   l, _ := xcore.NewXLanguageFromString("some=a tiny table\nlanguages=of english language\n")
   data.Set("#", l)
   
@@ -203,23 +203,28 @@ Some data:
   data["data6"] = true
   data["data7"] = func() string { return "ABC" }
   
-  d8_r1 := xcore.XDataset{}
-  d8_r1["data81"] = "rec 1: Entry 8-1"
-  d8_r1["data82"] = "rec 1: Entry 8-2"
+  d8_r1 := &xcore.XDataset{}
+  d8_r1.Set("data81", "rec 1: Entry 8-1")
+  d8_r1.Set("data82", "rec 1: Entry 8-2")
 
-  d8_r2 := xcore.XDataset{}
-  d8_r2["data81"] = "rec 2: Entry 8-1"
-  d8_r2["data82"] = "rec 2: Entry 8-2"
-  d8_r2["data83"] = "rec 2: Entry 8-3"
+  d8_r2 := &xcore.XDataset{}
+  d8_r2.Set("data81", "rec 2: Entry 8-1")
+  d8_r2.Set("data82", "rec 2: Entry 8-2")
+  d8_r2.Set("data83", "rec 2: Entry 8-3")
 
-  d8_r3 := xcore.XDataset{}
-  d8_r3["data81"] = "rec 3: Entry 8-1"
-  d8_r3["data82"] = "rec 3: Entry 8-2"
+  d8_r3 := &xcore.XDataset{}
+  d8_r3.Set("data81", "rec 3: Entry 8-1")
+  d8_r3.Set("data82", "rec 3: Entry 8-2")
   
-  data["data8"] = xcore.XDatasetCollection{d8_r1, d8_r2, d8_r3}
+  d := xcore.XDatasetCollection{}
+  d.Push(d8_r1)
+  d.Push(d8_r2)
+  d.Push(d8_r3)
+  
+  data["data8"] = &d
   data["data9"] = "I exist"
   
-//  fmt.Printf("ADDRESS DATA8_R1: %p", d8_r1)
+  fmt.Printf("Data: %v\n", data)
 //  fmt.Printf("ADDRESS DATA8 / GET R1: %p", data.GetCollection("data8").Get(0))
   
   result := tmpl.Execute(&data)

@@ -23,13 +23,14 @@ TO DO:
 Version Changes Control
 =======================
 
-V0.0.2 - 2018-??-??
+V0.0.2 - 2018-12-17
 -----------------------
 - Creation of XCache with all set of functions.
 - Creation of XLanguage with all set of functions.
 - Creation of XTemplate with all set of functions. Basic work done
 - Creation of a set of interfaces that XTemplate need to execute and inject the template, 
-- Creation of a basic XDataset and colection based on interfaces to build a set of data for the template. 
+- Creation of a basic XDataset and colection based on interfaces to build a set of data for the template.
+- Added xcore.go with version number as constant
 
 V0.0.1 - 2018-11-14
 -----------------------

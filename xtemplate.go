@@ -269,10 +269,12 @@ func (t *XTemplate)GetTemplate(name string) *XTemplate {
 func (t *XTemplate)Execute(data XDatasetDef) string {
   // Does data has a language ?
   if data != nil {
-    lang := data.Get("#")
+    lang, _ := data.Get("#")
     var language *XLanguage = nil
     if lang != nil { language = lang.(*XLanguage) }
-    stack := &XDatasetCollection{data}
+    var stack XDatasetCollectionDef
+    stack = &XDatasetCollection{}
+    stack.Push(data)
     return t.injector(stack, language)
   }
   return t.injector(nil, nil)
@@ -300,7 +302,7 @@ func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage
           injected = append(injected, substr)
         }
       case MetaVariable:
-        d := datacol.GetDataString(v.data)
+        d, _ := datacol.GetDataString(v.data)
         injected = append(injected, d)
       case MetaRange:    // Range (loop over subset)
 
@@ -310,11 +312,12 @@ func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage
         if subt != nil {
           // ****** We have to check the correct type of the collection
           
-          cl := datacol.GetDataRange(v.data)
+          cl, _ := datacol.GetDataRange(v.data)
           if cl != nil {
             for i := 0; i < cl.Count(); i++ {
               // if v.data is a substructure into data, then we stack the data and inject new stacked data
-              datacol.Push(cl.Get(i))
+              dcl, _ := cl.Get(i)
+              datacol.Push(dcl)
               substr := subt.injector(datacol, language)
               injected = append(injected, substr)
               // unstack extra data
@@ -334,8 +337,11 @@ func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage
           injected = append(injected, substr)
         }
       case MetaDump:
-        substr := datacol.Get(0).Print()
-        injected = append(injected, substr)
+        dsubstr, _ := datacol.Get(0)
+        if dsubstr != nil {
+          substr := dsubstr.Stringify()
+          injected = append(injected, substr)
+        }
       default:
         injected = append(injected, "THE METALANGUAGE FROM OUTERSPACE IS NOT SUPPORTED: " + fmt.Sprint(v.paramtype))
     }
@@ -347,7 +353,7 @@ func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage
 
 func searchConditionValue(id string, data XDatasetCollectionDef) string {
   // scan data for each dataset in order top to bottom
-  v := data.GetDataString(id)
+  v, _ := data.GetDataString(id)
   return v
 }
 
