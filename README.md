@@ -11,17 +11,23 @@ For GO, the actual existing code includes:
 
 TO DO:
 ======
-- XCache: activate persistant cache too (shared memory)
 - XCache: comments in code, manual
+- Apply XDataset for XConfig
 - XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
 - XLanguage comments in code and manual
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
 - Implements 2 parameters for &&, 3 parameters for @@ and ??
 - Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
+- XCache: activate persistant cache too (shared memory)
 
 Version Changes Control
 =======================
+
+V0.0.3 - 2018-??-??
+-----------------------
+- Added XCache.Flush function
+- Function XCache.Del implemented
 
 V0.0.2 - 2018-12-17
 -----------------------
@@ -45,7 +51,7 @@ XCache
 =======================
 XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
 The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistant (if you exit the application)
-and cannot grow too much (as memory is the limit). 
+and cannot grow too much (as memory is the limit).
 However, you can control a timeout of each cache piece, and eventually the comparison against a source file to invalid the cache.
 
 1. Overview
@@ -87,7 +93,7 @@ The XCache is resident in memory, supports multithreading and concurrency.
 "id" is the unique id of the XCache. 
 maxitems is the max authorized quantity of objects into the XCache.
 isfile is a boolean set to true then the entries IDs are filepath on hard disk and the system will check expiration date against the file last modif date. If the file is newer than the cache, the entry is invalidated and need recalculation.
-expire is a max duration of the objects into the cache. 
+expire is a max duration of the objects into the cache.
 
 
 func (c *XCache)Set(key string, indata interface{}) 
@@ -105,10 +111,22 @@ func (c *XCache)Del(key string)
 ------------------------
 Deletes the entry in the XCache
 
+func (c *XCache)Clean(perc int) int
+------------------------
+Cleans the cache to be able to receive more data: will first scan to invalidate and deletes expired entries (if there is an expiration time), then free 10% of items limit (if any)
+It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
+
+func (c *XCache)Verify() int
+------------------------
+Will scan the cache to first clean it (keeping 100% of the valid data), then scan all the data against its source if any.
+
 func (c *XCache)Count(key string) int
 ------------------------
 Gets the quantity of valid entries into the cache.
 
+func (c *XCache)Flush()
+------------------------
+Invalidate the whole cache and empty it
 
 
 XLanguage
@@ -195,8 +213,14 @@ Meta elements:
    &&xx&&   references
    !!xx!!   debug (dump)
 
- 2. Reference
+  2. Meta Language Reference
 ------------------------
+
+
+  3. Functions Reference
+------------------------
+
+
 
 
 ---
