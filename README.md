@@ -12,16 +12,16 @@ For GO, the actual existing code includes:
 
 TO DO:
 ======
-- XCache: comments in code, manual
-- XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
-- XCache: activate persistant cache too (shared memory) ?????
-
 - Apply XDataset for XConfig
 - XLanguage comments in code and manual
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
 - Implements 2 parameters for &&, 3 parameters for @@ and ??
 - Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
+
+- XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
+- XCache: activate persistant cache too (shared memory) ?????
+
 
 Version Changes Control
 =======================
@@ -140,31 +140,39 @@ func (c *XCache)Set(key string, indata interface{})
 
 func (c *XCache)Get(key string) (interface{}, bool)
 ------------------------
-Gets the value of the entry.
-- If the entry exists and is valid, returns the pointer to the object and false.
-- If the entry exists and is not valid anymore, returns nil and true.
-- If the entry does not exist, return nil and false.
+  get the value of an entry.
+  If the entry does not exists, returns nil, false
+  If the entry exists and is invalidated by time or validator function, then returns nil, true
+  If the entry is good, return <value>, false
+
 
 func (c *XCache)Del(key string)
 ------------------------
-Deletes the entry in the XCache.
+  deletes the entry of the cache if it exists.
 
-func (c *XCache)Clean(perc int) int
-------------------------
-Cleans the cache to be able to receive more data: will first scan to invalidate and deletes expired entries (if there is an expiration time), then free 10% of items limit (if any).
-It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
-
-func (c *XCache)Verify() int
-------------------------
-Will scan the cache to first clean it (keeping 100% of the valid data), then scan all the data against its source if any.
 
 func (c *XCache)Count(key string) int
 ------------------------
-Gets the quantity of valid entries into the cache.
+  returns the quantity of entries in the cache.
+
+
+func (c *XCache)Clean(perc int) int
+------------------------
+  deletes expired entries, and free perc% of max items based on time.
+  perc = 0 to 100 (percentage to clean).
+  Returns quantity of removed entries.
+  It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
+
+
+func (c *XCache)Verify() int
+------------------------
+  First, Clean(0) keeping all the entries, then deletes expired entries using Validator function.
+  Returns the quantity of removed entries.
 
 func (c *XCache)Flush()
 ------------------------
-Invalidate the whole cache and empty it.
+  Enpty the whole cache.
+  Returns nothing.
 
 
 

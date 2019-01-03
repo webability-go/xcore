@@ -12,8 +12,8 @@ import (
   XCacheEntry:
   ------------
   The cache entry has a time to measure expiration if needed, or time of entry in cache.
-  - ctime is creation time (used to validate the object against its source)
-  - rtime is last read time (used to clean the cache: the less accessed objects are removed)
+  - ctime is creation time (used to validate the object against its source).
+  - rtime is last read time (used to clean the cache: the less accessed objects are removed).
   The data as itself is an interface to whatever the user need to cache.
 */
 type XCacheEntry struct {
@@ -27,10 +27,10 @@ type XCacheEntry struct {
   ------
   The XCache has an id (informative).
   - The user can creates a cache with a maximum number of elements if need. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
-  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get. (this does not use CPU or extra locks
+  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get. (this does not use CPU or extra locks.
   - The Validator is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
-  - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache
-  - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data
+  - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
+  - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
   - Finally, the items are a map to cache entries, acceved by the key of entries.
 */
 type XCache struct {
@@ -46,9 +46,9 @@ type XCache struct {
 /*
   NewCache:
   ---------
-  Creates a new XCache structure. 
+  Creates a new XCache structure.
   The XCache is resident in memory, supports multithreading and concurrency.
-  "id" is the unique id of the XCache. 
+  "id" is the unique id of the XCache.
   maxitems is the max authorized quantity of objects into the XCache.
   expire is a max duration of the objects into the cache.
   Returns the *XCache created.
@@ -68,7 +68,7 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
   SetValidator:
   -------------
   Sets the validator function to check every entry in the cache against its original source.
-  Returns nothing
+  Returns nothing.
 */
 func (c *XCache)SetValidator(f func(string, time.Time) bool) {
   c.validator = f
@@ -78,9 +78,9 @@ func (c *XCache)SetValidator(f func(string, time.Time) bool) {
   Set:
   ----
   Sets an entry in the cache.
-  If the entry already exists, just replace it with a new creation date
-  If the entry does not exist, it will insert it in the cache and if the cache if full (maxitems reached), then a clean is called to remove 10% 
-  Returns nothing
+  If the entry already exists, just replace it with a new creation date.
+  If the entry does not exist, it will insert it in the cache and if the cache if full (maxitems reached), then a clean is called to remove 10%.
+  Returns nothing.
 */
 func (c *XCache)Set(key string, indata interface{}) {
   c.mutex.Lock()
@@ -98,6 +98,11 @@ func (c *XCache)Set(key string, indata interface{}) {
   }
 }
 
+/*
+  removeFromPile:
+  ---------------
+  will remove an entry key from the ordered pile.
+*/
 func (c *XCache)removeFromPile(key string) {
   // removes the key and append it to the end
   for i, x := range c.pile {
@@ -108,11 +113,14 @@ func (c *XCache)removeFromPile(key string) {
   }
 }
 
-// second boolean returned parameter is "invalid"
-// if the object does not exist in memory, returns nil, false
-// if the object does exist and is good, returns object, false
-// if the object does exist and is invalid, returns nil, true
-// Objects can become invalid when the expiration date has passed, or when the original source is newer (file type cache)
+/*
+  Get:
+  ----
+  get the value of an entry.
+  If the entry does not exists, returns nil, false.
+  If the entry exists and is invalidated by time or validator function, then returns nil, true.
+  If the entry is good, return <value>, false.
+*/
 func (c *XCache)Get(key string) (interface{}, bool) {
   c.mutex.Lock()
   if x, ok := c.items[key]; ok {
@@ -147,6 +155,11 @@ func (c *XCache)Get(key string) (interface{}, bool) {
   return nil, false
 }
 
+/*
+  Del:
+  ----
+  deletes the entry of the cache if it exists.
+*/
 func (c *XCache)Del(key string) {
   c.mutex.Lock()
   delete(c.items, key)
@@ -155,6 +168,11 @@ func (c *XCache)Del(key string) {
   c.mutex.Unlock()
 }
 
+/*
+  Count:
+  ------
+  returns the quantity of entries in the cache.
+*/
 func (c *XCache)Count() int {
   c.mutex.Lock()
   x := len(c.items)
@@ -163,8 +181,12 @@ func (c *XCache)Count() int {
 }
 
 /*
-  Clean: deletes expired entries, and free 10% of max items based on time
-  Returns quantity of removed entries. perc = 0 to 100 (percentage to clean)
+  Clean:
+  ------
+  deletes expired entries, and free perc% of max items based on time.
+  perc = 0 to 100 (percentage to clean).
+  Returns quantity of removed entries.
+  It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
 */
 func (c *XCache)Clean(perc int) int {
   if (LOG) { log.Println("Cleaning cache") }
@@ -194,8 +216,10 @@ func (c *XCache)Clean(perc int) int {
 }
 
 /*
-  Clean: deletes expired entries, and free 10% of max items based on time
-  Returns quantity of removed entries
+  Verify:
+  -------
+  First, Clean(0) keeping all the entries, then deletes expired entries using Validator function.
+  Returns the quantity of removed entries.
 */
 func (c *XCache)Verify() int {
   // 1. clean all expired items, do not touch others
@@ -215,9 +239,16 @@ func (c *XCache)Verify() int {
   return i
 }
 
+/*
+  Flush:
+  ------
+  Enpty the whole cache.
+  Returns nothing.
+*/
 func (c *XCache)Flush() {
   c.mutex.Lock()
   // how to really deletes the data ? ( to free memory)
   c.items = make(map[string]*XCacheEntry)
   c.mutex.Unlock()
 }
+
