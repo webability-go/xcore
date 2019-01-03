@@ -5,21 +5,23 @@ XCore for GO v0
 
 The XCore package is used to build basic object for programation. for the WebAbility compatility code
 For GO, the actual existing code includes:
-- Memory Caches
-- Templates
-- Language tables
+- XCache: Application Memory Caches
+- XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc)
+- XLanguage: language dependant text tables
+- XTemplate: template systeme with meta language
 
 TO DO:
 ======
 - XCache: comments in code, manual
-- Apply XDataset for XConfig
+- XCache: Cleaner should implements a pile to scan X% to remove (no need of btree, time is lineal)
 - XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
+- XCache: activate persistant cache too (shared memory)
+- Apply XDataset for XConfig
 - XLanguage comments in code and manual
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
 - Implements 2 parameters for &&, 3 parameters for @@ and ??
 - Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
-- XCache: activate persistant cache too (shared memory)
 
 Version Changes Control
 =======================
@@ -28,6 +30,10 @@ V0.0.3 - 2018-??-??
 -----------------------
 - Added XCache.Flush function
 - Function XCache.Del implemented
+- Function XCache.Clean implemented for expiration
+- Function XCache.Verify created
+- Function XCache.SetValidator added, to check cache validity agains a validator function
+- Files flags and code removed from XCache. If the cache is a file, the user should controls the files with its own Validator function (original funcions put in examples as a file validator). This lets a lots of flexibility to validate against any source of data (files, database, complex calculations, external streams, etc)
 
 V0.0.2 - 2018-12-17
 -----------------------
@@ -84,21 +90,52 @@ To use the package:
 
 import "github.com/webability-go/xcache"
 
+List of types:
+
+XCacheEntry:
+------------
+  The cache entry has a time to measure expiration if needed, or time of entry in cache.
+  - ctime is creation time (used to validate the object against its source)
+  - rtime is last read time (used to clean the cache: the less accessed objects are removed)
+  The data as itself is an interface to whatever the user need to cache.
+
+
+XCache:
+-------
+  The XCache has an id (informative).
+  - The user can creates a cache with a maximum number of elements if need. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
+  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get. (this does not use CPU or extra locks
+  - The Validator is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
+  - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache
+  - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data
+  - Finally, the items are a map to cache entries, acceved by the key of entries.
+
+  
 List of functions:
 
-func NewXCache(id string, maxitems int, isfile bool, expire time.Duration) *XCache
+func NewXCache(id string, maxitems int, expire time.Duration) *XCache
 ------------------------
-Creates a new XCache structure. 
-The XCache is resident in memory, supports multithreading and concurrency.
-"id" is the unique id of the XCache. 
-maxitems is the max authorized quantity of objects into the XCache.
-isfile is a boolean set to true then the entries IDs are filepath on hard disk and the system will check expiration date against the file last modif date. If the file is newer than the cache, the entry is invalidated and need recalculation.
-expire is a max duration of the objects into the cache.
+  Creates a new XCache structure. 
+  The XCache is resident in memory, supports multithreading and concurrency.
+  "id" is the unique id of the XCache. 
+  maxitems is the max authorized quantity of objects into the XCache.
+  expire is a max duration of the objects into the cache.
+  Returns the *XCache created.
+
+
+func (c *XCache)SetValidator(f func(string, time.Time) bool)
+------------------------
+  Sets the validator function to check every entry in the cache against its original source, for each Get and Verify calls.
+  Returns nothing.
 
 
 func (c *XCache)Set(key string, indata interface{}) 
 ------------------------
-Set an entry into our cache. If there was already an entry with the same key, it will be replaced.
+  Sets an entry in the cache.
+  If the entry already exists, just replace it with a new creation date
+  If the entry does not exist, it will insert it in the cache and if the cache if full (maxitems reached), then a clean is called to remove 10% 
+  Returns nothing
+
 
 func (c *XCache)Get(key string) (interface{}, bool)
 ------------------------
