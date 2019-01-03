@@ -72,9 +72,10 @@ If you want some stats of the cache, use the Count function.
 
 Example:
 
+```
 import "github.com/webability-go/xcache"
 
-var myfiles := xfile.NewXCache("myfiles", 0, true, 0)
+var myfiles := xfile.NewXCache("myfiles", 0, 0)
 
 func usemycache() {
   myfiles.Set("/home/sites/file1.txt", "somedata")
@@ -82,6 +83,7 @@ func usemycache() {
 
   go somefunc()
 }
+```
 
 
 -----------------------
