@@ -13,9 +13,9 @@ For GO, the actual existing code includes:
 TO DO:
 ======
 - XCache: comments in code, manual
-- XCache: Cleaner should implements a pile to scan X% to remove (no need of btree, time is lineal)
 - XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
-- XCache: activate persistant cache too (shared memory)
+- XCache: activate persistant cache too (shared memory) ?????
+
 - Apply XDataset for XConfig
 - XLanguage comments in code and manual
 - XTemplate must concatenate strings after compilation
@@ -26,14 +26,15 @@ TO DO:
 Version Changes Control
 =======================
 
-V0.0.3 - 2018-??-??
+V0.0.3 - 2019-01-02
 -----------------------
 - Added XCache.Flush function
 - Function XCache.Del implemented
-- Function XCache.Clean implemented for expiration
+- Function XCache.Clean implemented for expiration, and free some space
 - Function XCache.Verify created
 - Function XCache.SetValidator added, to check cache validity agains a validator function
 - Files flags and code removed from XCache. If the cache is a file, the user should controls the files with its own Validator function (original funcions put in examples as a file validator). This lets a lots of flexibility to validate against any source of data (files, database, complex calculations, external streams, etc)
+- XCache is ready for candidate release
 
 V0.0.2 - 2018-12-17
 -----------------------
@@ -60,8 +61,8 @@ The access to the data support multithreading and concurrency. For the same reas
 and cannot grow too much (as memory is the limit).
 However, you can control a timeout of each cache piece, and eventually the comparison against a source file to invalid the cache.
 
-1. Overview
 -----------------------
+1. Overview
 
 Declare a new XCache with NewXCache()
 
@@ -83,8 +84,8 @@ func usemycache() {
 }
 
 
-2. Reference
 -----------------------
+2. Reference
 
 To use the package: 
 
@@ -93,21 +94,21 @@ import "github.com/webability-go/xcache"
 List of types:
 
 XCacheEntry:
-------------
+------------------------
   The cache entry has a time to measure expiration if needed, or time of entry in cache.
-  - ctime is creation time (used to validate the object against its source)
-  - rtime is last read time (used to clean the cache: the less accessed objects are removed)
+  - ctime is creation time (used to validate the object against its source).
+  - rtime is last read time (used to clean the cache: the less accessed objects are removed).
   The data as itself is an interface to whatever the user need to cache.
 
 
 XCache:
--------
+------------------------
   The XCache has an id (informative).
   - The user can creates a cache with a maximum number of elements if need. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
-  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get. (this does not use CPU or extra locks
+  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get. (this does not use CPU or extra locks.
   - The Validator is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
-  - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache
-  - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data
+  - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
+  - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
   - Finally, the items are a map to cache entries, acceved by the key of entries.
 
   
@@ -132,25 +133,25 @@ func (c *XCache)SetValidator(f func(string, time.Time) bool)
 func (c *XCache)Set(key string, indata interface{}) 
 ------------------------
   Sets an entry in the cache.
-  If the entry already exists, just replace it with a new creation date
-  If the entry does not exist, it will insert it in the cache and if the cache if full (maxitems reached), then a clean is called to remove 10% 
-  Returns nothing
+  If the entry already exists, just replace it with a new creation date.
+  If the entry does not exist, it will insert it in the cache and if the cache if full (maxitems reached), then a clean is called to remove 10%.
+  Returns nothing.
 
 
 func (c *XCache)Get(key string) (interface{}, bool)
 ------------------------
-Gets the value of the entry. 
+Gets the value of the entry.
 - If the entry exists and is valid, returns the pointer to the object and false.
 - If the entry exists and is not valid anymore, returns nil and true.
 - If the entry does not exist, return nil and false.
 
 func (c *XCache)Del(key string)
 ------------------------
-Deletes the entry in the XCache
+Deletes the entry in the XCache.
 
 func (c *XCache)Clean(perc int) int
 ------------------------
-Cleans the cache to be able to receive more data: will first scan to invalidate and deletes expired entries (if there is an expiration time), then free 10% of items limit (if any)
+Cleans the cache to be able to receive more data: will first scan to invalidate and deletes expired entries (if there is an expiration time), then free 10% of items limit (if any).
 It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
 
 func (c *XCache)Verify() int
@@ -163,7 +164,10 @@ Gets the quantity of valid entries into the cache.
 
 func (c *XCache)Flush()
 ------------------------
-Invalidate the whole cache and empty it
+Invalidate the whole cache and empty it.
+
+
+
 
 
 XLanguage
