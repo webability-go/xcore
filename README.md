@@ -12,7 +12,6 @@ For GO, the actual existing code includes:
 
 TO DO:
 ======
-- Apply XDataset for XConfig
 - XLanguage comments in code and manual
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
@@ -25,6 +24,14 @@ TO DO:
 
 Version Changes Control
 =======================
+
+V0.0.5 - 2019-??-??
+-----------------------
+- 
+
+V0.0.4 - 2019-01-02
+-----------------------
+- XDataset.Get* functions added to comply with any type of data of a dataset for templates, config, database record etc.
 
 V0.0.3 - 2019-01-02
 -----------------------
@@ -173,7 +180,7 @@ func (c *XCache)Verify() int
 
 func (c *XCache)Flush()
 ------------------------
-  Enpty the whole cache.
+  Empty the whole cache.
   Returns nothing.
 
 

@@ -1,11 +1,9 @@
 package xcore
 
 import (
-//  "fmt"
   "sync"
   "time"
   "log"
-//  "math"
 )
 
 /*
@@ -206,7 +204,7 @@ func (c *XCache)Clean(perc int) int {
   // How many do we have to clean ?
   total := len(c.items)
   num := total * perc / 100
-  log.Println("Total de elementos a quitar:", num)
+  if (LOG) { log.Println("Quantity of elements to remove from cache:", num) }
   for i = 0; i < num; i++ {
     delete(c.items, c.pile[i])
   }

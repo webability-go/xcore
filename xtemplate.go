@@ -312,7 +312,7 @@ func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage
         if subt != nil {
           // ****** We have to check the correct type of the collection
           
-          cl, _ := datacol.GetDataRange(v.data)
+          cl, _ := datacol.GetCollection(v.data)
           if cl != nil {
             for i := 0; i < cl.Count(); i++ {
               // if v.data is a substructure into data, then we stack the data and inject new stacked data
