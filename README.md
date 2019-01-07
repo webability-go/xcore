@@ -25,13 +25,10 @@ TO DO:
 Version Changes Control
 =======================
 
-V0.0.5 - 2019-??-??
------------------------
-- 
-
-V0.0.4 - 2019-01-02
+V0.0.4 - 2019-01-06
 -----------------------
 - XDataset.Get* functions added to comply with any type of data of a dataset for templates, config, database record etc.
+- XCache manual completed.
 
 V0.0.3 - 2019-01-02
 -----------------------
