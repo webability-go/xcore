@@ -94,6 +94,8 @@ func (d *XDataset)GetBool(key string) (bool, bool) {
   if val, ok := (*d)[key]; ok {
     switch val.(type) {
       case bool: return val.(bool), true
+      case int: return val.(int)!=0, true
+      case float64: return val.(float64)!=0, true
     }
   }
   return false, false
@@ -103,6 +105,12 @@ func (d *XDataset)GetInt(key string) (int, bool) {
   if val, ok := (*d)[key]; ok {
     switch val.(type) {
       case int: return val.(int), true
+      case float64: return int(val.(float64)), true
+      case bool: if val.(bool) {
+        return 1, true
+      } else {
+        return 0, true
+      }
     }
   }
   return 0, false
@@ -112,6 +120,12 @@ func (d *XDataset)GetFloat(key string) (float64, bool) {
   if val, ok := (*d)[key]; ok {
     switch val.(type) {
       case float64: return val.(float64), true
+      case int: return float64(val.(int)), true
+      case bool: if val.(bool) {
+        return 1.0, true
+      } else {
+        return 0.0, true
+      }
     }
   }
   return 0, false

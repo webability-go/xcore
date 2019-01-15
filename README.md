@@ -25,6 +25,10 @@ TO DO:
 Version Changes Control
 =======================
 
+V0.0.5 - 2019-??-??
+-----------------------
+- Added conversion between types con XDataset.Get* functions
+
 V0.0.4 - 2019-01-06
 -----------------------
 - XDataset.Get* functions added to comply with any type of data of a dataset for templates, config, database record etc.
