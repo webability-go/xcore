@@ -27,7 +27,8 @@ Version Changes Control
 
 V0.0.6 - 2019-
 -----------------------
-- Added xcache.GetId()
+- Added xcache.GetId(), xcache.GetMax() and xcache.GetExpire()
+- XCache Documentation modified
 
 V0.0.5 - 2019-02-05
 -----------------------
@@ -144,6 +145,21 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache
   Returns the *XCache created.
 
 
+func (c *XCache)GetId() string
+------------------------
+  exposes the ID of the cache
+
+
+func (c *XCache)GetMax() int
+------------------------
+  exposes the max quantity of items of the cache
+
+  
+func (c *XCache)GetExpire() time.Duration
+------------------------
+  exposes the expiration time of the cache
+
+  
 func (c *XCache)SetValidator(f func(string, time.Time) bool)
 ------------------------
   Sets the validator function to check every entry in the cache against its original source, for each Get and Verify calls.

@@ -65,12 +65,30 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
 /*
   GetId:
   ---------
-  expose the ID of the cache
+  exposes the ID of the cache
 */
 func (c *XCache)GetId() string {
   return c.id
 }
 
+
+/*
+  GetMax:
+  ---------
+  exposes the max quantity of items of the cache
+*/
+func (c *XCache)GetMax() int {
+  return c.maxitems
+}
+
+/*
+  GetExpire:
+  ---------
+  exposes the expiration time of the cache
+*/
+func (c *XCache)GetExpire() time.Duration {
+  return c.expire
+}
 
 /*
   SetValidator:
