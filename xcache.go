@@ -63,6 +63,16 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
 }
 
 /*
+  GetId:
+  ---------
+  expose the ID of the cache
+*/
+func (c *XCache)GetId() string {
+  return c.id
+}
+
+
+/*
   SetValidator:
   -------------
   Sets the validator function to check every entry in the cache against its original source.

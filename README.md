@@ -25,6 +25,10 @@ TO DO:
 Version Changes Control
 =======================
 
+V0.0.6 - 2019-
+-----------------------
+- Added xcache.GetId()
+
 V0.0.5 - 2019-02-05
 -----------------------
 - Added conversion between types con XDataset.Get* functions
