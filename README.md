@@ -25,7 +25,14 @@ TO DO:
 Version Changes Control
 =======================
 
-V0.0.6 - 2019-
+V0.0.7 - 2019-
+-----------------------
+- Manual for XCache finished
+- Manual for XDataset finished
+- Preformat for XLanguage manual
+- Preformat for XTemplate manual
+
+V0.0.6 - 2019-02-07
 -----------------------
 - Added xcache.GetId(), xcache.GetMax() and xcache.GetExpire()
 - XCache Documentation modified
@@ -68,7 +75,7 @@ V0.0.1 - 2018-11-14
 Manual:
 =======================
 
-XCache
+I. XCache
 =======================
 XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
 The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistant (if you exit the application)
@@ -81,24 +88,30 @@ However, you can control a timeout of each cache piece, and eventually the compa
 Declare a new XCache with NewXCache()
 
 Then you can use the 3 basic functions to control the content of the cache: Get/Set/Del.
+You can put any kind of data into your XCache.
+The XCache is thread safe.
+
+The cache can be limited in quantity of entries and timeout for data. The cache is automanaged (for invalid expired data) and can be cleaned partially or totally manually.
 
 If you want some stats of the cache, use the Count function.
 
 Example:
 
 ```
-import "github.com/webability-go/xcache"
+import "github.com/webability-go/xcore"
 
-var myfiles := xfile.NewXCache("myfiles", 0, 0)
+var myfiles = xcore.NewXCache("myfiles", 0, 0)
 
 func usemycache() {
-  myfiles.Set(", "somedata")
-  myfiles.Set("/home/sites/file2.txt", "somedata")
+  myfiles.Set("https://developers.webability.info:82/", "somedata")
+  myfiles.Set("/home/sites/file2.txt", "someotherdata")
 
   go somefunc()
+  
+  fmt.Println("Quantity of data into cache:", myfiles.count())
 }
 
-func somefun() {
+func somefunc() {
   data, invalid := myfiles.Get("https://developers.webability.info:82/");
   
 }
@@ -125,8 +138,8 @@ XCacheEntry:
 XCache:
 ------------------------
   The XCache has an id (informative).
-  - The user can creates a cache with a maximum number of elements if need. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
-  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get. (this does not use CPU or extra locks.
+  - The user can creates a cache with a maximum number of elements if needed. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
+  - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existance" on Get (this does not use CPU or extra locks).
   - The Validator is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
   - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
   - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
@@ -197,7 +210,7 @@ func (c *XCache)Clean(perc int) int
   deletes expired entries, and free perc% of max items based on time.
   perc = 0 to 100 (percentage to clean).
   Returns quantity of removed entries.
-  It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
+  It Will **not** verify the cache against its source (if Validator is set). If you want to scan that, use the Verify function.
 
 
 func (c *XCache)Verify() int
@@ -212,7 +225,7 @@ func (c *XCache)Flush()
 
   
   
-XDataSet
+II. XDataSet
 =======================
 
 1. Overview
@@ -240,99 +253,185 @@ You can store into it generic supported data, as well as any complex interface s
 - XDataSetCollectionDef (anything extended with this interface)
 - Anything else ( interface{} )
 
+The generic supported data comes with a set of functions to get/set those data directly into the XDataset.
+
 Example:
 
 
+```
+import "github.com/webability-go/xcore"
+
+data := xcore.XDataset{}
+data["data1"] = "DATA1"
+data["data2"] = "DATA1"
+sm := xcore.XDataset{}
+sm["data31"] = "DATA31"
+data["data3"] = sm
+data["data4"] = 123
+data["data5"] = 123.432
+data["data6"] = true
+data["data7"] = func() string { return "ABC" }
+
+d8_r1 := &xcore.XDataset{}
+d8_r1.Set("data81", "rec 1: Entry 8-1")
+d8_r1.Set("data82", "rec 1: Entry 8-2")
+
+d8_r2 := &xcore.XDataset{}
+d8_r2.Set("data81", "rec 2: Entry 8-1")
+d8_r2.Set("data82", "rec 2: Entry 8-2")
+d8_r2.Set("data83", "rec 2: Entry 8-3")
+
+d8_r3 := &xcore.XDataset{}
+d8_r3.Set("data81", "rec 3: Entry 8-1")
+d8_r3.Set("data82", "rec 3: Entry 8-2")
+
+d := xcore.XDatasetCollection{}
+d.Push(d8_r1)
+d.Push(d8_r2)
+d.Push(d8_r3)
+
+data["data8"] = &d
+data["data9"] = "I exist"
+```
 
 2. Reference
 ------------------------
 
-type XDatasetDef interface {
-  // Stringify will dump the content into a human readable string
-  Stringify() string
+The XDatasetDef Interface:
+---------------------
+The interface is used to derivate any type of data as a Data Set. Any other components that needs an XDataSetDef to inject data (for instance a template or a database cursor) does not need explicitly an XDataSet but anything derived this this interface (for instance an XRecord from xdominion can be used to inject something into and XTemplate)
 
-  // Set will associate the data to the key. If it already exists, it will be replaced
-  Set(key string, data interface{})
+The XDatasetDef interface needs those function declared:
 
-  // Get will return the value associated to the key if it exists, or bool = false
-  Get(key string) (interface{}, bool)
-  // Same as Get but will return the value associated to the key as a XDatasetDef if it exists, or bool = false
-  GetDataset(key string) (XDatasetDef, bool)
-  // Same as Get but will return the value associated to the key as a XDatasetCollectionDef if it exists, or bool = false
-  GetCollection(key string) (XDatasetCollectionDef, bool)
+func (d *XDatasetDef)Stringify() string
+------------------------
+  Stringify will dump the content into a human readable string
 
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetString(key string) (string, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetBool(key string) (bool, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetInt(key string) (int, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetFloat(key string) (float64, bool)
-  // Same as Get but will return the value associated to the key as a XDatasetCollectionDef if it exists, or bool = false
-  GetStringCollection(key string) ([]string, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetBoolCollection(key string) ([]bool, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetIntCollection(key string) ([]int, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  GetFloatCollection(key string) ([]float64, bool)
+func (d *XDatasetDef)Set(key string, data interface{})
+------------------------
+  Set will associate the data to the key. If it already exists, it will be replaced
+
+func (d *XDatasetDef)Get(key string) (interface{}, bool)
+------------------------
+  Get will return the value associated to the key if it exists, or bool = false
+
+func (d *XDatasetDef)GetDataset(key string) (XDatasetDef, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a XDatasetDef if it exists, or bool = false
+
+func (d *XDatasetDef)GetCollection(key string) (XDatasetCollectionDef, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a XDatasetCollectionDef if it exists, or bool = false
+
+func (d *XDatasetDef)GetString(key string) (string, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a string if it exists, or bool = false
   
-  // Del will delete the data associated to the key and deletes the key entry
-  Del(key string)
-}
+func (d *XDatasetDef)GetBool(key string) (bool, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a Bool if it exists, or bool = false
+  
+func (d *XDatasetDef)GetInt(key string) (int, bool)
+------------------------
+  Same as Get but will return the value associated to the key as an Int if it exists, or bool = false
+  
+func (d *XDatasetDef)GetFloat(key string) (float64, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a float64 if it exists, or bool = false
+  
+func (d *XDatasetDef)GetStringCollection(key string) ([]string, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a []string if it exists, or bool = false
+  
+func (d *XDatasetDef)GetBoolCollection(key string) ([]bool, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a []Bool if it exists, or bool = false
+  
+func (d *XDatasetDef)GetIntCollection(key string) ([]int, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a []int if it exists, or bool = false
+  
+func (d *XDatasetDef)GetFloatCollection(key string) ([]float64, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a []float64 if it exists, or bool = false
+  
+func (d *XDatasetDef)Del(key string)
+------------------------
+  Del will delete the data associated to the key and deletes the key entry
 
-/* Basic dataset */
-type XDataset map[string]interface{}
 
 
-type XDatasetCollectionDef interface {
-  // Stringify will dump the content into a human readable string
-  Stringify() string
+The basic XDataset type is a simple map[string]interface{}
+However, you can build any complex structure that derivates the interface and implements all the required functions to stay compatible with the XDatasetDef.
 
-  // Will add a datasetdef to the beginning of the collection
-  Unshift(data XDatasetDef)
-  // Will remove the first datasetdef of the collection and return it
-  Shift() XDatasetDef
 
-  // Will add a datasetdef to the end of the collection
-  Push(data XDatasetDef)
-  // Will remove the last datasetdef of the collection and return it
-  Pop() XDatasetDef
+The XDatasetCollectionDef Interface:
+---------------------
+The interface is used to derivate any type of data as a Data Set Collection. This is a slice of any XDatasetDef compatible data
 
-  // Will count the quantity of entries
-  Count() int
+The XDatasetCollectionDef interface needs those function declared:
 
-  // Will get the entry by the index and let it in the collection
-  Get(index int) (XDatasetDef, bool)
+func (d *XDatasetCollectionDef)Stringify() string
+---------------------
+  Stringify will dump the content into a human readable string
 
-  // Will search for the data associated to the key by priority (last entry is the most important)
-  // returns bool = false if nothing has been found
-  GetData(key string) (interface{}, bool)
+func (d *XDatasetCollectionDef)Unshift(data XDatasetDef)
+---------------------
+  Will add a datasetdef to the beginning of the collection
 
-  // Same as GetData but will convert the result to a string if possible
-  // returns bool = false if nothing has been found
-  GetDataString(key string) (string, bool)
-  // Same as GetData but will convert the result to an int if possible
-  // returns bool = false if nothing has been found
-  GetDataInt(key string) (int, bool)
-  // Same as GetData but will convert the result to a boolean if possible
-  // returns second bool = false if nothing has been found
-  GetDataBool(key string) (bool, bool)
-  // Same as GetData but will convert the result to a float if possible
-  // returns bool = false if nothing has been found
-  GetDataFloat(key string) (float64, bool)
-  // Same as GetData but will convert the result to a collection of data if possible
-  // returns bool = false if nothing has been found
-  GetCollection(key string) (XDatasetCollectionDef, bool)
-}
+func (d *XDatasetCollectionDef)Shift() XDatasetDef
+---------------------
+  Will remove the first datasetdef of the collection and return it
 
-// =====================
-// XDatasetConnection
-// =====================
+func (d *XDatasetCollectionDef)Push(data XDatasetDef)
+---------------------
+  Will add a datasetdef to the end of the collection
 
-type XDatasetCollection []XDatasetDef
+func (d *XDatasetCollectionDef)Pop() XDatasetDef
+---------------------
+  Will remove the last datasetdef of the collection and return it
 
+func (d *XDatasetCollectionDef)Count() int
+---------------------
+  Will count the quantity of entries
+
+func (d *XDatasetCollectionDef)Get(index int) (XDatasetDef, bool)
+---------------------
+  Will get the entry by the index and let it in the collection
+
+func (d *XDatasetCollectionDef)GetData(key string) (interface{}, bool)
+---------------------
+  Will search for the data associated to the key by priority (last entry is the most important)
+  returns bool = false if nothing has been found
+
+func (d *XDatasetCollectionDef)GetDataString(key string) (string, bool)
+---------------------
+  Same as GetData but will convert the result to a string if possible
+  returns bool = false if nothing has been found
+
+func (d *XDatasetCollectionDef)GetDataInt(key string) (int, bool)
+---------------------
+  Same as GetData but will convert the result to an int if possible
+  returns bool = false if nothing has been found
+
+func (d *XDatasetCollectionDef)GetDataBool(key string) (bool, bool)
+---------------------
+  Same as GetData but will convert the result to a boolean if possible
+  returns second bool = false if nothing has been found
+
+func (d *XDatasetCollectionDef)GetDataFloat(key string) (float64, bool)
+---------------------
+  Same as GetData but will convert the result to a float if possible
+  returns bool = false if nothing has been found
+
+func (d *XDatasetCollectionDef)GetCollection(key string) (XDatasetCollectionDef, bool)
+---------------------
+  Same as GetData but will convert the result to a collection of data if possible
+  returns bool = false if nothing has been found
+
+
+The basic XDataset type is a simple []DatasetDef
+However, you can build any complex structure that derivates the interface and implements all the required functions to stay compatible with the XDatasetCollectionDef.
 
 
 
@@ -345,11 +444,15 @@ XLanguage
 The XLanguage table of text entries can be loaded from XML file, XML string or normal file or string.
 
 The XML Format is:
+
+```
 <?xml version="1.0" encoding="UTF-8"?>
 <language id="NAMEOFLANGUAGE" lang="LG">
   <entry id="ENTRYNAME">ENTRYVALUE</entry>
   <entry id="ENTRYNAME">ENTRYVALUE</entry>
 </language>
+```
+
 where NAMEOFLANGUAGE is the name of your table entry, for example "homepate", "user_report", etc
       LG is the ISO-3369 2 letters language ID, for example "es" for spanish, "en" for english
       ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
@@ -427,7 +530,7 @@ In sight to create and use templates, you have all those possible options to use
 
 Exammples:
 
-[1]
+```
 * Load the template file:
 <pre>
 $buffer = file_get_contents('path/to/your/file.template');
@@ -451,13 +554,13 @@ print $template->resolve();
 ~~//~~ similar to
 print $template;
 </pre>
-[_]
+```
 
 If you want to use caches and compiled files for much faster access (for instance if you use it in a CMS or so), it is better to use TemplateSource since it resolve all the caches workflow, up to stock the template in shared memory.
 
 How to use it:
 
-[1]
+```
 * Create the template source:
 <pre>
 $SHM = new \core\WASHM(); ~~//~~ Do no forget to use a unique ID for your application
@@ -489,7 +592,7 @@ print $template->resolve();
 ~~//~~ Similar to
 print $template;
 </pre>
-[_]
+```
 
 As a reference, using the simple \core\WATemplate object will take approx 12 milisecond to load/compile/resolve the template.
 Using the shared memory cache will take only 2 milliseconds to get the template and resolve it (on a 2GHz Xeon processor).
@@ -503,6 +606,7 @@ Talking about a good CMS or an application with many templates, using the \datas
 2. Meta Language Reference
 ------------------------
 
+```
 Comments:
    %-- comments --%
 Fields:
@@ -524,7 +628,9 @@ Meta elements:
    @@xx@@   loops
    &&xx&&   references
    !!xx!!   debug (dump)
-   
+```
+
+
 ++ Comments
 
 You may use comments into your template.
@@ -534,7 +640,8 @@ Comments are defined by ~~%--~~ and ~~--%~~
 
 Example:
 
-[1]<pre>
+```
+<pre>
 
 ~~%--~~ This is a comment. It will not appear in the final code. ~~--%~~
 
@@ -545,7 +652,8 @@ Anything here
 ~~[[]]~~
 ~~--%~~
 
-</pre>[_]
+</pre>
+```
 
 
 ++ Nested Templates
@@ -553,28 +661,32 @@ Anything here
 You can define new nested templates into your main template
 A nested template is defined by:
 
-[1]<pre>
+```
+<pre>
 ~~[[templateid]]~~
 your nested template
 ~~[[]]~~
-</pre>[_]
+</pre>
+```
 
 The id is any combination of letters (a-z, A-Z, accents are welcome too), numbers (0-9), and 3 special chars: .-_
 
 The old syntax also work and is deprecated. It will be definitively removed as of beginning of 2013.
 
-[1]<pre>
+```
+<pre>
 %%SUBTEMPLATE(templateid)%%
 your nested template
 %%ENDSUBTEMPLATE%%
-</pre>[_]
+</pre>
+```
 
 There is no limits into nesting templates.
 Any nested template will inheritate all the father elements and can use father elements too.
 
 Example:
 
-[1]
+```
 <pre>&&header&&
 Welcome to my page
 &&footer&&
@@ -593,16 +705,18 @@ Welcome to my page
 
 ~~[[]]~~
 </pre>
-[_]
+```
 
 You may use more than one id into the same template to avoid repetition of the same code.
 The different id's are separated with a pipe |
 
-[1]<pre>
+```
+<pre>
 ~~[[templateid|anotherid|something.key|andmoreid]]~~
 your nested template
 ~~[[]]~~
-</pre>[_]
+</pre>
+```
 
 
 
@@ -631,7 +745,8 @@ They usually carry pieces of HTML code, for example a color, a size, a tag.
 
 Example:
 
-[1]<pre>
+```
+<pre>
 &lt;div style="background-color: ~~__BGCOLOR__~~;">
 Welcome to my page.<br />
 You may use the same parameter as many time you wish.&lt;br />
@@ -640,7 +755,8 @@ You may use the same parameter as many time you wish.&lt;br />
 &lt;span onclick="alert('hello again, world');" class="~~__BUTTONCLASS__~~">Click me again!&lt;/span>
 
 &lt;/div>
-</pre>[_]
+</pre>
+```
 
 
 +++ Languages entries
@@ -653,7 +769,8 @@ The languages entries generally carry titles, menu options, tables headers etc.
 
 Example:
 
-[1]<pre>
+```
+<pre>
 &lt;div style="background-color: blue;">
 ##welcome##&lt;br />
 You may use the same parameter as many time you wish.&lt;br />
@@ -662,7 +779,8 @@ You may use the same parameter as many time you wish.&lt;br />
 &lt;span onclick="alert('##helloagain##');" class="button">##clickme## ##again##!&lt;/span>
 
 &lt;/div>
-</pre>[_]
+</pre>
+```
 
 
 +++ Field values
@@ -673,7 +791,8 @@ Is it highly recomended to use this syntax for any data field you need to replac
 
 Example:
 
-[1]<pre>
+```
+<pre>
 &lt;div style="background-color: blue;">
 Welcome to my site&lt;br />
 You may use the same parameter as many time you wish.&lt;br />
@@ -684,7 +803,8 @@ or {fdegres} farenheit&lt;br />
 Is {degres} degres too cold ? Buy a pullover!&lt;br />
 
 &lt;/div>
-</pre>[_]
+</pre>
+```
 
 
 ++ MetaElements
@@ -699,7 +819,7 @@ You can inject nearly anything into a template metaelements.
 
 Example of a data array to inject:
 
-[1]
+```
 <pre>$array = array(
   'detail' => array(
      'key1' => array('name' => 'Juan', 'status' => 1),
@@ -714,7 +834,7 @@ Example of a data array to inject:
   'param4' => '100%',
 );
 </pre>
-[_]
+```
 
 - The **data array** can be any traversable, iterable, countable object too, as of version 1.01.11 and superior.
 
@@ -736,7 +856,7 @@ When you use an id to point a value, the template will first search into the ava
 If no id is found, the it will search into the upper levers if any
 
 Example:
-[1]
+```
 <pre>$array = array(
   'detail' => array(
     'data1' => array(
@@ -756,7 +876,7 @@ At the level of 'key2', using ~~{{appname}}~~ will get back 'DomCore'
 At the level of 'data1', using ~~{{appname}}~~ will get back an empty string
 
 
-[_]
+```
  
 
 +++ Path access: id>id>id>id
@@ -765,7 +885,7 @@ At any level into the data array, you can access any entry into the subset array
 
 For instance, if you have the following data array:
 
-[1]
+```
 <pre>$array = array(
   'detail' => array(
     'data1' => array(
@@ -777,7 +897,7 @@ For instance, if you have the following data array:
   )
 );
 </pre>
-[_]
+```
 
 Let's suppose we are into a nested metaelements at the 'data1' level. You may want to access directly the 'Juan' entry.
 The path will be:
@@ -828,7 +948,7 @@ The <var2>id</var2> can be a direct name, or a path to access a data into the **
 
 Example:
 
-[2]
+```
 **Our vector of values:**
 <pre>$array = array(
   '<var2>image</var2>' => array('<var5>src</var5>' => '/pics/logo.gif', '<var6>title</var6>' => 'Title of my image')
@@ -855,7 +975,7 @@ using ~~{{src}}~~ and ~~{{title}}~~ out of the body template is useless, since t
   &lt;hr />Data footer
 ~~[[]]~~
 </pre>
-[_]
+```
 
 
 +++ Loops: @@<var1>entry</var1>@@ @@<var1>entry</var1>:<var2>template</var2>@@ and @@<var1>entry</var1>:<var2>template</var2>:<var3>check</var3>@@
@@ -881,7 +1001,7 @@ The <var1>entry</var1> and <var3>check</var3> can be a direct name, or a path to
 
 Example:
 
-[2]
+```
 **Our vector of values:**
 <pre>$array = array(
   'detail' => array(
@@ -936,7 +1056,7 @@ There is nobody in the list&lt;br />
   ~~[[status]]Ok[[]]~~
 ~~[[]]~~
 </pre>
-[_]
+```
 
 
 +++ Conditional: ??<var1>entry</var1>?? ??<var1>entry</var1>:<var2>templateid</var2>?? and ??<var1>entry</var1>:<var2>templateid</var2>:<var3>check</var3>??
@@ -959,7 +1079,7 @@ The <var1>entry</var1> and <var3>check</var3> can be a direct name, or a path to
 
 Example:
 
-[2]
+```
 **Our vector of values:**
 <pre>$array = array(
   'image1' => null,
@@ -984,7 +1104,7 @@ Image with status=1:<br />
 ~~&lt;img src="{{src}}" alt="{{title}}" title="{{title}}" />&lt;br />~~
 ~~[[]]~~
 
-[_]
+```
 
 
 +++ Debug tools

@@ -212,7 +212,7 @@ func (c *XCache)Count() int {
   deletes expired entries, and free perc% of max items based on time.
   perc = 0 to 100 (percentage to clean).
   Returns quantity of removed entries.
-  It Will **not** verify the cache against its source (if isfile is set to true). If you want to scan that, use the Verify function.
+  It Will **not** verify the cache against its source (if Validator is set). If you want to scan that, use the Verify function.
 */
 func (c *XCache)Clean(perc int) int {
   if (LOG) { log.Println("Cleaning cache") }
