@@ -123,7 +123,7 @@ func somefunc() {
 
 To use the package: 
 
-import "github.com/webability-go/xcache"
+import "github.com/webability-go/xcore"
 
 List of types:
 
@@ -296,6 +296,10 @@ data["data9"] = "I exist"
 
 2. Reference
 ------------------------
+
+To use the package: 
+
+import "github.com/webability-go/xcore"
 
 The XDatasetDef Interface:
 ---------------------
@@ -487,6 +491,9 @@ Then you can use the set of basic access functions:
 2. Reference
 ------------------------
 
+To use the package: 
+
+import "github.com/webability-go/xcore"
 
 
 
@@ -1122,6 +1129,10 @@ Shows only the variables names of the elements and metaelements, values are not 
 
 3. Functions Reference
 ------------------------
+
+To use the package: 
+
+import "github.com/webability-go/xcore"
 
 type XTemplateParam struct {
   paramtype int
