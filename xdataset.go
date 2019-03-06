@@ -2,6 +2,7 @@ package xcore
 
 import (
   "fmt"
+  "time"
 )
 
 /* 
@@ -25,20 +26,24 @@ type XDatasetDef interface {
 
   // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
   GetString(key string) (string, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as a bool if it exists, or bool = false
   GetBool(key string) (bool, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as an int if it exists, or bool = false
   GetInt(key string) (int, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as a float64 if it exists, or bool = false
   GetFloat(key string) (float64, bool)
-  // Same as Get but will return the value associated to the key as a XDatasetCollectionDef if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as a Time if it exists, or bool = false
+  GetTime(key string) (time.Time, bool)
+  // Same as Get but will return the value associated to the key as a []String if it exists, or bool = false
   GetStringCollection(key string) ([]string, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as a []bool if it exists, or bool = false
   GetBoolCollection(key string) ([]bool, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as a []int if it exists, or bool = false
   GetIntCollection(key string) ([]int, bool)
-  // Same as Get but will return the value associated to the key as a string if it exists, or bool = false
+  // Same as Get but will return the value associated to the key as a []float64 if it exists, or bool = false
   GetFloatCollection(key string) ([]float64, bool)
+  // Same as Get but will return the value associated to the key as a []Time if it exists, or bool = false
+  GetTimeCollection(key string) ([]time.Time, bool)
   
   // Del will delete the data associated to the key and deletes the key entry
   Del(key string)
@@ -131,6 +136,15 @@ func (d *XDataset)GetFloat(key string) (float64, bool) {
   return 0, false
 }
 
+func (d *XDataset)GetTime(key string) (time.Time, bool) {
+  if val, ok := (*d)[key]; ok {
+    switch val.(type) {
+      case time.Time: return val.(time.Time), true
+    }
+  }
+  return time.Time{}, false
+}
+
 func (d *XDataset)GetStringCollection(key string) ([]string, bool) {
   if val, ok := (*d)[key]; ok {
     switch val.(type) {
@@ -162,6 +176,15 @@ func (d *XDataset)GetFloatCollection(key string) ([]float64, bool) {
   if val, ok := (*d)[key]; ok {
     switch val.(type) {
       case []float64: return val.([]float64), true
+    }
+  }
+  return nil, false
+}
+
+func (d *XDataset)GetTimeCollection(key string) ([]time.Time, bool) {
+  if val, ok := (*d)[key]; ok {
+    switch val.(type) {
+      case []time.Time: return val.([]time.Time), true
     }
   }
   return nil, false
@@ -209,7 +232,10 @@ type XDatasetCollectionDef interface {
   // Same as GetData but will convert the result to a float if possible
   // returns bool = false if nothing has been found
   GetDataFloat(key string) (float64, bool)
-  // Same as GetData but will convert the result to a collection of data if possible
+  // Same as GetData but will convert the result to a Time if possible
+  // returns bool = false if nothing has been found
+  GetDataTime(key string) (time.Time, bool)
+  // Same as GetData but will convert the result to a XDatasetCollectionDef of data if possible
   // returns bool = false if nothing has been found
   GetCollection(key string) (XDatasetCollectionDef, bool)
 }
@@ -292,6 +318,15 @@ func (d *XDatasetCollection)GetDataFloat(key string) (float64, bool) {
     }
   }
   return 0, false
+}
+
+func (d *XDatasetCollection)GetDataTime(key string) (time.Time, bool) {
+  if val, ok := d.GetData(key); ok {
+    switch val.(type) {
+      case time.Time: return val.(time.Time), true
+    }
+  }
+  return time.Time{}, false
 }
 
 func (d *XDatasetCollection)GetCollection(key string) (XDatasetCollectionDef, bool) {

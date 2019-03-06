@@ -50,7 +50,7 @@ Then you can use the set of basic access functions:
 
 */
 
-// OFicial XLanguage structure for the user
+// Oficial XLanguage structure for the user
 type XLanguage struct {
   Name string
   Language string

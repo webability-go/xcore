@@ -13,20 +13,23 @@ For GO, the actual existing code includes:
 TO DO:
 ======
 - XLanguage comments in code and manual
+- XTemplate comments in code and manual
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
 - Implements 2 parameters for &&, 3 parameters for @@ and ??
 - Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
 
-- XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers)
-- XCache: activate persistant cache too (shared memory) ?????
+- Some improvements to check, later:
+- XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers) (bad point: huge overhead of memory for every threads stack)
+- XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
 
 Version Changes Control
 =======================
 
-V0.0.7 - 2019-
+V0.0.7 - 2019-03-06
 -----------------------
+- Time functions added to XDatasetDef and XDatasetCollectionDef interfaces, and XDataset and XDatasetCollection structures
 - Manual for XCache finished
 - Manual for XDataset finished
 - Preformat for XLanguage manual
@@ -343,6 +346,10 @@ func (d *XDatasetDef)GetFloat(key string) (float64, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a float64 if it exists, or bool = false
   
+func (d *XDatasetDef)GetTime(key string) (time.Time, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a time.Time if it exists, or bool = false
+  
 func (d *XDatasetDef)GetStringCollection(key string) ([]string, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []string if it exists, or bool = false
@@ -358,6 +365,10 @@ func (d *XDatasetDef)GetIntCollection(key string) ([]int, bool)
 func (d *XDatasetDef)GetFloatCollection(key string) ([]float64, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []float64 if it exists, or bool = false
+  
+func (d *XDatasetDef)GetTimeCollection(key string) ([]time.Time, bool)
+------------------------
+  Same as Get but will return the value associated to the key as a []time.Time if it exists, or bool = false
   
 func (d *XDatasetDef)Del(key string)
 ------------------------
@@ -428,6 +439,11 @@ func (d *XDatasetCollectionDef)GetDataFloat(key string) (float64, bool)
   Same as GetData but will convert the result to a float if possible
   returns bool = false if nothing has been found
 
+func (d *XDatasetCollectionDef)GetDataTime(key string) (time.Time, bool)
+---------------------
+  Same as GetData but will convert the result to a time.Time if possible
+  returns bool = false if nothing has been found
+
 func (d *XDatasetCollectionDef)GetCollection(key string) (XDatasetCollectionDef, bool)
 ---------------------
   Same as GetData but will convert the result to a collection of data if possible
@@ -457,21 +473,26 @@ The XML Format is:
 </language>
 ```
 
-where NAMEOFLANGUAGE is the name of your table entry, for example "homepate", "user_report", etc
-      LG is the ISO-3369 2 letters language ID, for example "es" for spanish, "en" for english
-      ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
-      ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
+where:
+- NAMEOFLANGUAGE is the name of your table entry, for example "homepage", "user_report", etc
+- LG is the ISO-3369 2 letters language ID, for example "es" for spanish, "en" for english
+- ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
+- ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
 
 The Flat Text format is:
+
+```
 ENTRYNAME=ENTRYVALUE
 ENTRYNAME=ENTRYVALUE
-where ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
-      ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
+```
+
+where:
+- ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
+- ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
 
 There is no name of table or language in this format (you "know" what you are loading)
 
-The advantage to use XML forma is to have more control over your language, and eventyally add attributes into your entry, 
-for instance translated="yes/no", verified="yes/no", and any other data that your system could insert
+The advantage to use XML forma is to have more control over your language, and eventyally add attributes into your entry, for instance translated="yes/no", verified="yes/no", and any other data that your system could insert
 
 Create a new XLanguage empty structure:
 
@@ -488,14 +509,78 @@ Then you can use the set of basic access functions:
 
 - Set/Get/Del/SetName/SetLanguage/GetName/GetLanguage
 
+Example:
+
+```
+lang, err := xcore.NewXLanguageFromXMLString(`
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="language-demo" lang="en">
+  <entry id="entry1">Welcome to</entry>
+  <entry id="entry2">XCore</entry>
+</language>
+`)
+
+tr1 = lang.Get("entry1")
+tr2 = lang.Get("entry2")
+
+fmt.Println(tr1, tr2)
+```
+
+
 2. Reference
 ------------------------
 
-To use the package: 
+To use the package:
 
 import "github.com/webability-go/xcore"
 
+List of types:
 
+XLanguage:
+------------------------
+  The language entry has a name and a language as main parameters.
+  The Entries map structure contains all the different language entries  key=value
+
+
+func NewXLanguage(name string, lang string) *XLanguage {
+   Creates an empty Language structure with a name and a language
+
+func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
+   Creates an XLanguage structure with the data from the XML file
+   Returns nil if there is an error
+
+func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
+
+func NewXLanguageFromFile(file string) (*XLanguage, error) {
+
+func NewXLanguageFromString(data string) (*XLanguage, error) {
+
+/* LoadXMLFile:
+   Loads a language from an XML file and replace the content of the XLanguage structure with the new data
+*/
+func (l *XLanguage)LoadXMLFile(file string) error {
+
+func (l *XLanguage)LoadXMLString(data string) error {
+
+func (l *XLanguage)LoadFile(file string) error {
+
+func (l *XLanguage)LoadString(data string) error {
+
+func (l *XLanguage)SetName(name string) {
+
+func (l *XLanguage)SetLanguage(lang string) {
+
+func (l *XLanguage)GetName() string {
+
+func (l *XLanguage)GetLanguage() string {
+
+func (l *XLanguage)Set(entry string, value string) {
+
+func (l *XLanguage)Get(entry string) string {
+
+func (l *XLanguage)Del(entry string) {
+
+func (l *XLanguage) Print() string {
 
 
 
