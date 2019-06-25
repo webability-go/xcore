@@ -379,6 +379,9 @@ func (d *XDatasetDef)Del(key string)
 ------------------------
   Del will delete the data associated to the key and deletes the key entry
 
+func (d *XDatasetDef)Clone() XDatasetDef
+------------------------
+  Clone will do a deep clone of the dataset, duplicating any value that is native or with a Clone() function
 
 
 The basic XDataset type is a simple map[string]interface{}
@@ -454,8 +457,14 @@ func (d *XDatasetCollectionDef)GetCollection(key string) (XDatasetCollectionDef,
   Same as GetData but will convert the result to a collection of data if possible
   returns bool = false if nothing has been found
 
+func (d *XDatasetCollectionDef)Clone() XDatasetCollectionDef
+------------------------
+  Clone will do a deep clone of the datasetcollection, duplicating any value that is native or with a Clone() function
 
-The basic XDataset type is a simple []DatasetDef
+
+
+
+The basic XDatasetCollection type is a simple []DatasetDef
 However, you can build any complex structure that derivates the interface and implements all the required functions to stay compatible with the XDatasetCollectionDef.
 
 
