@@ -27,6 +27,11 @@ TO DO:
 Version Changes Control
 =======================
 
+V0.0.8 - 2019-06-25
+-----------------------
+- Added Clone on XDatasetDef and XDataCollectionsetDef
+- XDataset testunit added
+
 V0.0.7 - 2019-03-06
 -----------------------
 - Time functions added to XDatasetDef and XDatasetCollectionDef interfaces, and XDataset and XDatasetCollection structures

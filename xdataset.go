@@ -3,6 +3,7 @@ package xcore
 import (
   "fmt"
   "time"
+//  "reflect"
 )
 
 /* 
@@ -47,6 +48,8 @@ type XDatasetDef interface {
   
   // Del will delete the data associated to the key and deletes the key entry
   Del(key string)
+  // Clone the object
+  Clone() XDatasetDef
 }
 
 // =====================
@@ -194,7 +197,19 @@ func (d *XDataset)Del(key string) {
   delete(*d, key)
 }
 
-
+// Check if we deep-clone the object ?
+func (d *XDataset)Clone() XDatasetDef {
+  cloned := &XDataset{}
+  for id, val := range *d {
+    clonedval := val
+    // If the object is also cloneable, we clone it
+    if cloneable, ok := val.(interface{Clone() XDatasetDef }); ok {
+      clonedval = cloneable.Clone()
+    }
+    cloned.Set(id, clonedval)
+  }
+  return cloned
+}
 
 type XDatasetCollectionDef interface {
   // Stringify will dump the content into a human readable string
@@ -238,6 +253,9 @@ type XDatasetCollectionDef interface {
   // Same as GetData but will convert the result to a XDatasetCollectionDef of data if possible
   // returns bool = false if nothing has been found
   GetCollection(key string) (XDatasetCollectionDef, bool)
+  
+  // Clone the object
+  Clone() XDatasetCollectionDef
 }
 
 // =====================
@@ -334,5 +352,13 @@ func (d *XDatasetCollection)GetCollection(key string) (XDatasetCollectionDef, bo
   // Verify v IS actually a XDatasetCollectionDef to avoid the error
   if ok { return v.(XDatasetCollectionDef), true }
   return nil, false
+}
+
+func (d *XDatasetCollection)Clone() XDatasetCollectionDef {
+  cloned := &XDatasetCollection{}
+  for _, val := range *d {
+    *cloned = append(*cloned, val.Clone())
+  }
+  return cloned
 }
 
