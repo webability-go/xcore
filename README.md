@@ -27,6 +27,11 @@ TO DO:
 Version Changes Control
 =======================
 
+V0.0.9 - 2019-06-
+-----------------------
+- Error corrected on XCache: removing an element from a slice when the element is the last one was causing out of bound index.
+- XCache.maxitem = 0 (no number of elements limit) is corrected: it was not working 
+
 V0.0.8 - 2019-06-25
 -----------------------
 - Added Clone on XDatasetDef and XDataCollectionsetDef

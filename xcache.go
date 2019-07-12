@@ -47,8 +47,8 @@ type XCache struct {
   Creates a new XCache structure.
   The XCache is resident in memory, supports multithreading and concurrency.
   "id" is the unique id of the XCache.
-  maxitems is the max authorized quantity of objects into the XCache.
-  expire is a max duration of the objects into the cache.
+  maxitems is the max authorized quantity of objects into the XCache. If 0, no limit
+  expire is a max duration of the objects into the cache. If 0, no limit
   Returns the *XCache created.
 */
 func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
@@ -118,7 +118,7 @@ func (c *XCache)Set(key string, indata interface{}) {
   }
   c.pile = append(c.pile, key)
   c.mutex.Unlock()
-  if len(c.items) >= c.maxitems {
+  if c.maxitems > 0 && len(c.items) >= c.maxitems {
     // We need a cleaning
     c.Clean(10)
   }
@@ -133,7 +133,11 @@ func (c *XCache)removeFromPile(key string) {
   // removes the key and append it to the end
   for i, x := range c.pile {
     if x == key {
-      c.pile = append(c.pile[:i], c.pile[i+1:]...)
+      if i == len(c.pile)-1 {
+        c.pile = c.pile[:i]
+      } else {
+        c.pile = append(c.pile[:i], c.pile[i+1:]...)
+      }
       break
     }
   }
