@@ -131,9 +131,8 @@ func (d *XDataset) GetInt(key string) (int, bool) {
 		case bool:
 			if val.(bool) {
 				return 1, true
-			} else {
-				return 0, true
 			}
+			return 0, true
 		}
 	}
 	return 0, false
@@ -150,9 +149,8 @@ func (d *XDataset) GetFloat(key string) (float64, bool) {
 		case bool:
 			if val.(bool) {
 				return 1.0, true
-			} else {
-				return 0.0, true
 			}
+			return 0.0, true
 		}
 	}
 	return 0, false
@@ -224,7 +222,7 @@ func (d *XDataset) GetTimeCollection(key string) ([]time.Time, bool) {
 	return nil, false
 }
 
-// Del will deletes the variable 
+// Del will deletes the variable
 func (d *XDataset) Del(key string) {
 	delete(*d, key)
 }
