@@ -33,7 +33,7 @@ type XCache struct {
 	pile      []string
 }
 
-// NewCache will create a new XCache structure.
+// NewXCache will create a new XCache structure.
 // The XCache is resident in memory, supports multithreading and concurrency.
 // "id" is the unique id of the XCache.
 // maxitems is the max authorized quantity of objects into the XCache. If 0, no limit
