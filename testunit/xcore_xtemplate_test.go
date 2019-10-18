@@ -149,23 +149,23 @@ Some data:
   data["data6"] = true
   data["data7"] = func() string { return "ABC" }
   
-  d8_r1 := &xcore.XDataset{}
-  d8_r1.Set("data81", "rec 1: Entry 8-1")
-  d8_r1.Set("data82", "rec 1: Entry 8-2")
+  d8r1 := &xcore.XDataset{}
+  d8r1.Set("data81", "rec 1: Entry 8-1")
+  d8r1.Set("data82", "rec 1: Entry 8-2")
 
-  d8_r2 := &xcore.XDataset{}
-  d8_r2.Set("data81", "rec 2: Entry 8-1")
-  d8_r2.Set("data82", "rec 2: Entry 8-2")
-  d8_r2.Set("data83", "rec 2: Entry 8-3")
+  d8r2 := &xcore.XDataset{}
+  d8r2.Set("data81", "rec 2: Entry 8-1")
+  d8r2.Set("data82", "rec 2: Entry 8-2")
+  d8r2.Set("data83", "rec 2: Entry 8-3")
 
-  d8_r3 := &xcore.XDataset{}
-  d8_r3.Set("data81", "rec 3: Entry 8-1")
-  d8_r3.Set("data82", "rec 3: Entry 8-2")
+  d8r3 := &xcore.XDataset{}
+  d8r3.Set("data81", "rec 3: Entry 8-1")
+  d8r3.Set("data82", "rec 3: Entry 8-2")
   
   d := xcore.XDatasetCollection{}
-  d.Push(d8_r1)
-  d.Push(d8_r2)
-  d.Push(d8_r3)
+  d.Push(d8r1)
+  d.Push(d8r2)
+  d.Push(d8r3)
   
   data["data8"] = &d
   data["data9"] = "I exist"

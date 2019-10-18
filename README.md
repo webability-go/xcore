@@ -1,5 +1,7 @@
 @UTF-8
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
+
 XCore for GO v0
 =============================
 
@@ -26,6 +28,20 @@ TO DO:
 
 Version Changes Control
 =======================
+
+V0.1.0 - 2019-10-18
+-----------------------
+- Code cleaned to pass 100% of goreportcard.com. Card note added in this document
+
+V0.0.9 - 2019-07-18
+-----------------------
+- Error corrected on XCache: removing an element from a slice when the element is the last one was causing out of bound index.
+- XCache.maxitem = 0 (no number of elements limit) is corrected: it was not working 
+
+V0.0.8 - 2019-06-25
+-----------------------
+- Added Clone on XDatasetDef and XDataCollectionsetDef
+- XDataset testunit added
 
 V0.0.7 - 2019-03-06
 -----------------------
@@ -374,6 +390,9 @@ func (d *XDatasetDef)Del(key string)
 ------------------------
   Del will delete the data associated to the key and deletes the key entry
 
+func (d *XDatasetDef)Clone() XDatasetDef
+------------------------
+  Clone will do a deep clone of the dataset, duplicating any value that is native or with a Clone() function
 
 
 The basic XDataset type is a simple map[string]interface{}
@@ -449,8 +468,14 @@ func (d *XDatasetCollectionDef)GetCollection(key string) (XDatasetCollectionDef,
   Same as GetData but will convert the result to a collection of data if possible
   returns bool = false if nothing has been found
 
+func (d *XDatasetCollectionDef)Clone() XDatasetCollectionDef
+------------------------
+  Clone will do a deep clone of the datasetcollection, duplicating any value that is native or with a Clone() function
 
-The basic XDataset type is a simple []DatasetDef
+
+
+
+The basic XDatasetCollection type is a simple []DatasetDef
 However, you can build any complex structure that derivates the interface and implements all the required functions to stay compatible with the XDatasetCollectionDef.
 
 
