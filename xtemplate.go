@@ -36,12 +36,11 @@ Meta elements:
    !!xx!!   debug (dump)
 */
 
-/* MetaString and other consts
-   type of elements present in the template
-*/
+// MetaString and other consts:
+//   type of elements present in the template
 const (
-	MetaString  = 0 // a simple string to integrate into the code
-	MetaComment = 1 // Comment, ignore it
+	MetaString  = 0  // a simple string to integrate into the code
+	MetaComment = 1  // Comment, ignore it
 
 	MetaLanguage  = 2 // one param of the URL parameters list, index-1 based [page]/value1/value2...
 	MetaReference = 3 // an URL variable coming through a query ?variable=value
@@ -56,39 +55,29 @@ const (
 	MetaUnused = -1 // a "not used anymore" param to be freed
 )
 
-/* XTemplateParam
-   One parameter definition into the template
-*/
+// XTemplateParam is a parameter definition into the template
 type XTemplateParam struct {
 	paramtype int
 	data      string
 	children  *XTemplateData
 }
 
-/* XTemplateData
-   Array of all the parameters into the template
-*/
+// XTemplateData is an Array of all the parameters into the template
 type XTemplateData []XTemplateParam
 
-/* XTemplate
-   The pain template structure
-*/
+// XTemplate is the plain template structure
 type XTemplate struct {
 	Name         string
 	Root         *XTemplateData
 	SubTemplates map[string]*XTemplate
 }
 
-/* NewXTemplate
-   Creates a new empty template
-*/
+// NewXTemplate will create a new empty template
 func NewXTemplate() *XTemplate {
 	return &XTemplate{}
 }
 
-/* NewXTemplateFromFile
-   Creates a new template from a file containing the template code
-*/
+// NewXTemplateFromFile will create a new template from a file containing the template code
 func NewXTemplateFromFile(file string) (*XTemplate, error) {
 	t := &XTemplate{}
 	err := t.LoadFile(file)
@@ -98,9 +87,7 @@ func NewXTemplateFromFile(file string) (*XTemplate, error) {
 	return t, nil
 }
 
-/* NewXTemplateFromString
-   Creates a new template from a string containing the template code
-*/
+// NewXTemplateFromString will create a new template from a string containing the template code
 func NewXTemplateFromString(data string) (*XTemplate, error) {
 	t := &XTemplate{}
 	err := t.LoadString(data)
@@ -110,9 +97,7 @@ func NewXTemplateFromString(data string) (*XTemplate, error) {
 	return t, nil
 }
 
-/* LoadFile
-   Load a file into the template
-*/
+// LoadFile will load a file into the template
 func (t *XTemplate) LoadFile(file string) error {
 	tFile, err := os.Open(file)
 	if err != nil {
@@ -129,9 +114,7 @@ func (t *XTemplate) LoadFile(file string) error {
 	return t.LoadString(string(data))
 }
 
-/* LoadString
-   Load a string into the template
-*/
+// LoadString will load a string into the template
 func (t *XTemplate) LoadString(data string) error {
 	return t.compile(data)
 }
