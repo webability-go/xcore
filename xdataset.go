@@ -330,7 +330,7 @@ func (d *XDatasetCollection) Count() int {
 	return len(*d)
 }
 
-// Get will retreive an element by index from the collection
+// Get will retrieve an element by index from the collection
 func (d *XDatasetCollection) Get(index int) (XDatasetDef, bool) {
 	if index < 0 || index >= len(*d) {
 		return nil, false
@@ -338,7 +338,7 @@ func (d *XDatasetCollection) Get(index int) (XDatasetDef, bool) {
 	return (*d)[index], true
 }
 
-// GetData will retrieve the first availabe data identified by key from the collection ordered by index
+// GetData will retrieve the first available data identified by key from the collection ordered by index
 func (d *XDatasetCollection) GetData(key string) (interface{}, bool) {
 	for i := len(*d) - 1; i >= 0; i-- {
 		val, ok := (*d)[i].Get(key)
@@ -349,7 +349,7 @@ func (d *XDatasetCollection) GetData(key string) (interface{}, bool) {
 	return nil, false
 }
 
-// GetDataString will retrieve the first availabe data identified by key from the collection ordered by index and return it as a string
+// GetDataString will retrieve the first available data identified by key from the collection ordered by index and return it as a string
 func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
 	v, ok := d.GetData(key)
 	if ok {
@@ -358,7 +358,7 @@ func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
 	return "", false
 }
 
-// GetDataBool will retrieve the first availabe data identified by key from the collection ordered by index and return it as a boolean
+// GetDataBool will retrieve the first available data identified by key from the collection ordered by index and return it as a boolean
 func (d *XDatasetCollection) GetDataBool(key string) (bool, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -369,7 +369,7 @@ func (d *XDatasetCollection) GetDataBool(key string) (bool, bool) {
 	return false, false
 }
 
-// GetDataInt will retrieve the first availabe data identified by key from the collection ordered by index and return it as an integer
+// GetDataInt will retrieve the first available data identified by key from the collection ordered by index and return it as an integer
 func (d *XDatasetCollection) GetDataInt(key string) (int, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -380,7 +380,7 @@ func (d *XDatasetCollection) GetDataInt(key string) (int, bool) {
 	return 0, false
 }
 
-// GetDataFloat will retrieve the first availabe data identified by key from the collection ordered by index and return it as a float
+// GetDataFloat will retrieve the first available data identified by key from the collection ordered by index and return it as a float
 func (d *XDatasetCollection) GetDataFloat(key string) (float64, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -391,7 +391,7 @@ func (d *XDatasetCollection) GetDataFloat(key string) (float64, bool) {
 	return 0, false
 }
 
-// GetDataTime will retrieve the first availabe data identified by key from the collection ordered by index and return it as a time
+// GetDataTime will retrieve the first available data identified by key from the collection ordered by index and return it as a time
 func (d *XDatasetCollection) GetDataTime(key string) (time.Time, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
