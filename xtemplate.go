@@ -36,9 +36,11 @@ Meta elements:
    !!xx!!   debug (dump)
 */
 
+/* MetaString and other consts: type of elements present in the template
+*/
 const (
-	MetaString  = 0 // a simple string to integrate into the code
-	MetaComment = 1 // Comment, ignore it
+	MetaString  = 0  // a simple string to integrate into the code
+	MetaComment = 1  // Comment, ignore it
 
 	MetaLanguage  = 2 // one param of the URL parameters list, index-1 based [page]/value1/value2...
 	MetaReference = 3 // an URL variable coming through a query ?variable=value
@@ -53,24 +55,34 @@ const (
 	MetaUnused = -1 // a "not used anymore" param to be freed
 )
 
+/* XTemplateParam: One parameter definition into the template
+*/
 type XTemplateParam struct {
 	paramtype int
 	data      string
 	children  *XTemplateData
 }
 
+/* XTemplateData: Array of all the parameters into the template
+*/
 type XTemplateData []XTemplateParam
 
+/* XTemplate: The pain template structure
+*/
 type XTemplate struct {
 	Name         string
 	Root         *XTemplateData
 	SubTemplates map[string]*XTemplate
 }
 
+/* NewXTemplate: Creates a new empty template
+*/
 func NewXTemplate() *XTemplate {
 	return &XTemplate{}
 }
 
+/* NewXTemplateFromFile: Creates a new template from a file containing the template code
+*/
 func NewXTemplateFromFile(file string) (*XTemplate, error) {
 	t := &XTemplate{}
 	err := t.LoadFile(file)
@@ -80,6 +92,8 @@ func NewXTemplateFromFile(file string) (*XTemplate, error) {
 	return t, nil
 }
 
+/* NewXTemplateFromString: Creates a new template from a string containing the template code
+*/
 func NewXTemplateFromString(data string) (*XTemplate, error) {
 	t := &XTemplate{}
 	err := t.LoadString(data)
@@ -89,6 +103,8 @@ func NewXTemplateFromString(data string) (*XTemplate, error) {
 	return t, nil
 }
 
+/* LoadFile: Load a file into the template
+*/
 func (t *XTemplate) LoadFile(file string) error {
 	tFile, err := os.Open(file)
 	if err != nil {
@@ -105,10 +121,14 @@ func (t *XTemplate) LoadFile(file string) error {
 	return t.LoadString(string(data))
 }
 
+/* LoadString: Load a string into the template
+*/
 func (t *XTemplate) LoadString(data string) error {
 	return t.compile(data)
 }
 
+/* compile: Interprete the template code into objects
+*/
 func (t *XTemplate) compile(data string) error {
 	// build, compile return result
 	code :=
@@ -261,6 +281,8 @@ func (t *XTemplate) compile(data string) error {
 	return nil
 }
 
+/* AddTemplate: Adds a sub template to this template
+*/
 func (t *XTemplate) AddTemplate(name string, tmpl *XTemplate) {
 	if t.SubTemplates == nil {
 		t.SubTemplates = make(map[string]*XTemplate)
@@ -268,6 +290,8 @@ func (t *XTemplate) AddTemplate(name string, tmpl *XTemplate) {
 	t.SubTemplates[name] = tmpl
 }
 
+/* GetTemplate: Gets a sub template existing into this template
+*/
 func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	if t.SubTemplates == nil {
 		return nil
@@ -275,6 +299,8 @@ func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	return t.SubTemplates[name]
 }
 
+/* Execute: Inject the data into the template and creates the final string
+*/
 func (t *XTemplate) Execute(data XDatasetDef) string {
 	// Does data has a language ?
 	if data != nil {
@@ -291,6 +317,8 @@ func (t *XTemplate) Execute(data XDatasetDef) string {
 	return t.injector(nil, nil)
 }
 
+/* injector: Injects the data into this template
+*/
 func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage) string {
 	var injected []string
 	for _, v := range *t.Root {
@@ -361,6 +389,8 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 	return strings.Join(injected, "")
 }
 
+/* searchConditionValue: Search one parameter value from the data
+*/
 func searchConditionValue(id string, data XDatasetCollectionDef) string {
 	// scan data for each dataset in order top to bottom
 	v, _ := data.GetDataString(id)
@@ -390,6 +420,8 @@ func scanValue(id string, data *XDatasetDef) interface{} {
 }
 */
 
+/* buildValue: Transform a data to a string
+*/
 func buildValue(data interface{}) string {
 	// if data is string, return data
 	// if data is a type, return conversion
@@ -397,6 +429,8 @@ func buildValue(data interface{}) string {
 	return fmt.Sprint(data)
 }
 
+/* Print: Creates the final string representing the code of the template
+*/
 func (t *XTemplate) Print() string {
 	return fmt.Sprint(t)
 }
