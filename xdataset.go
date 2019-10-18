@@ -3,14 +3,10 @@ package xcore
 import (
 	"fmt"
 	"time"
-	//  "reflect"
 )
 
-/*
-The XDataset is a special interface to implement a set of data that can be scanned recursively (by XTemplate)
-to search data into it, Stringify it, and set/get/del entries of data
-*/
-
+// XDatasetDef is a special interface to implement a set of data that can be scanned recursively (by XTemplate for instance)
+//   to search data into it, Stringify it, and set/get/del entries of data
 type XDatasetDef interface {
 	// Stringify will dump the content into a human readable string
 	Stringify() string
@@ -56,18 +52,20 @@ type XDatasetDef interface {
 // XDataset
 // =====================
 
-/* Basic dataset */
+// XDataset is the basic interface dataset interface
 type XDataset map[string]interface{}
 
-// makes an interface of XDataset to reuse for otrhe libraries and be sure we can call the functions
+// Stringify will transform the XDataset into a readable string
 func (d *XDataset) Stringify() string {
 	return fmt.Sprint(*d)
 }
 
+// Set will add a variable key with value data to the XDataset
 func (d *XDataset) Set(key string, data interface{}) {
 	(*d)[key] = data
 }
 
+// Get will read the value of the key variable
 func (d *XDataset) Get(key string) (interface{}, bool) {
 	data, ok := (*d)[key]
 	if ok {
@@ -76,6 +74,7 @@ func (d *XDataset) Get(key string) (interface{}, bool) {
 	return nil, false
 }
 
+// GetDataset will read the value of the key variable as a XDatasetDef cast type
 func (d *XDataset) GetDataset(key string) (XDatasetDef, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -86,6 +85,7 @@ func (d *XDataset) GetDataset(key string) (XDatasetDef, bool) {
 	return nil, false
 }
 
+// GetCollection will read the value of the key variable as a XDatasetCollection cast type
 func (d *XDataset) GetCollection(key string) (XDatasetCollectionDef, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -96,6 +96,7 @@ func (d *XDataset) GetCollection(key string) (XDatasetCollectionDef, bool) {
 	return nil, false
 }
 
+// GetString will read the value of the key variable as a string cast type
 func (d *XDataset) GetString(key string) (string, bool) {
 	data, ok := (*d)[key]
 	if ok {
@@ -104,6 +105,7 @@ func (d *XDataset) GetString(key string) (string, bool) {
 	return "", false
 }
 
+// GetBool will read the value of the key variable as a boolean cast type
 func (d *XDataset) GetBool(key string) (bool, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -118,6 +120,7 @@ func (d *XDataset) GetBool(key string) (bool, bool) {
 	return false, false
 }
 
+// GetInt will read the value of the key variable as an integer cast type
 func (d *XDataset) GetInt(key string) (int, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -136,6 +139,7 @@ func (d *XDataset) GetInt(key string) (int, bool) {
 	return 0, false
 }
 
+// GetFloat will read the value of the key variable as a float64 cast type
 func (d *XDataset) GetFloat(key string) (float64, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -154,6 +158,7 @@ func (d *XDataset) GetFloat(key string) (float64, bool) {
 	return 0, false
 }
 
+// GetTime will read the value of the key variable as a time cast type
 func (d *XDataset) GetTime(key string) (time.Time, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -164,6 +169,7 @@ func (d *XDataset) GetTime(key string) (time.Time, bool) {
 	return time.Time{}, false
 }
 
+// GetStringCollection will read the value of the key variable as a collection of strings cast type
 func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -174,6 +180,7 @@ func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
 	return nil, false
 }
 
+// GetBoolCollection will read the value of the key variable as a collection of bool cast type
 func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -184,6 +191,7 @@ func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
 	return nil, false
 }
 
+// GetIntCollection will read the value of the key variable as a collection of int cast type
 func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -194,6 +202,7 @@ func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
 	return nil, false
 }
 
+// GetFloatCollection will read the value of the key variable as a collection of float cast type
 func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -204,6 +213,7 @@ func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
 	return nil, false
 }
 
+// GetTimeCollection will read the value of the key variable as a collection of time cast type
 func (d *XDataset) GetTimeCollection(key string) ([]time.Time, bool) {
 	if val, ok := (*d)[key]; ok {
 		switch val.(type) {
@@ -214,11 +224,12 @@ func (d *XDataset) GetTimeCollection(key string) ([]time.Time, bool) {
 	return nil, false
 }
 
+// Del will deletes the variable 
 func (d *XDataset) Del(key string) {
 	delete(*d, key)
 }
 
-// Check if we deep-clone the object ?
+// Clone will creates a totally new data memory cloned from this object
 func (d *XDataset) Clone() XDatasetDef {
 	cloned := &XDataset{}
 	for id, val := range *d {
@@ -232,6 +243,7 @@ func (d *XDataset) Clone() XDatasetDef {
 	return cloned
 }
 
+// XDatasetCollectionDef is the definition of a collection of XDatasetDefs
 type XDatasetCollectionDef interface {
 	// Stringify will dump the content into a human readable string
 	Stringify() string
@@ -283,36 +295,44 @@ type XDatasetCollectionDef interface {
 // XDatasetConnection
 // =====================
 
+// XDatasetCollection is the basic collection of XDatasetDefs
 type XDatasetCollection []XDatasetDef
 
+// Stringify will transform the XDatasetCollection into a readable string
 func (d *XDatasetCollection) Stringify() string {
 	return fmt.Sprint(d)
 }
 
+// Unshift will adds a XDatasetDef at the beginning of the collection
 func (d *XDatasetCollection) Unshift(data XDatasetDef) {
 	*d = append([]XDatasetDef{data}, (*d)...)
 }
 
+// Shift will remove the element at the beginning of the collection
 func (d *XDatasetCollection) Shift() XDatasetDef {
 	data := (*d)[0]
 	*d = (*d)[1:]
 	return data
 }
 
+// Push will adds a XDatasetDef at the end of the collection
 func (d *XDatasetCollection) Push(data XDatasetDef) {
 	*d = append(*d, data)
 }
 
+// Pop will remove the element at the end of the collection
 func (d *XDatasetCollection) Pop() XDatasetDef {
 	data := (*d)[len(*d)-1]
 	*d = (*d)[:len(*d)-1]
 	return data
 }
 
+// Count will return the quantity of elements into the collection
 func (d *XDatasetCollection) Count() int {
 	return len(*d)
 }
 
+// Get will retreive an element by index from the collection
 func (d *XDatasetCollection) Get(index int) (XDatasetDef, bool) {
 	if index < 0 || index >= len(*d) {
 		return nil, false
@@ -320,6 +340,7 @@ func (d *XDatasetCollection) Get(index int) (XDatasetDef, bool) {
 	return (*d)[index], true
 }
 
+// GetData will retrieve the first availabe data identified by key from the collection ordered by index
 func (d *XDatasetCollection) GetData(key string) (interface{}, bool) {
 	for i := len(*d) - 1; i >= 0; i-- {
 		val, ok := (*d)[i].Get(key)
@@ -330,6 +351,7 @@ func (d *XDatasetCollection) GetData(key string) (interface{}, bool) {
 	return nil, false
 }
 
+// GetDataString will retrieve the first availabe data identified by key from the collection ordered by index and return it as a string
 func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
 	v, ok := d.GetData(key)
 	if ok {
@@ -338,6 +360,7 @@ func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
 	return "", false
 }
 
+// GetDataBool will retrieve the first availabe data identified by key from the collection ordered by index and return it as a boolean
 func (d *XDatasetCollection) GetDataBool(key string) (bool, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -348,6 +371,7 @@ func (d *XDatasetCollection) GetDataBool(key string) (bool, bool) {
 	return false, false
 }
 
+// GetDataInt will retrieve the first availabe data identified by key from the collection ordered by index and return it as an integer
 func (d *XDatasetCollection) GetDataInt(key string) (int, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -358,6 +382,7 @@ func (d *XDatasetCollection) GetDataInt(key string) (int, bool) {
 	return 0, false
 }
 
+// GetDataFloat will retrieve the first availabe data identified by key from the collection ordered by index and return it as a float
 func (d *XDatasetCollection) GetDataFloat(key string) (float64, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -368,6 +393,7 @@ func (d *XDatasetCollection) GetDataFloat(key string) (float64, bool) {
 	return 0, false
 }
 
+// GetDataTime will retrieve the first availabe data identified by key from the collection ordered by index and return it as a time
 func (d *XDatasetCollection) GetDataTime(key string) (time.Time, bool) {
 	if val, ok := d.GetData(key); ok {
 		switch val.(type) {
@@ -378,6 +404,7 @@ func (d *XDatasetCollection) GetDataTime(key string) (time.Time, bool) {
 	return time.Time{}, false
 }
 
+// GetCollection will retrieve a collection from the XDatasetCollection
 func (d *XDatasetCollection) GetCollection(key string) (XDatasetCollectionDef, bool) {
 	v, ok := d.GetData(key)
 	// Verify v IS actually a XDatasetCollectionDef to avoid the error
@@ -387,6 +414,7 @@ func (d *XDatasetCollection) GetCollection(key string) (XDatasetCollectionDef, b
 	return nil, false
 }
 
+// Clone will make a full copy of the object into memory
 func (d *XDatasetCollection) Clone() XDatasetCollectionDef {
 	cloned := &XDatasetCollection{}
 	for _, val := range *d {

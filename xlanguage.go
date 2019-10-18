@@ -50,24 +50,20 @@ Then you can use the set of basic access functions:
 
 */
 
-// Oficial XLanguage structure for the user
+// XLanguage is the oficial structure for the user
 type XLanguage struct {
 	Name     string
 	Language string
 	Entries  map[string]string
 }
 
-/* NewXLanguage:
-   Creates an empty Language structure with a name and a language
-*/
+// NewXLanguage will create an empty Language structure with a name and a language
 func NewXLanguage(name string, lang string) *XLanguage {
 	return &XLanguage{Name: name, Language: lang, Entries: make(map[string]string)}
 }
 
-/* NewXLanguageFromXMLFile:
-   Creates an XLanguage structure with the data into the XML file
-   Returns nil if there is an error
-*/
+// NewXLanguageFromXMLFile will create an XLanguage structure with the data into the XML file
+//   Returns nil if there is an error
 func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
 	lang := &XLanguage{Entries: make(map[string]string)}
 	err := lang.LoadXMLFile(file)
@@ -77,6 +73,8 @@ func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
 	return lang, nil
 }
 
+// NewXLanguageFromXMLString will create an XLanguage structure with the data into the XML String
+//   Returns nil if there is an error
 func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
 	lang := &XLanguage{Entries: make(map[string]string)}
 	err := lang.LoadXMLString(xml)
@@ -86,6 +84,8 @@ func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
 	return lang, nil
 }
 
+// NewXLanguageFromFile will create an XLanguage structure with the data into the text file
+//   Returns nil if there is an error
 func NewXLanguageFromFile(file string) (*XLanguage, error) {
 	l := &XLanguage{Entries: make(map[string]string)}
 	err := l.LoadFile(file)
@@ -95,6 +95,8 @@ func NewXLanguageFromFile(file string) (*XLanguage, error) {
 	return l, nil
 }
 
+// NewXLanguageFromString will create an XLanguage structure with the data into the string
+//   Returns nil if there is an error
 func NewXLanguageFromString(data string) (*XLanguage, error) {
 	l := &XLanguage{Entries: make(map[string]string)}
 	err := l.LoadString(data)
@@ -104,9 +106,8 @@ func NewXLanguageFromString(data string) (*XLanguage, error) {
 	return l, nil
 }
 
-/* LoadXMLFile:
-   Loads a language from an XML file and replace the content of the XLanguage structure with the new data
-*/
+// LoadXMLFile will Load a language from an XML file and replace the content of the XLanguage structure with the new data
+//   Returns nil if there is an error
 func (l *XLanguage) LoadXMLFile(file string) error {
 	xmlFile, err := os.Open(file)
 	if err != nil {
@@ -123,6 +124,8 @@ func (l *XLanguage) LoadXMLFile(file string) error {
 	return l.LoadXMLString(string(data))
 }
 
+// LoadXMLString will Load a language from an XML file and replace the content of the XLanguage structure with the new data
+//   Returns nil if there is an error
 func (l *XLanguage) LoadXMLString(data string) error {
 	// Temporal structures for XML loading
 	type xentry struct {
@@ -152,6 +155,8 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	return nil
 }
 
+// LoadFile will Load a language from a file and replace the content of the XLanguage structure with the new data
+//   Returns nil if there is an error
 func (l *XLanguage) LoadFile(file string) error {
 	flatFile, err := os.Open(file)
 	if err != nil {
@@ -168,6 +173,8 @@ func (l *XLanguage) LoadFile(file string) error {
 	return l.LoadString(string(data))
 }
 
+// LoadString will Load a language from a string and replace the content of the XLanguage structure with the new data
+//   Returns nil if there is an error
 func (l *XLanguage) LoadString(data string) error {
 	scanner := bufio.NewScanner(strings.NewReader(data))
 	for scanner.Scan() {
@@ -198,26 +205,32 @@ func (l *XLanguage) LoadString(data string) error {
 	return nil
 }
 
+// SetName will set the name of the language table
 func (l *XLanguage) SetName(name string) {
 	l.Name = name
 }
 
+// SetLanguage will set the language ISO code (2 letters) of the language table
 func (l *XLanguage) SetLanguage(lang string) {
 	l.Language = lang
 }
 
+// GetName will return the name of the language table
 func (l *XLanguage) GetName() string {
 	return l.Name
 }
 
+// GetLanguage will return the language of the language table
 func (l *XLanguage) GetLanguage() string {
 	return l.Language
 }
 
+// Set will add an entry id-value into the language table
 func (l *XLanguage) Set(entry string, value string) {
 	l.Entries[entry] = value
 }
 
+// Get will read an entry id-value from the language table
 func (l *XLanguage) Get(entry string) string {
 	v, ok := l.Entries[entry]
 	if ok {
@@ -226,10 +239,12 @@ func (l *XLanguage) Get(entry string) string {
 	return ""
 }
 
+// Del will remove an entry id-value from the language table
 func (l *XLanguage) Del(entry string) {
 	delete(l.Entries, entry)
 }
 
+// Print will get the language table as a readable string
 func (l *XLanguage) Print() string {
 	return fmt.Sprint(l)
 }

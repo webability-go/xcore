@@ -119,9 +119,7 @@ func (t *XTemplate) LoadString(data string) error {
 	return t.compile(data)
 }
 
-/* compile
-   Interprete the template code into objects
-*/
+// compile will interprete the template code into objects
 func (t *XTemplate) compile(data string) error {
 	// build, compile return result
 	code :=
@@ -274,9 +272,7 @@ func (t *XTemplate) compile(data string) error {
 	return nil
 }
 
-/* AddTemplate
-   Adds a sub template to this template
-*/
+// AddTemplate will add a sub template to this template
 func (t *XTemplate) AddTemplate(name string, tmpl *XTemplate) {
 	if t.SubTemplates == nil {
 		t.SubTemplates = make(map[string]*XTemplate)
@@ -284,9 +280,7 @@ func (t *XTemplate) AddTemplate(name string, tmpl *XTemplate) {
 	t.SubTemplates[name] = tmpl
 }
 
-/* GetTemplate
-   Gets a sub template existing into this template
-*/
+// GetTemplate gets a sub template existing into this template
 func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	if t.SubTemplates == nil {
 		return nil
@@ -294,9 +288,7 @@ func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	return t.SubTemplates[name]
 }
 
-/* Execute
-   Inject the data into the template and creates the final string
-*/
+// Execute will inject the data into the template and creates the final string
 func (t *XTemplate) Execute(data XDatasetDef) string {
 	// Does data has a language ?
 	if data != nil {
@@ -313,9 +305,7 @@ func (t *XTemplate) Execute(data XDatasetDef) string {
 	return t.injector(nil, nil)
 }
 
-/* injector
-   Injects the data into this template
-*/
+// injector will injects the data into this template
 func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage) string {
 	var injected []string
 	for _, v := range *t.Root {
@@ -386,18 +376,14 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 	return strings.Join(injected, "")
 }
 
-/* searchConditionValue
-   Search one parameter value from the data
-*/
+// searchConditionValue will search one parameter value from the data
 func searchConditionValue(id string, data XDatasetCollectionDef) string {
 	// scan data for each dataset in order top to bottom
 	v, _ := data.GetDataString(id)
 	return v
 }
 
-/* buildValue
-   Transform a data to a string
-*/
+// buildValue will transform a data to a string
 func buildValue(data interface{}) string {
 	// if data is string, return data
 	// if data is a type, return conversion
@@ -405,9 +391,7 @@ func buildValue(data interface{}) string {
 	return fmt.Sprint(data)
 }
 
-/* Print
-   Creates the final string representing the code of the template
-*/
+// Print will creates the final string representing the code of the template
 func (t *XTemplate) Print() string {
 	return fmt.Sprint(t)
 }
