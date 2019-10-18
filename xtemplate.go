@@ -39,8 +39,8 @@ Meta elements:
 // MetaString and other consts:
 //   type of elements present in the template
 const (
-	MetaString  = 0  // a simple string to integrate into the code
-	MetaComment = 1  // Comment, ignore it
+	MetaString  = 0 // a simple string to integrate into the code
+	MetaComment = 1 // Comment, ignore it
 
 	MetaLanguage  = 2 // one param of the URL parameters list, index-1 based [page]/value1/value2...
 	MetaReference = 3 // an URL variable coming through a query ?variable=value
@@ -293,7 +293,7 @@ func (t *XTemplate) Execute(data XDatasetDef) string {
 	// Does data has a language ?
 	if data != nil {
 		lang, _ := data.Get("#")
-		var language *XLanguage = nil
+		var language *XLanguage
 		if lang != nil {
 			language = lang.(*XLanguage)
 		}
