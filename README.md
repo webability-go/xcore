@@ -1,6 +1,7 @@
 @UTF-8
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
+[![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
 
 XCore for GO v0
 =============================
@@ -22,12 +23,18 @@ TO DO:
 - Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
 
 - Some improvements to check, later:
-- XCache: makes some test, what is faster, 10000x go threads sleeping one with each data into the thread and a channel to wake them up and communicate the data, or like it is right now (mutex and concurrent acceses for a memory dynamic map for 10000 memory pointers) (bad point: huge overhead of memory for every threads stack)
 - XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
 
 Version Changes Control
 =======================
+
+V0.1.1 - 2019-11-05
+-----------------------
+- XCore Code comments enhanced to publish in godoc.org as libraries documentation
+
+
+
 
 V0.1.0 - 2019-10-18
 -----------------------
