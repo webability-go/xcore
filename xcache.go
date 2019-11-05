@@ -1,3 +1,40 @@
+// XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
+// The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistant (if you exit the application)
+// and cannot grow too much (as memory is the limit).
+// However, you can control a timeout of each cache piece, and eventually the comparison against a source (file, database, etc) to invalid the cache.
+// 
+// -----------------------
+// 1. Overview
+// 
+// Declare a new XCache with NewXCache()
+// 
+// Then you can use the 3 basic functions to control the content of the cache: Get/Set/Del.
+// You can put any kind of data into your XCache.
+// The XCache is thread safe.
+// 
+// The cache can be limited in quantity of entries and timeout for data. The cache is automanaged (for invalid expired data) and can be cleaned partially or totally manually.
+// 
+// If you want some stats of the cache, use the Count function.
+// 
+// Example:
+// 
+// import "github.com/webability-go/xcore"
+// 
+// var myfiles = xcore.NewXCache("myfiles", 0, 0)
+// 
+// func usemycache() {
+//   myfiles.Set("https://developers.webability.info:82/", "somedata")
+//   myfiles.Set("/home/sites/file2.txt", "someotherdata")
+// 
+//   go somefunc()
+//   
+//   fmt.Println("Quantity of data into cache:", myfiles.count())
+// }
+// 
+// func somefunc() {
+//   data, invalid := myfiles.Get("https://developers.webability.info:82/");
+//   
+// }
 package xcore
 
 import (
@@ -6,9 +43,10 @@ import (
 	"time"
 )
 
-// XCacheEntry The cache entry has a time to measure expiration if needed, or time of entry in cache.
-// - ctime is creation time (used to validate the object against its source).
-// - rtime is last read time (used to clean the cache: the less accessed objects are removed).
+// XCacheEntry is the cache basic structure to save some data in memory.
+// The cache entry has a time to measure expiration if needed, or time of entry in cache:
+// - ctime is the creation time (used to validate the object against its source).
+// - rtime is the last read time (used to clean the cache: the less accessed objects are removed).
 // The data as itself is an interface to whatever the user need to cache.
 type XCacheEntry struct {
 	ctime time.Time
@@ -16,13 +54,14 @@ type XCacheEntry struct {
 	data  interface{}
 }
 
-// XCache has an id (informative).
-// - The user can creates a cache with a maximum number of elements if need. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
-// - The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existence" on Get. (this does not use CPU or extra locks.
-// - The Validator is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
-// - The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
-// - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
-// - Finally, the items are a map to cache entries, acceved by the key of entries.
+// XCache is the main cache structure, that contains a collection of XCacheEntries and some metadata.
+// "id": XCache has a unique id (informative).
+// "maxitems": The user can creates a cache with a maximum number of elements into it. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of the oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
+// "expire": The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existence" on Get. (this does not use CPU or extra locks).
+// "validator" is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
+// "mutex": The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
+// "pile": The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
+// "items": The items are a map to cache entries, acceved by the key of entries.
 type XCache struct {
 	mutex     sync.Mutex
 	id        string
@@ -33,11 +72,11 @@ type XCache struct {
 	pile      []string
 }
 
-// NewXCache will create a new XCache structure.
+// NewXCache function will create a new XCache structure.
 // The XCache is resident in memory, supports multithreading and concurrency.
 // "id" is the unique id of the XCache.
-// maxitems is the max authorized quantity of objects into the XCache. If 0, no limit
-// expire is a max duration of the objects into the cache. If 0, no limit
+// "maxitems" is the max authorized quantity of objects into the XCache. If 0, the cache hast no limit in quantity of objects.
+// "expire" is a max duration of the objects into the cache. If 0, no limit
 // Returns the *XCache created.
 func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
 	if LOG {
@@ -204,8 +243,9 @@ func (c *XCache) Clean(perc int) int {
 	return i
 }
 
-// Verify will first, Clean(0) keeping all the entries, then will delete expired entries using Validator function.
+// Verify will first, Clean(0) keeping all the entries, then will delete expired entries using the Validator function.
 // Returns the quantity of removed entries.
+// Based on what the validator function does, calling Verify can be **very** slow and cpu dependant. Be very careful.
 func (c *XCache) Verify() int {
 	// 1. clean all expired items, do not touch others
 	i := c.Clean(0)
@@ -226,7 +266,7 @@ func (c *XCache) Verify() int {
 	return i
 }
 
-// Flush will empty the whole cache.
+// Flush will empty the whole cache and free all the memory of it.
 // Returns nothing.
 func (c *XCache) Flush() {
 	c.mutex.Lock()
