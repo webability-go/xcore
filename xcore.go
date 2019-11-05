@@ -2,17 +2,17 @@
 // Use of this source code is governed by a MIT licence
 // license that can be found in the LICENSE file.
 
-//	The XCore package is a set of basic objects for programation (XCache, XDataset, XLanguage, XTemplate)
-//	For GO, the actual existing code includes:
+// The XCore package is a set of basic objects for programation (XCache, XDataset, XLanguage, XTemplate).
+// For GO, the actual existing code includes:
 //
-//		- XCache: Application Memory Caches for any purpose,
-//		- XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc),
-//		- XLanguage: language dependant text tables,
-//		- XTemplate: template system with meta language.
+// - XCache: Application Memory Caches for any purpose,
+// - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc),
+// - XLanguage: language dependant text tables,
+// - XTemplate: template system with meta language.
 //
-//	The Package hast been used for years on professional PHP projects in the WebAbility Core for PHP program.
+// The Package hast been used for years on professional PHP projects in the WebAbility Core for PHP program.
 //
-//
+// XCache
 //
 //
 //
