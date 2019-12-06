@@ -16,7 +16,7 @@
 // The Package hast been used for years on professional PHP projects in the WebAbility Core for PHP program and is now available for GO.
 // It is already used on sites that serve more than 60 million pages a month.
 //
-// XCache:
+// XCache
 //
 // XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
 // The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistent (if you exit the application)
@@ -24,36 +24,35 @@
 // However, you can control a timeout of each cache piece, and eventually the comparison against a source (file, database, etc) to invalid the cache.
 //
 // Declare a new XCache with NewXCache() function:
-/*
-import "github.com/webability-go/xcore"
-
-var myfiles = xcore.NewXCache("myfiles", 0, 0)
-var mydbtable = xcore.NewXCache("mydb-table", 0, 0)
-
-func main() {
-  myfiles.Set("https://developers.webability.info/", "somedata")
-  myfiles.Set("/home/sites/file2.txt", "someotherdata")
-	myrecords := GetAllMyDatabaseTableData()
-	for _, rec := range myrecords {
-    key, _ := rec.GetString("key")
-		mydbtable.Set(key, rec)
-  }
-}
-
-	func usemycache() {
-
-	  go somefunc()
-
-	  fmt.Println("Quantity of data into cache:", myfiles.Count(), mydbtable.Count())
-	}
-
-	func somefunc() {
-	  data, invalid := myfiles.Get("https://developers.webability.info/");
-		moredata, invalid2 := mydbtable.Get("4455");
-
-		// do something with data
-	}
-*/
+//
+//  import "github.com/webability-go/xcore"
+//
+//  var myfiles = xcore.NewXCache("myfiles", 0, 0)
+//  var mydbtable = xcore.NewXCache("mydb-table", 0, 0)
+//
+//  func main() {
+//    myfiles.Set("https://developers.webability.info/", "somedata")
+//    myfiles.Set("/home/sites/file2.txt", "someotherdata")
+//  	myrecords := GetAllMyDatabaseTableData()
+//  	for _, rec := range myrecords {
+//      key, _ := rec.GetString("key")
+//  		mydbtable.Set(key, rec)
+//    }
+//  }
+//
+//  	func usemycache() {
+//
+//  	  go somefunc()
+//
+//  	  fmt.Println("Quantity of data into cache:", myfiles.Count(), mydbtable.Count())
+//  	}
+//
+//  	func somefunc() {
+//  	  data, invalid := myfiles.Get("https://developers.webability.info/");
+//  		moredata, invalid2 := mydbtable.Get("4455");
+//
+//  		// do something with data
+//  	}
 //
 // Then you can use the 3 basic functions to control the content of the cache: Get/Set/Del.
 // You can put any kind of data into your XCache.
