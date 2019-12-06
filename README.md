@@ -30,8 +30,12 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.2.0 - 2019-12-06
+- XCache Code simplified to expose XCache definition as public, remove not usefull funcion (Get*)
+- XCache 0.2.0 is not compatible with XCache 0.1.* , you may need to change your code
+
 v0.1.2 - 2019-12-05
-- Code cleaned to meet golangci standards
+- Code cleaned to meet golangci standards, golint checks, more documentation.
 
 V0.1.1 - 2019-11-05
 -----------------------

@@ -7,32 +7,33 @@ import (
 )
 
 // XCacheEntry is the cache basic structure to save some data in memory.
-// The cache entry has a time to measure expiration if needed, or time of entry in cache:
-// - ctime is the creation time (used to validate the object against its source).
-// - rtime is the last read time (used to clean the cache: the less accessed objects are removed).
-// The data as itself is an interface to whatever the user need to cache.
 type XCacheEntry struct {
+	// The cache entry has a time to measure expiration if needed, or time of entry in cache:
+	// - ctime is the creation time (used to validate the object against its source).
 	ctime time.Time
+	// - rtime is the last read time (used to clean the cache: the less accessed objects are removed).
 	rtime time.Time
-	data  interface{}
+	// The data as itself is an interface to whatever the user need to cache.
+	data interface{}
 }
 
 // XCache is the main cache structure, that contains a collection of XCacheEntries and some metadata.
-// "id": XCache has a unique id (informative).
-// "maxitems": The user can creates a cache with a maximum number of elements into it. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of the oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
-// "expire": The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existence" on Get. (this does not use CPU or extra locks).
-// "validator" is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
-// "mutex": The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
-// "pile": The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
-// "items": The items are a map to cache entries, acceved by the key of entries.
 type XCache struct {
-	mutex     sync.Mutex
-	id        string
-	maxitems  int
-	validator func(string, time.Time) bool
-	expire    time.Duration
-	items     map[string]*XCacheEntry
-	pile      []string
+	// "ID": XCache has a unique id (informative).
+	ID string
+	// "Maxitems": The user can creates a cache with a maximum number of elements into it. In this case, when the cache reaches the maximum number of elements stored, then the system makes a clean of 10% of the oldest elements. This type of use is not recommended since is it heavy in CPU use to clean the cache.
+	Maxitems int
+	// "Validator" is a function that can be set to check the validity of the data (for instance if the data originates from a file or a database). The validator is called for each Get (and can be heavy for CPU or can wait a long time, for instance if the check is an external database on another cluster). Beware of this.
+	Validator func(string, time.Time) bool
+	// "Expire": The user can also create an expiration duration, so every elements in the cache is invalidated after a certain amount of time. It is more recommended to use the cache with an expiration duration. The obsolete objects are destroyed when the user tries to use them and return a "non existence" on Get. (this does not use CPU or extra locks).
+	Expire time.Duration
+	// Not available from outside for security, access of data is based on a mutex
+	// "mutex": The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
+	mutex sync.Mutex
+	// "pile": The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
+	items map[string]*XCacheEntry
+	// "items": The items are a map to cache entries, acceved by the key of entries.
+	pile []string
 }
 
 // NewXCache function will create a new XCache structure.
@@ -46,33 +47,12 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
 		log.Printf("Creating cache with data {id: %s, maxitems: %d, expire: %d}", id, maxitems, expire)
 	}
 	return &XCache{
-		id:        id,
-		maxitems:  maxitems,
-		validator: nil,
-		expire:    expire,
+		ID:        id,
+		Maxitems:  maxitems,
+		Validator: nil,
+		Expire:    expire,
 		items:     make(map[string]*XCacheEntry),
 	}
-}
-
-// GetID will expose the ID of the cache
-func (c *XCache) GetID() string {
-	return c.id
-}
-
-// GetMax will expose the max quantity of items of the cache
-func (c *XCache) GetMax() int {
-	return c.maxitems
-}
-
-// GetExpire will expose the expiration time of the cache
-func (c *XCache) GetExpire() time.Duration {
-	return c.expire
-}
-
-// SetValidator will set the validator function to check every entry in the cache against its original source.
-// Returns nothing.
-func (c *XCache) SetValidator(f func(string, time.Time) bool) {
-	c.validator = f
 }
 
 // Set will set an entry in the cache.
@@ -89,7 +69,7 @@ func (c *XCache) Set(key string, indata interface{}) {
 	}
 	c.pile = append(c.pile, key)
 	c.mutex.Unlock()
-	if c.maxitems > 0 && len(c.items) >= c.maxitems {
+	if c.Maxitems > 0 && len(c.items) >= c.Maxitems {
 		// We need a cleaning
 		c.Clean(10)
 	}
@@ -118,8 +98,8 @@ func (c *XCache) Get(key string) (interface{}, bool) {
 	c.mutex.Lock()
 	if x, ok := c.items[key]; ok {
 		c.mutex.Unlock()
-		if c.validator != nil {
-			if b := c.validator(key, x.ctime); !b {
+		if c.Validator != nil {
+			if b := c.Validator(key, x.ctime); !b {
 				if LOG {
 					log.Println("Validator invalids entry: " + key)
 				}
@@ -131,8 +111,8 @@ func (c *XCache) Get(key string) (interface{}, bool) {
 			}
 		}
 		// expired ?
-		if c.expire != 0 {
-			if x.ctime.Add(c.expire).Before(time.Now()) {
+		if c.Expire != 0 {
+			if x.ctime.Add(c.Expire).Before(time.Now()) {
 				if LOG {
 					log.Println("Cache timeout Expired: " + key)
 				}
@@ -180,9 +160,9 @@ func (c *XCache) Clean(perc int) int {
 	i := 0
 	c.mutex.Lock()
 	// 1. clean all expired items
-	if c.expire != 0 {
+	if c.Expire != 0 {
 		for k, x := range c.items {
-			if x.ctime.Add(c.expire).Before(time.Now()) {
+			if x.ctime.Add(c.Expire).Before(time.Now()) {
 				if LOG {
 					log.Println("Cache timeout Expired: " + k)
 				}
@@ -213,9 +193,9 @@ func (c *XCache) Verify() int {
 	// 1. clean all expired items, do not touch others
 	i := c.Clean(0)
 	// 2. If there is a validator, verifies anything
-	if c.validator != nil {
+	if c.Validator != nil {
 		for k, x := range c.items {
-			if b := c.validator(k, x.ctime); !b {
+			if b := c.Validator(k, x.ctime); !b {
 				if LOG {
 					log.Println("Validator invalids entry: " + k)
 				}
