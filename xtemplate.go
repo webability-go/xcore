@@ -59,7 +59,7 @@ const (
 type XTemplateParam struct {
 	paramtype int
 	data      string
-	children  *XTemplateData
+//	children  *XTemplateData
 }
 
 // XTemplateData is an Array of all the parameters into the template
@@ -265,7 +265,7 @@ func (t *XTemplate) compile(data string) error {
 		}
 	}
 
-	// ************** NOTE: MISSING OPEN/CLOSE SUBTEMPLATES = COMPILATION ERROR
+	// TODO(phil) NOTE: MISSING OPEN/CLOSE SUBTEMPLATES = COMPILATION ERROR
 
 	compiled = compiled[:currentpointer]
 	t.Root = &compiled
@@ -297,8 +297,7 @@ func (t *XTemplate) Execute(data XDatasetDef) string {
 		if lang != nil {
 			language = lang.(*XLanguage)
 		}
-		var stack XDatasetCollectionDef
-		stack = &XDatasetCollection{}
+		stack := &XDatasetCollection{}
 		stack.Push(data)
 		return t.injector(stack, language)
 	}
@@ -332,11 +331,11 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			injected = append(injected, d)
 		case MetaRange: // Range (loop over subset)
 
-			// ***** subtemplate depends on first, last, loop # counter, key, condition etc
+			// TODO(phil) subtemplate depends on first, last, loop # counter, key, condition etc
 			subt := t.GetTemplate(v.data)
 
 			if subt != nil {
-				// ****** We have to check the correct type of the collection
+				// TODO(phil) We have to check the correct type of the collection
 
 				cl, _ := datacol.GetCollection(v.data)
 				if cl != nil {
@@ -353,7 +352,7 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			}
 		case MetaCondition:
 
-			// ***** subtemplate depends on condition completion
+			// TODO(phil) subtemplate depends on condition completion
 			subt := t.GetTemplate(v.data)
 			value := searchConditionValue(v.data, datacol)
 
@@ -383,6 +382,7 @@ func searchConditionValue(id string, data XDatasetCollectionDef) string {
 	return v
 }
 
+/*
 // buildValue will transform a data to a string
 func buildValue(data interface{}) string {
 	// if data is string, return data
@@ -390,6 +390,7 @@ func buildValue(data interface{}) string {
 	// if data is a function, call the function then return the value
 	return fmt.Sprint(data)
 }
+*/
 
 // Print will creates the final string representing the code of the template
 func (t *XTemplate) Print() string {

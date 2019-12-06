@@ -12,9 +12,9 @@ import (
 func TestCommentParam(t *testing.T) {
 	// Test 1: assign a simple parameter string with some comments
 	tmpl := xcore.NewXTemplate()
-	tmpl.LoadString("%-- starting comment --%Text %--with a [[]]comment--% here. Also an%----% empty comment %--ending comment--%")
+	err := tmpl.LoadString("%-- starting comment --%Text %--with a [[]]comment--% here. Also an%----% empty comment %--ending comment--%")
 
-	//  fmt.Println(tmpl)
+  fmt.Println(err)
 	//  fmt.Println(tmpl.Root)
 
 	result := tmpl.Execute(nil)

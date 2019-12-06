@@ -2,6 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
+[![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
 
 XCore for GO v0
 =============================
@@ -29,12 +30,12 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.1.2 - 2019-12-05
+- Code cleaned to meet golangci standards
+
 V0.1.1 - 2019-11-05
 -----------------------
 - XCore Code comments enhanced to publish in godoc.org as libraries documentation
-
-
-
 
 V0.1.0 - 2019-10-18
 -----------------------
@@ -43,7 +44,7 @@ V0.1.0 - 2019-10-18
 V0.0.9 - 2019-07-18
 -----------------------
 - Error corrected on XCache: removing an element from a slice when the element is the last one was causing out of bound index.
-- XCache.maxitem = 0 (no number of elements limit) is corrected: it was not working 
+- XCache.maxitem = 0 (no number of elements limit) is corrected: it was not working
 
 V0.0.8 - 2019-06-25
 -----------------------
@@ -88,7 +89,7 @@ V0.0.2 - 2018-12-17
 - Creation of XCache with all set of functions.
 - Creation of XLanguage with all set of functions.
 - Creation of XTemplate with all set of functions. Basic work done
-- Creation of a set of interfaces that XTemplate need to execute and inject the template, 
+- Creation of a set of interfaces that XTemplate need to execute and inject the template,
 - Creation of a basic XDataset and colection based on interfaces to build a set of data for the template.
 - Added xcore.go with version number as constant
 
@@ -133,13 +134,13 @@ func usemycache() {
   myfiles.Set("/home/sites/file2.txt", "someotherdata")
 
   go somefunc()
-  
+
   fmt.Println("Quantity of data into cache:", myfiles.count())
 }
 
 func somefunc() {
   data, invalid := myfiles.Get("https://developers.webability.info:82/");
-  
+
 }
 ```
 
@@ -147,7 +148,7 @@ func somefunc() {
 -----------------------
 2. Reference
 
-To use the package: 
+To use the package:
 
 import "github.com/webability-go/xcore"
 
@@ -171,14 +172,14 @@ XCache:
   - The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
   - Finally, the items are a map to cache entries, acceved by the key of entries.
 
-  
+
 List of functions:
 
 func NewXCache(id string, maxitems int, expire time.Duration) *XCache
 ------------------------
-  Creates a new XCache structure. 
+  Creates a new XCache structure.
   The XCache is resident in memory, supports multithreading and concurrency.
-  "id" is the unique id of the XCache. 
+  "id" is the unique id of the XCache.
   maxitems is the max authorized quantity of objects into the XCache.
   expire is a max duration of the objects into the cache.
   Returns the *XCache created.
@@ -193,19 +194,19 @@ func (c *XCache)GetMax() int
 ------------------------
   exposes the max quantity of items of the cache
 
-  
+
 func (c *XCache)GetExpire() time.Duration
 ------------------------
   exposes the expiration time of the cache
 
-  
+
 func (c *XCache)SetValidator(f func(string, time.Time) bool)
 ------------------------
   Sets the validator function to check every entry in the cache against its original source, for each Get and Verify calls.
   Returns nothing.
 
 
-func (c *XCache)Set(key string, indata interface{}) 
+func (c *XCache)Set(key string, indata interface{})
 ------------------------
   Sets an entry in the cache.
   If the entry already exists, just replace it with a new creation date.
@@ -249,8 +250,8 @@ func (c *XCache)Flush()
   Empty the whole cache.
   Returns nothing.
 
-  
-  
+
+
 II. XDataSet
 =======================
 
@@ -323,7 +324,7 @@ data["data9"] = "I exist"
 2. Reference
 ------------------------
 
-To use the package: 
+To use the package:
 
 import "github.com/webability-go/xcore"
 
@@ -356,43 +357,43 @@ func (d *XDatasetDef)GetCollection(key string) (XDatasetCollectionDef, bool)
 func (d *XDatasetDef)GetString(key string) (string, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetBool(key string) (bool, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a Bool if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetInt(key string) (int, bool)
 ------------------------
   Same as Get but will return the value associated to the key as an Int if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetFloat(key string) (float64, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a float64 if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetTime(key string) (time.Time, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a time.Time if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetStringCollection(key string) ([]string, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []string if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetBoolCollection(key string) ([]bool, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []Bool if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetIntCollection(key string) ([]int, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []int if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetFloatCollection(key string) ([]float64, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []float64 if it exists, or bool = false
-  
+
 func (d *XDatasetDef)GetTimeCollection(key string) ([]time.Time, bool)
 ------------------------
   Same as Get but will return the value associated to the key as a []time.Time if it exists, or bool = false
-  
+
 func (d *XDatasetDef)Del(key string)
 ------------------------
   Del will delete the data associated to the key and deletes the key entry
@@ -864,7 +865,7 @@ The official elements defined for the templates are:
 
 +++ Parameters replacement:
 
-Parameters generally have the following syntax: ~~__PARAMETER__~~ 
+Parameters generally have the following syntax: ~~__PARAMETER__~~
 They usually carry pieces of HTML code, for example a color, a size, a tag.
 
 Example:
@@ -1001,7 +1002,7 @@ At the level of 'data1', using ~~{{appname}}~~ will get back an empty string
 
 
 ```
- 
+
 
 +++ Path access: id>id>id>id
 
@@ -1109,7 +1110,7 @@ Makes a call to a subtemplate for each value in the loop vector (like the values
 If you use @@<var1>entry</var1>@@, this is equivalent to @@<var1>entry</var1>:<var2>entry</var2>:@@
 If you use @@<var1>entry</var1>:<var2>templateid</var2>@@, this is equivalent to @@<var1>entry</var1>:<var2>templateid</var2>:@@
 
-If '<var1>entry</var1>' does not exists in the values vector, or is empty, or is not a vector, the <var2>templateid</var2> with suffix '.none' will be searched. 
+If '<var1>entry</var1>' does not exists in the values vector, or is empty, or is not a vector, the <var2>templateid</var2> with suffix '.none' will be searched.
 If this template does not exists, nothing will be shown.
 
 If '<var1>entry</var1>' is a vector the following templates will be searched for each line, in that order:
@@ -1190,7 +1191,7 @@ Makes a call to a subtemplate only if the field exists and have a value.
 If you use ??<var1>entry</var1>??, this is equivalent to ??<var1>entry</var1>:<var2>entry</var2>:??
 If you use ??<var1>entry</var1>:<var2>templateid</var2>??, this is equivalent to ??<var1>entry</var1>:<var2>templateid</var2>:??
 
-If '<var1>entry</var1>' does not exists in the values vector, or is empty, or is not a vector, the <var2>templateid</var2> with suffix '.none' will be searched. 
+If '<var1>entry</var1>' does not exists in the values vector, or is empty, or is not a vector, the <var2>templateid</var2> with suffix '.none' will be searched.
 If this template does not exists, nothing will be shown.
 
 The template with the suffix .none is **mandatory**.
@@ -1247,7 +1248,7 @@ Shows only the variables names of the elements and metaelements, values are not 
 3. Functions Reference
 ------------------------
 
-To use the package: 
+To use the package:
 
 import "github.com/webability-go/xcore"
 

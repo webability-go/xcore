@@ -13,9 +13,10 @@
 //
 // - XTemplate: template system with meta language.
 //
-// The Package hast been used for years on professional PHP projects in the WebAbility Core for PHP program.
+// The Package hast been used for years on professional PHP projects in the WebAbility Core for PHP program and is now available for GO.
+// It is already used on sites that serve more than 60 million pages a month.
 //
-// XCache
+// XCache:
 //
 // XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
 // The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistant (if you exit the application)
@@ -24,21 +25,33 @@
 //
 // Declare a new XCache with NewXCache() function:
 /*
-	import "github.com/webability-go/xcore"
-	
-	var myfiles = xcore.NewXCache("myfiles", 0, 0)
-	
+import "github.com/webability-go/xcore"
+
+var myfiles = xcore.NewXCache("myfiles", 0, 0)
+var mydbtable = xcore.NewXCache("mydb-table", 0, 0)
+
+func main() {
+  myfiles.Set("https://developers.webability.info/", "somedata")
+  myfiles.Set("/home/sites/file2.txt", "someotherdata")
+	myrecords := GetAllMyDatabaseTableData()
+	for _, rec := range myrecords {
+    key, _ := rec.GetString("key")
+		mydbtable.Set(key, rec)
+  }
+}
+
 	func usemycache() {
-		myfiles.Set("https://developers.webability.info/", "somedata")
-		myfiles.Set("/home/sites/file2.txt", "someotherdata")
-	
-		go somefunc()
-	
-		fmt.Println("Quantity of data into cache:", myfiles.count())
+
+	  go somefunc()
+
+	  fmt.Println("Quantity of data into cache:", myfiles.Count(), mydbtable.Count())
 	}
-	
+
 	func somefunc() {
-		data, invalid := myfiles.Get("https://developers.webability.info:82/");
+	  data, invalid := myfiles.Get("https://developers.webability.info/");
+		moredata, invalid2 := mydbtable.Get("4455");
+
+		// do something with data
 	}
 */
 //
@@ -49,6 +62,8 @@
 // The cache can be limited in quantity of entries and timeout for data. The cache is automanaged (for invalid expired data) and can be cleaned partially or totally manually.
 //
 // If you want some stats of the cache, use the Count function.
+//
+// XLanguage
 //
 // The XLanguage table of text entries can be loaded from XML file, XML string or normal file or string.
 // XML Format is:
@@ -96,7 +111,7 @@
 package xcore
 
 // VERSION: is the used version nombre of the XCore library.
-const VERSION = "0.1.1"
+const VERSION = "0.1.2"
 
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
 //
