@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT licence
 // license that can be found in the LICENSE file.
 
-// The XCore package is a set of basic objects for programation (XCache, XDataset, XLanguage, XTemplate).
+// Package XCore is a set of basic objects for programation (XCache, XDataset, XLanguage, XTemplate).
 // For GO, the actual existing code includes:
 //
 // - XCache: Application Memory Caches for any purpose,
@@ -19,7 +19,7 @@
 // XCache:
 //
 // XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
-// The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistant (if you exit the application)
+// The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistent (if you exit the application)
 // and cannot grow too much (as memory is the limit).
 // However, you can control a timeout of each cache piece, and eventually the comparison against a source (file, database, etc) to invalid the cache.
 //
@@ -110,10 +110,10 @@ func main() {
 //
 package xcore
 
-// VERSION: is the used version nombre of the XCore library.
+// VERSION is the used version nombre of the XCore library.
 const VERSION = "0.1.2"
 
+// LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
-//
 // LOG can be set to true or false dynamically to trace only parts of code on demand.
 var LOG = false
