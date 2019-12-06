@@ -104,6 +104,8 @@ func (d *XDataset) GetString(key string) (string, bool) {
 }
 
 // GetBool will read the value of the key variable as a boolean cast type
+// If the value is int, float, it will be convert with the rule 0: false, != 0: true
+// If the value is anything else and it exists, it will return true if it's not nil
 func (d *XDataset) GetBool(key string) (bool, bool) {
 	if val, ok := (*d)[key]; ok {
 		if val2, ok2 := val.(bool); ok2 {
@@ -112,27 +114,98 @@ func (d *XDataset) GetBool(key string) (bool, bool) {
 		if val2, ok2 := val.(int); ok2 {
 			return val2 != 0, true
 		}
+		if val2, ok2 := val.(int8); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(int16); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(int32); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(int64); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(uint); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(uint8); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(uint16); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(uint32); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(uint64); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(byte); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(float32); ok2 {
+			return val2 != 0, true
+		}
 		if val2, ok2 := val.(float64); ok2 {
 			return val2 != 0, true
+		}
+		if val != nil {
+			return true, true
 		}
 	}
 	return false, false
 }
 
 // GetInt will read the value of the key variable as an integer cast type
+// If the value is bool, will return 0/1
+// If the value is float, will return integer part of value
 func (d *XDataset) GetInt(key string) (int, bool) {
 	if val, ok := (*d)[key]; ok {
-		if val2, ok2 := val.(int); ok2 {
-			return val2, true
-		}
-		if val2, ok2 := val.(float64); ok2 {
-			return int(val2), true
-		}
 		if val2, ok2 := val.(bool); ok2 {
 			if val2 {
 				return 1, true
 			}
 			return 0, true
+		}
+		if val2, ok2 := val.(int); ok2 {
+			return val2, true
+		}
+		if val2, ok2 := val.(int8); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(int16); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(int32); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(int64); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(uint); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(uint8); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(uint16); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(uint32); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(uint64); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(byte); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(float32); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(float64); ok2 {
+			return int(val2), true
 		}
 	}
 	return 0, false
@@ -141,17 +214,50 @@ func (d *XDataset) GetInt(key string) (int, bool) {
 // GetFloat will read the value of the key variable as a float64 cast type
 func (d *XDataset) GetFloat(key string) (float64, bool) {
 	if val, ok := (*d)[key]; ok {
-		if val2, ok2 := val.(float64); ok2 {
-			return val2, true
-		}
-		if val2, ok2 := val.(int); ok2 {
-			return float64(val2), true
-		}
 		if val2, ok2 := val.(bool); ok2 {
 			if val2 {
 				return 1.0, true
 			}
 			return 0.0, true
+		}
+		if val2, ok2 := val.(int); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(int8); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(int16); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(int32); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(int64); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(uint); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(uint8); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(uint16); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(uint32); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(uint64); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(byte); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(float32); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(float64); ok2 {
+			return val2, true
 		}
 	}
 	return 0.0, false
