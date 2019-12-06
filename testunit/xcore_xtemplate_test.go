@@ -14,7 +14,7 @@ func TestCommentParam(t *testing.T) {
 	tmpl := xcore.NewXTemplate()
 	err := tmpl.LoadString("%-- starting comment --%Text %--with a [[]]comment--% here. Also an%----% empty comment %--ending comment--%")
 
-  fmt.Println(err)
+	fmt.Println(err)
 	//  fmt.Println(tmpl.Root)
 
 	result := tmpl.Execute(nil)
