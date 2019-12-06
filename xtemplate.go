@@ -59,7 +59,7 @@ const (
 type XTemplateParam struct {
 	paramtype int
 	data      string
-//	children  *XTemplateData
+	//	children  *XTemplateData
 }
 
 // XTemplateData is an Array of all the parameters into the template

@@ -130,7 +130,7 @@ func (d *XDataset) GetInt(key string) (int, bool) {
 		}
 		if val2, ok2 := val.(bool); ok2 {
 			if val2 {
-  			return 1, true
+				return 1, true
 			}
 			return 0, true
 		}
@@ -149,7 +149,7 @@ func (d *XDataset) GetFloat(key string) (float64, bool) {
 		}
 		if val2, ok2 := val.(bool); ok2 {
 			if val2 {
-  			return 1.0, true
+				return 1.0, true
 			}
 			return 0.0, true
 		}
