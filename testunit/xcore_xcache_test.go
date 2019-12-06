@@ -56,7 +56,7 @@ func TestXCacheValidate(t *testing.T) {
 
 	// Test 1: creates 100 max, no file, expires in 1 sec
 	cache := xcore.NewXCache("mycache1", 100, 0) // no timeout
-	cache.SetValidator(Validate)
+	cache.Validator = Validate
 
 	// put some values
 	cache.Set("a", 1)
