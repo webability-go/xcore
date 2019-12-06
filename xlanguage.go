@@ -88,7 +88,7 @@ func (l *XLanguage) LoadXMLFile(file string) error {
 func (l *XLanguage) LoadXMLString(data string) error {
 	// Temporal structures for XML loading
 	type xentry struct {
-		Id    string `xml:"id,attr"`
+		ID    string `xml:"id,attr"`
 		Entry string `xml:",chardata"`
 	}
 
@@ -109,7 +109,7 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	l.Name = temp.Name
 	l.Language = temp.Language
 	for _, e := range temp.Entries {
-		l.Entries[e.Id] = e.Entry
+		l.Entries[e.ID] = e.Entry
 	}
 	return nil
 }

@@ -55,7 +55,7 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
 }
 
 // GetId will expose the ID of the cache
-func (c *XCache) GetId() string {
+func (c *XCache) GetID() string {
 	return c.id
 }
 

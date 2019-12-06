@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT licence
 // license that can be found in the LICENSE file.
 
-// Package XCore is a set of basic objects for programation (XCache, XDataset, XLanguage, XTemplate).
+// Package xcore is a set of basic objects for programation (XCache, XDataset, XLanguage, XTemplate).
 // For GO, the actual existing code includes:
 //
 // - XCache: Application Memory Caches for any purpose,

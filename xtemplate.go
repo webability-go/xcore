@@ -261,7 +261,7 @@ func (t *XTemplate) compile(data string) error {
 			if currentpointer != i {
 				compiled[currentpointer] = x
 			}
-			currentpointer += 1
+			currentpointer++
 		}
 	}
 

@@ -356,9 +356,8 @@ func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
 // GetDataBool will retrieve the first available data identified by key from the collection ordered by index and return it as a boolean
 func (d *XDatasetCollection) GetDataBool(key string) (bool, bool) {
 	if val, ok := d.GetData(key); ok {
-		switch val.(type) {
-		case bool:
-			return val.(bool), true
+		if val2, ok2 := val.(bool); ok2 {
+			return val2, true
 		}
 	}
 	return false, false
@@ -367,9 +366,8 @@ func (d *XDatasetCollection) GetDataBool(key string) (bool, bool) {
 // GetDataInt will retrieve the first available data identified by key from the collection ordered by index and return it as an integer
 func (d *XDatasetCollection) GetDataInt(key string) (int, bool) {
 	if val, ok := d.GetData(key); ok {
-		switch val.(type) {
-		case int:
-			return val.(int), true
+		if val2, ok2 := val.(int); ok2 {
+			return val2, true
 		}
 	}
 	return 0, false
@@ -378,9 +376,8 @@ func (d *XDatasetCollection) GetDataInt(key string) (int, bool) {
 // GetDataFloat will retrieve the first available data identified by key from the collection ordered by index and return it as a float
 func (d *XDatasetCollection) GetDataFloat(key string) (float64, bool) {
 	if val, ok := d.GetData(key); ok {
-		switch val.(type) {
-		case float64:
-			return val.(float64), true
+		if val2, ok2 := val.(float64); ok2 {
+			return val2, true
 		}
 	}
 	return 0, false
@@ -389,9 +386,8 @@ func (d *XDatasetCollection) GetDataFloat(key string) (float64, bool) {
 // GetDataTime will retrieve the first available data identified by key from the collection ordered by index and return it as a time
 func (d *XDatasetCollection) GetDataTime(key string) (time.Time, bool) {
 	if val, ok := d.GetData(key); ok {
-		switch val.(type) {
-		case time.Time:
-			return val.(time.Time), true
+		if val2, ok2 := val.(time.Time); ok2 {
+			return val2, true
 		}
 	}
 	return time.Time{}, false
