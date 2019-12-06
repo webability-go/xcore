@@ -77,9 +77,8 @@ func (d *XDataset) Get(key string) (interface{}, bool) {
 // GetDataset will read the value of the key variable as a XDatasetDef cast type
 func (d *XDataset) GetDataset(key string) (XDatasetDef, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case XDatasetDef:
-			return val.(XDatasetDef), true
+		if val2, ok2 := val.(XDatasetDef); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
@@ -88,9 +87,8 @@ func (d *XDataset) GetDataset(key string) (XDatasetDef, bool) {
 // GetCollection will read the value of the key variable as a XDatasetCollection cast type
 func (d *XDataset) GetCollection(key string) (XDatasetCollectionDef, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case XDatasetCollectionDef:
-			return val.(XDatasetCollectionDef), true
+		if val2, ok2 := val.(XDatasetCollectionDef); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
@@ -108,13 +106,14 @@ func (d *XDataset) GetString(key string) (string, bool) {
 // GetBool will read the value of the key variable as a boolean cast type
 func (d *XDataset) GetBool(key string) (bool, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case bool:
-			return val.(bool), true
-		case int:
-			return val.(int) != 0, true
-		case float64:
-			return val.(float64) != 0, true
+		if val2, ok2 := val.(bool); ok2 {
+			return val2, true
+		}
+		if val2, ok2 := val.(int); ok2 {
+			return val2 != 0, true
+		}
+		if val2, ok2 := val.(float64); ok2 {
+			return val2 != 0, true
 		}
 	}
 	return false, false
@@ -123,14 +122,15 @@ func (d *XDataset) GetBool(key string) (bool, bool) {
 // GetInt will read the value of the key variable as an integer cast type
 func (d *XDataset) GetInt(key string) (int, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case int:
-			return val.(int), true
-		case float64:
-			return int(val.(float64)), true
-		case bool:
-			if val.(bool) {
-				return 1, true
+		if val2, ok2 := val.(int); ok2 {
+			return val2, true
+		}
+		if val2, ok2 := val.(float64); ok2 {
+			return int(val2), true
+		}
+		if val2, ok2 := val.(bool); ok2 {
+			if val2 {
+  			return 1, true
 			}
 			return 0, true
 		}
@@ -141,27 +141,27 @@ func (d *XDataset) GetInt(key string) (int, bool) {
 // GetFloat will read the value of the key variable as a float64 cast type
 func (d *XDataset) GetFloat(key string) (float64, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case float64:
-			return val.(float64), true
-		case int:
-			return float64(val.(int)), true
-		case bool:
-			if val.(bool) {
-				return 1.0, true
+		if val2, ok2 := val.(float64); ok2 {
+			return val2, true
+		}
+		if val2, ok2 := val.(int); ok2 {
+			return float64(val2), true
+		}
+		if val2, ok2 := val.(bool); ok2 {
+			if val2 {
+  			return 1.0, true
 			}
 			return 0.0, true
 		}
 	}
-	return 0, false
+	return 0.0, false
 }
 
 // GetTime will read the value of the key variable as a time cast type
 func (d *XDataset) GetTime(key string) (time.Time, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case time.Time:
-			return val.(time.Time), true
+		if val2, ok2 := val.(time.Time); ok2 {
+			return val2, true
 		}
 	}
 	return time.Time{}, false
@@ -170,9 +170,8 @@ func (d *XDataset) GetTime(key string) (time.Time, bool) {
 // GetStringCollection will read the value of the key variable as a collection of strings cast type
 func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case []string:
-			return val.([]string), true
+		if val2, ok2 := val.([]string); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
@@ -181,9 +180,8 @@ func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
 // GetBoolCollection will read the value of the key variable as a collection of bool cast type
 func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case []bool:
-			return val.([]bool), true
+		if val2, ok2 := val.([]bool); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
@@ -192,9 +190,8 @@ func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
 // GetIntCollection will read the value of the key variable as a collection of int cast type
 func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case []int:
-			return val.([]int), true
+		if val2, ok2 := val.([]int); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
@@ -203,9 +200,8 @@ func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
 // GetFloatCollection will read the value of the key variable as a collection of float cast type
 func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case []float64:
-			return val.([]float64), true
+		if val2, ok2 := val.([]float64); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
@@ -214,9 +210,8 @@ func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
 // GetTimeCollection will read the value of the key variable as a collection of time cast type
 func (d *XDataset) GetTimeCollection(key string) ([]time.Time, bool) {
 	if val, ok := (*d)[key]; ok {
-		switch val.(type) {
-		case []time.Time:
-			return val.([]time.Time), true
+		if val2, ok2 := val.([]time.Time); ok2 {
+			return val2, true
 		}
 	}
 	return nil, false
