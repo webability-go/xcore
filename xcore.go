@@ -21,14 +21,23 @@
 // XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
 // The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistent (if you exit the application)
 // and cannot grow too much (as memory is the limit).
-// However, you can control a timeout of each cache piece, and eventually the comparison against a source (file, database, etc) to invalid the cache.
+// However, you can control a timeout of each cache piece, and eventually a comparison function against a source (file, database, etc) to invalid the cache.
 //
-// Declare a new XCache with NewXCache() function:
+// 1. Declare a new XCache with NewXCache() function:
 //
 //  import "github.com/webability-go/xcore"
 //
-//  var myfiles = xcore.NewXCache("myfiles", 0, 0)
-//  var mydbtable = xcore.NewXCache("mydb-table", 0, 0)
+//  // 50 items max
+//  var myfiles = xcore.NewXCache("myfiles", 50, 0)
+//
+//  // 10 minutes expiration
+//  var mydbtable = xcore.NewXCache("mydb-table", 0, 10 * time.Minute)
+//
+//  // No direct limits on the cache
+//  var myotherdbtable = xcore.NewXCache("mydb-table", 0, 0)
+//
+// 2. Once you have declared the cache, you can fill it with anything you want. The main cache object is an interface{}
+// so you can put here anything you need, from simple variables to complex structures. You need to use the Set funcion:
 //
 //  func main() {
 //    myfiles.Set("https://developers.webability.info/", "somedata")
@@ -40,27 +49,39 @@
 //    }
 //  }
 //
-//  	func usemycache() {
+// 3. To use the cache, just ask for your entry with Get function:
 //
-//  	  go somefunc()
+//  func usemycache() {
 //
-//  	  fmt.Println("Quantity of data into cache:", myfiles.Count(), mydbtable.Count())
-//  	}
+//    filedata, invalid := myfiles.Get("https://developers.webability.info/");
+//    dbdata, invalid2 := mydbtable.Get("4455");
+//    // do something with the fetched data
+//  }
 //
-//  	func somefunc() {
-//  	  data, invalid := myfiles.Get("https://developers.webability.info/");
-//  		moredata, invalid2 := mydbtable.Get("4455");
+// 4. To maintain the cache you may need Del function, to delete a specific entry (maybe because you deleted the record in database).
+// You may also need Clean function to deletes a percentage of the cache, or Flush to deletes it all.
+// The Verify function is used to check cache entries against their sources through the Validator function.
+// Be very carefull, if the cache is big or the Validator function is complex (maybe ask for a remote server information),
+// the verification may be VERY slow and huge CPU use.
+// The Count function gives some stats about the cache.
 //
-//  		// do something with data
-//  	}
+//  func analyze() {
 //
-// Then you can use the 3 basic functions to control the content of the cache: Get/Set/Del.
-// You can put any kind of data into your XCache.
+//    // Actual size of cache
+//    fmt.Println(mydbtable.Count())
+//    // Removes 30% of objects
+//    objectsremoved := mydbtable.Clean(30)
+//    // New size of cache
+//    fmt.Println(mydbtable.Count())
+//    // totally flush the cache
+//    mydbtable.Flush()
+//    // New size of cache, should be 0
+//    fmt.Println(mydbtable.Count())
+//  }
+//
 // The XCache is thread safe.
-//
 // The cache can be limited in quantity of entries and timeout for data. The cache is automanaged (for invalid expired data) and can be cleaned partially or totally manually.
 //
-// If you want some stats of the cache, use the Count function.
 //
 // XLanguage
 //
@@ -110,7 +131,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "0.2.0"
+const VERSION = "0.2.1"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.

@@ -30,6 +30,9 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.2.1 - 2019-12-13
+- XCache manual enhanced with examples
+
 v0.2.0 - 2019-12-06
 - XCache Code simplified to expose XCache definition as public, remove not usefull funcion (Get*)
 - XCache 0.2.0 is not compatible with XCache 0.1.* , you may need to change your code
