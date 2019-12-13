@@ -1,4 +1,3 @@
-// d
 package xcore
 
 import (
