@@ -1,4 +1,4 @@
-// XCache documentation
+// d
 package xcore
 
 import (

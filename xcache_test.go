@@ -3,17 +3,17 @@ package xcore
 import "testing"
 
 import (
-  "fmt"
+	"fmt"
 )
- 
-func ExampleXCache() {
-  cache := NewXCache("cacheid", 0, 0)
 
-  fmt.Println(cache.Count())
+func ExampleXCache() {
+	cache := NewXCache("cacheid", 0, 0)
+
+	fmt.Println(cache.Count())
 }
 
 func TestXCache(t *testing.T) {
-  cache := NewXCache("cacheid", 0, 0)
+	cache := NewXCache("cacheid", 0, 0)
 
-  fmt.Println(cache.Count())
+	fmt.Println(cache.Count())
 }
