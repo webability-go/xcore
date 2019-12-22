@@ -7,17 +7,19 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"golang.org/x/text/language"
 )
 
 // XLanguage is the oficial structure for the user
 type XLanguage struct {
 	Name     string
-	Language string
+	Language language.Tag
 	Entries  map[string]string
 }
 
 // NewXLanguage will create an empty Language structure with a name and a language
-func NewXLanguage(name string, lang string) *XLanguage {
+func NewXLanguage(name string, lang language.Tag) *XLanguage {
 	return &XLanguage{Name: name, Language: lang, Entries: make(map[string]string)}
 }
 
@@ -107,7 +109,7 @@ func (l *XLanguage) LoadXMLString(data string) error {
 
 	// Scan to our XLanguage Object
 	l.Name = temp.Name
-	l.Language = temp.Language
+	l.Language, _ = language.Parse(temp.Language)
 	for _, e := range temp.Entries {
 		l.Entries[e.ID] = e.Entry
 	}
@@ -170,7 +172,7 @@ func (l *XLanguage) SetName(name string) {
 }
 
 // SetLanguage will set the language ISO code (2 letters) of the language table
-func (l *XLanguage) SetLanguage(lang string) {
+func (l *XLanguage) SetLanguage(lang language.Tag) {
 	l.Language = lang
 }
 
@@ -180,7 +182,7 @@ func (l *XLanguage) GetName() string {
 }
 
 // GetLanguage will return the language of the language table
-func (l *XLanguage) GetLanguage() string {
+func (l *XLanguage) GetLanguage() language.Tag {
 	return l.Language
 }
 

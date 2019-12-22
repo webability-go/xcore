@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"github.com/webability-go/xcore"
 	"testing"
-	//  "unsafe"
+
+	"golang.org/x/text/language"
 )
 
 /* TEST XLANGUAGE */
 
 func TestXLanguage(t *testing.T) {
 	// Test 1: creates from empty
-	lang := xcore.NewXLanguage("mytranslation", "es")
+	lang := xcore.NewXLanguage("mytranslation", language.Spanish)
 	fmt.Println(lang)
 
 	// Test 2: set/get
