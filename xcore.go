@@ -135,7 +135,7 @@
 //
 // Then you can use the set of basic access functions:
 //
-// SetName/SetLanguage functions are used to set the table name and language of the object (generally to build an object from scracth)
+// SetName/SetLanguage functions are used to set the table name and language of the object (generally to build an object from scratch)
 // GetName/GetLanguage functions are used to get the table name and language of the object (generally when you load it from some source)
 // Set/Get/Del functions are used to add or modify a new entry, read an entry, or deletes an entry in the object.
 //
@@ -146,7 +146,7 @@
 1. Overview
 ------------------------
 
-The XDataSetDef is an interfase to build a standard set of data optionally nested and hierarchical, that can be used for any purpose:
+The XDataSetDef is an interface to build a standard set of data optionally nested and hierarchical, that can be used for any purpose:
 - Keep complex data in memory
 - Create JSON structures
 - Inject data into templates
@@ -218,7 +218,7 @@ import "github.com/webability-go/xcore"
 
 The XDatasetDef Interface:
 ---------------------
-The interface is used to derivate any type of data as a Data Set. Any other components that needs an XDataSetDef to inject data (for instance a template or a database cursor) does not need explicitly an XDataSet but anything derived this this interface (for instance an XRecord from xdominion can be used to inject something into and XTemplate)
+The interface is used to extend any type of data as a Data Set. Any other components that needs an XDataSetDef to inject data (for instance a template or a database cursor) does not need explicitly an XDataSet but anything derived this this interface (for instance an XRecord from xdominion can be used to inject something into and XTemplate)
 
 The XDatasetDef interface needs those function declared:
 
@@ -292,12 +292,12 @@ func (d *XDatasetDef)Clone() XDatasetDef
 
 
 The basic XDataset type is a simple map[string]interface{}
-However, you can build any complex structure that derivates the interface and implements all the required functions to stay compatible with the XDatasetDef.
+However, you can build any complex structure that extends the interface and implements all the required functions to stay compatible with the XDatasetDef.
 
 
 The XDatasetCollectionDef Interface:
 ---------------------
-The interface is used to derivate any type of data as a Data Set Collection. This is a slice of any XDatasetDef compatible data
+The interface is used to extend any type of data as a Data Set Collection. This is a slice of any XDatasetDef compatible data
 
 The XDatasetCollectionDef interface needs those function declared:
 
@@ -372,7 +372,7 @@ func (d *XDatasetCollectionDef)Clone() XDatasetCollectionDef
 
 
 The basic XDatasetCollection type is a simple []DatasetDef
-However, you can build any complex structure that derivates the interface and implements all the required functions to stay compatible with the XDatasetCollectionDef.
+However, you can build any complex structure that extends the interface and implements all the required functions to stay compatible with the XDatasetCollectionDef.
 */
 //
 // XTemplate
@@ -389,13 +389,13 @@ class to compile and keep a Template string
 A template is a set of HTML/XML (or any other language) string with a meta language to inject variables and build a final string.
 
 The XCore XTemplate system is based on the injection of parameters, language translation strings and data fields directly into the HTML (Or any other language you need) template.
-The HTML itself (or any other language) is a fixed code not directly used by the template system, but used to dress the data you want to represent in your prefered language.
+The HTML itself (or any other language) is a fixed code not directly used by the template system, but used to dress the data you want to represent in your preferred language.
 
-The variables to inject are into a XDataSet structure or into a structure extended from XDataSetDef interfase.
+The variables to inject are into a XDataSet structure or into a structure extended from XDataSetDef interface.
 The injection of data is based on a XDataSet structure of values that can be nested into another XDataSet and XDataSetConnection and so on.
 The template compiler recognize nested arrays to automatically make loops on the information.
 
-The macrolanguage is extremely simple and is made to be usefull and **really** separate programation from template code (not like other may generic template systems that just mix code and data).
+The macrolanguage is extremely simple and is made to be useful and **really** separate programation from template code (not like other may generic template systems that just mix code and data).
 
 !!Templates are made to store reusable HTML code, and overall easily changeable by **NON PROGRAMMING PEOPLE**.!!
 
@@ -410,7 +410,7 @@ In sight to create and use templates, you have all those possible options to use
 * Meta elements, to build a code based on a data array. There are various types of meta elements:
 ** Data access with ~~{{...}}~~, to show the value of a data into the data array
 ** Subtemplates access with ~~&&...&&~~, to call a subtemplate based on the value of an entry in the data array.
-** Conditional access with ~~??...??~~, to show a piece of HTML based on the existance or value of an entry in the data array.
+** Conditional access with ~~??...??~~, to show a piece of HTML based on the existence or value of an entry in the data array.
 ** Loops access with ~~@@...@@~~, to repeat a piece of HTML based on a table of values.
 ** Debug tools with ~~!!...!!~~, to show the data array.
 
@@ -481,7 +481,7 @@ print $template;
 </pre>
 ```
 
-As a reference, using the simple \core\WATemplate object will take approx 12 milisecond to load/compile/resolve the template.
+As a reference, using the simple \core\WATemplate object will take approx 12 millisecond to load/compile/resolve the template.
 Using the shared memory cache will take only 2 milliseconds to get the template and resolve it (on a 2GHz Xeon processor).
 
 Talking about a good CMS or an application with many templates, using the \datasources\TemplateSource decreases dramatically file accesses and calculation time of your code.
@@ -521,7 +521,7 @@ Meta elements:
 ++ Comments
 
 You may use comments into your template.
-The comments will be discarded immediatly at the compilation of the template and not interfere with the rest of your code.
+The comments will be discarded immediately at the compilation of the template and not interfere with the rest of your code.
 
 Comments are defined by ~~%--~~ and ~~--%~~
 
@@ -618,9 +618,9 @@ The elements are replaced by the addElement() method into the template class.
 We "logically" define 3 type of elements. The separation is only for human logic. The system doesn't make a difference between them. Anything you give to the method will be replaced, however the syntax is. You may define new syntax and new types of elements at will.
 The official elements defined for the templates are:
 
-* parameters, which are any piece of information, generaly used to build the HTML code.
+* parameters, which are any piece of information, generally used to build the HTML code.
 * language entries, which are any readable information in the language you choose.
-* field values, which are generally usefull information from a database or data repository.
+* field values, which are generally useful information from a database or data repository.
 
 !!We highly recommend to use the metaelements instead of simple elements.!!
 
@@ -673,8 +673,8 @@ You may use the same parameter as many time you wish.&lt;br />
 +++ Field values
 
 Fields values should have the format: {fieldname}
-Your fields source can be a database or any other prefered repository data source.
-Is it highly recomended to use this syntax for any data field you need to replace in your template.
+Your fields source can be a database or any other preferred repository data source.
+Is it highly recommended to use this syntax for any data field you need to replace in your template.
 
 Example:
 
@@ -997,7 +997,7 @@ Image with status=1:<br />
 +++ Debug tools
 
 There are two keywords to dump the content of the vector of values, i.e. the elements and the metaelements.
-This is very usefull when you dont know the code that calls the template, don't remember some values, or for debug facilities.
+This is very useful when you dont know the code that calls the template, don't remember some values, or for debug facilities.
 
 ++++ ~~!!dump!!~~
 Shows the totality of the elements and metaelements, variables and values.
