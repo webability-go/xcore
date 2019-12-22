@@ -61,7 +61,7 @@
 // 4. To maintain the cache you may need Del function, to delete a specific entry (maybe because you deleted the record in database).
 // You may also need Clean function to deletes a percentage of the cache, or Flush to deletes it all.
 // The Verify function is used to check cache entries against their sources through the Validator function.
-// Be very carefull, if the cache is big or the Validator function is complex (maybe ask for a remote server information),
+// Be very careful, if the cache is big or the Validator function is complex (maybe ask for a remote server information),
 // the verification may be VERY slow and huge CPU use.
 // The Count function gives some stats about the cache.
 //
