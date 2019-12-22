@@ -35,6 +35,7 @@ Version Changes Control
 
 v0.2.2 - 2019-12-21
 - XLanguage now support golang x/text/language instead of direct iso 2 charater language
+- godoc manuals for xlanguage, xdataset and xtemplate prepared
 
 v0.2.1 - 2019-12-13
 - XCache manual enhanced with examples
