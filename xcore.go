@@ -9,7 +9,7 @@
 //
 // - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc),
 //
-// - XLanguage: language dependant text tables,
+// - XLanguage: language dependent text tables,
 //
 // - XTemplate: template system with meta language.
 //
@@ -1061,7 +1061,7 @@ func (t *XTemplate)Print() string {
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "0.2.2"
+const VERSION = "0.2.3"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
