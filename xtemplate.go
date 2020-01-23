@@ -307,6 +307,9 @@ func (t *XTemplate) Execute(data XDatasetDef) string {
 // injector will injects the data into this template
 func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage) string {
 	var injected []string
+	if t.Root == nil {
+		return "Error, no template.Root compiled"
+	}
 	for _, v := range *t.Root {
 		switch v.paramtype {
 		case MetaString: // included string from original code
@@ -327,8 +330,10 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 				injected = append(injected, substr)
 			}
 		case MetaVariable:
-			d, _ := datacol.GetDataString(v.data)
-			injected = append(injected, d)
+			if datacol != nil {
+				d, _ := datacol.GetDataString(v.data)
+				injected = append(injected, d)
+			}
 		case MetaRange: // Range (loop over subset)
 
 			// TODO(phil) subtemplate depends on first, last, loop # counter, key, condition etc
@@ -337,21 +342,22 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			if subt != nil {
 				// TODO(phil) We have to check the correct type of the collection
 
-				cl, _ := datacol.GetCollection(v.data)
-				if cl != nil {
-					for i := 0; i < cl.Count(); i++ {
-						// if v.data is a substructure into data, then we stack the data and inject new stacked data
-						dcl, _ := cl.Get(i)
-						datacol.Push(dcl)
-						substr := subt.injector(datacol, language)
-						injected = append(injected, substr)
-						// unstack extra data
-						datacol.Pop()
+				if datacol != nil {
+					cl, _ := datacol.GetCollection(v.data)
+					if cl != nil {
+						for i := 0; i < cl.Count(); i++ {
+							// if v.data is a substructure into data, then we stack the data and inject new stacked data
+							dcl, _ := cl.Get(i)
+							datacol.Push(dcl)
+							substr := subt.injector(datacol, language)
+							injected = append(injected, substr)
+							// unstack extra data
+							datacol.Pop()
+						}
 					}
 				}
 			}
 		case MetaCondition:
-
 			// TODO(phil) subtemplate depends on condition completion
 			subt := t.GetTemplate(v.data)
 			value := searchConditionValue(v.data, datacol)
@@ -362,10 +368,12 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 				injected = append(injected, substr)
 			}
 		case MetaDump:
-			dsubstr, _ := datacol.Get(0)
-			if dsubstr != nil {
-				substr := dsubstr.Stringify()
-				injected = append(injected, substr)
+			if datacol != nil {
+				dsubstr, _ := datacol.Get(0)
+				if dsubstr != nil {
+					substr := dsubstr.Stringify()
+					injected = append(injected, substr)
+				}
 			}
 		default:
 			injected = append(injected, "THE METALANGUAGE FROM OUTERSPACE IS NOT SUPPORTED: "+fmt.Sprint(v.paramtype))
@@ -378,6 +386,9 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 // searchConditionValue will search one parameter value from the data
 func searchConditionValue(id string, data XDatasetCollectionDef) string {
 	// scan data for each dataset in order top to bottom
+	if data == nil {
+		return ""
+	}
 	v, _ := data.GetDataString(id)
 	return v
 }
