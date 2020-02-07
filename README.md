@@ -7,7 +7,7 @@
 XCore for GO v0
 =============================
 
-The XCore package is used to build basic object for programation. for the WebAbility compatility code
+The XCore package is used to build basic object for programmtion. for the WebAbility compatility code
 For GO, the actual existing code includes:
 - XCache: Application Memory Caches
 - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc)
@@ -30,6 +30,19 @@ TO DO:
 
 Version Changes Control
 =======================
+
+v0.3.1 - 2020-02-
+-----------------------
+- (Working) XTemplates now resolve @@ metalanguage with 1,2 and 3 Parameters
+- (Working) XTemplates now resolve && metalanguage with 1,2 and 4 Parameters
+- (Working) XTemplates now resolve ?? metalanguage with 1,2 and 3 Parameters
+- (Working) XTemplates now implements sub templates derivation (-none -first -last -(key) -(number) )
+- (working) Manuals for XCache, XLanguage and XTemplate written with reference of the metalanguage
+
+v0.3.0 - 2020-02-06
+-----------------------
+- The properties of XTemplateParam are now public so the full structure can be used to build other type of code based on the XTemplate rules
+- The subtemplates IDs must be lowers, numbers and . - _ in sight of integration with other systems that can mix tags [[]] within the code
 
 v0.2.3 - 2020-01-23
 -----------------------
