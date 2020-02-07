@@ -57,8 +57,8 @@ const (
 
 // XTemplateParam is a parameter definition into the template
 type XTemplateParam struct {
-	paramtype int
-	data      string
+	ParamType int
+	Data      string
 	//	children  *XTemplateData
 }
 
@@ -140,7 +140,7 @@ func (t *XTemplate) compile(data string) error {
 
 			// ==== NESTED ELEMENTS (SUB TEMPLATES)
 			`|\[\[(\])\]` + // index based 15
-			`|(\[)\[(.+?)\]\]` // index based 16
+			`|(\[)\[([a-z0-9\.\-_]+?)\]\]` // index based 16
 
 	codex := regexp.MustCompile(code)
 	indexes := codex.FindAllStringIndex(data, -1)
@@ -150,54 +150,54 @@ func (t *XTemplate) compile(data string) error {
 	pointer := 0
 	for i, x := range indexes {
 		if pointer != x[0] {
-			compiled = append(compiled, *(&XTemplateParam{paramtype: MetaString, data: data[pointer:x[0]]}))
+			compiled = append(compiled, *(&XTemplateParam{ParamType: MetaString, Data: data[pointer:x[0]]}))
 		}
 
 		param := &XTemplateParam{}
 		if matches[i][1] == "%" {
-			param.paramtype = MetaComment // comment
-			param.data = matches[i][2]
+			param.ParamType = MetaComment // comment
+			param.Data = matches[i][2]
 		} else if matches[i][3] == "#" {
-			param.paramtype = MetaLanguage // Entry Param
-			param.data = matches[i][4]
+			param.ParamType = MetaLanguage // Entry Param
+			param.Data = matches[i][4]
 		} else if matches[i][5] == "&" {
-			param.paramtype = MetaReference // sysparam
+			param.ParamType = MetaReference // sysparam
 
 			// BUILD THE 2 & PARTS
-			param.data = matches[i][6]
+			param.Data = matches[i][6]
 
 		} else if matches[i][7] == "@" {
-			param.paramtype = MetaRange // pageparam
+			param.ParamType = MetaRange // pageparam
 
 			// BUILD THE 3 @ PARTS
-			param.data = matches[i][8]
+			param.Data = matches[i][8]
 
 		} else if matches[i][9] == "?" {
-			param.paramtype = MetaCondition // local pageparam
+			param.ParamType = MetaCondition // local pageparam
 
 			// BUILD THE 3 ? PARTS
-			param.data = matches[i][10]
+			param.Data = matches[i][10]
 
 		} else if matches[i][11] == "!" {
-			param.paramtype = MetaDump // instance param
-			param.data = matches[i][12]
+			param.ParamType = MetaDump // instance param
+			param.Data = matches[i][12]
 		} else if matches[i][13] == "{" {
-			param.paramtype = MetaVariable // local instance param
-			param.data = matches[i][14]
+			param.ParamType = MetaVariable // local instance param
+			param.Data = matches[i][14]
 		} else if matches[i][16] == "[" {
-			param.paramtype = MetaTemplateStart // javascript call for header
-			param.data = matches[i][17]
+			param.ParamType = MetaTemplateStart // javascript call for header
+			param.Data = matches[i][17]
 		} else if matches[i][15] == "]" {
-			param.paramtype = MetaTemplateEnd // css call for header
+			param.ParamType = MetaTemplateEnd // css call for header
 		} else {
-			param.paramtype = MetaUnused // unknown, will be removed
+			param.ParamType = MetaUnused // unknown, will be removed
 		}
 		compiled = append(compiled, *param)
 		pointer = x[1]
 	}
-	// end of data
+	// end of Data
 	if pointer != len(data) {
-		compiled = append(compiled, *(&XTemplateParam{paramtype: MetaString, data: data[pointer:]}))
+		compiled = append(compiled, *(&XTemplateParam{ParamType: MetaString, Data: data[pointer:]}))
 	}
 
 	// second pass: all the sub templates into the Subtemplates
@@ -205,11 +205,11 @@ func (t *XTemplate) compile(data string) error {
 	subtemplates := []*XTemplate{}
 	actualtemplate := t
 	for i, x := range compiled {
-		if x.paramtype == MetaTemplateStart {
+		if x.ParamType == MetaTemplateStart {
 			startpointers = append(startpointers, i)
 			subtemplates = append(subtemplates, actualtemplate)
-			actualtemplate = &XTemplate{Name: x.data, Root: nil}
-		} else if x.paramtype == MetaTemplateEnd {
+			actualtemplate = &XTemplate{Name: x.Data, Root: nil}
+		} else if x.ParamType == MetaTemplateEnd {
 			// we found the end of the nested box, lets create a nested param array from stacked startpointer up to i
 			last := len(startpointers) - 1
 			if last < 0 {
@@ -220,9 +220,9 @@ func (t *XTemplate) compile(data string) error {
 
 			var subset XTemplateData
 			for ptr := startpointer + 1; ptr < i; ptr++ { // we ignore the BOX]] end param (we dont need it in the hierarchic structure)
-				if compiled[ptr].paramtype != MetaUnused { // we just ignore params marked to be deleted
+				if compiled[ptr].ParamType != MetaUnused { // we just ignore params marked to be deleted
 					subset = append(subset, compiled[ptr])
-					compiled[ptr].paramtype = MetaUnused // marked to be deleted, traslated to a substructure
+					compiled[ptr].ParamType = MetaUnused // marked to be deleted, traslated to a substructure
 				}
 			}
 			actualtemplate.Root = &subset
@@ -246,8 +246,8 @@ func (t *XTemplate) compile(data string) error {
 			// pop actualtemplate
 			actualtemplate = uppertemplate
 
-			compiled[startpointer].paramtype = MetaUnused // marked to be deleted, no need of start template
-			compiled[i].paramtype = MetaUnused            // marked to be deleted, no need of end template
+			compiled[startpointer].ParamType = MetaUnused // marked to be deleted, no need of start template
+			compiled[i].ParamType = MetaUnused            // marked to be deleted, no need of end template
 		}
 	}
 	if len(startpointers) > 0 {
@@ -257,7 +257,7 @@ func (t *XTemplate) compile(data string) error {
 	// last pass: delete params marked to be deleted and concatenate strings
 	currentpointer := 0
 	for i, x := range compiled {
-		if x.paramtype != MetaUnused {
+		if x.ParamType != MetaUnused {
 			if currentpointer != i {
 				compiled[currentpointer] = x
 			}
@@ -288,7 +288,7 @@ func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	return t.SubTemplates[name]
 }
 
-// Execute will inject the data into the template and creates the final string
+// Execute will inject the Data into the template and creates the final string
 func (t *XTemplate) Execute(data XDatasetDef) string {
 	// Does data has a language ?
 	if data != nil {
@@ -311,18 +311,18 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 		return "Error, no template.Root compiled"
 	}
 	for _, v := range *t.Root {
-		switch v.paramtype {
+		switch v.ParamType {
 		case MetaString: // included string from original code
-			injected = append(injected, v.data)
+			injected = append(injected, v.Data)
 		case MetaComment:
 			// nothing to do: comment ignored
 		case MetaLanguage:
 			if language != nil {
-				injected = append(injected, language.Get(v.data))
+				injected = append(injected, language.Get(v.Data))
 			}
 		case MetaReference: // Reference
 			// search for the subtemplate and reinject anything into it
-			subt := t.GetTemplate(v.data)
+			subt := t.GetTemplate(v.Data)
 			if subt != nil {
 				// if v.data is a substructure into data, then we stack the data and inject new stacked data
 
@@ -331,19 +331,24 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			}
 		case MetaVariable:
 			if datacol != nil {
-				d, _ := datacol.GetDataString(v.data)
+				d, _ := datacol.GetDataString(v.Data)
 				injected = append(injected, d)
 			}
-		case MetaRange: // Range (loop over subset)
-
+		case MetaRange: // Range (loop over subset) @@id:id@@
 			// TODO(phil) subtemplate depends on first, last, loop # counter, key, condition etc
-			subt := t.GetTemplate(v.data)
+			xdata := strings.Split(v.Data, ":")
+			subdataid := xdata[0]
+			subtemplateid := xdata[0]
+			if len(xdata) > 1 {
+				subtemplateid = xdata[1]
+			}
 
+			subt := t.GetTemplate(subtemplateid)
 			if subt != nil {
 				// TODO(phil) We have to check the correct type of the collection
 
 				if datacol != nil {
-					cl, _ := datacol.GetCollection(v.data)
+					cl, _ := datacol.GetCollection(subdataid)
 					if cl != nil {
 						for i := 0; i < cl.Count(); i++ {
 							// if v.data is a substructure into data, then we stack the data and inject new stacked data
@@ -359,8 +364,8 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			}
 		case MetaCondition:
 			// TODO(phil) subtemplate depends on condition completion
-			subt := t.GetTemplate(v.data)
-			value := searchConditionValue(v.data, datacol)
+			subt := t.GetTemplate(v.Data)
+			value := searchConditionValue(v.Data, datacol)
 
 			// if v.data is a substructure into data, then we stack the data and inject new stacked data
 			if value != "" {
@@ -376,7 +381,7 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 				}
 			}
 		default:
-			injected = append(injected, "THE METALANGUAGE FROM OUTERSPACE IS NOT SUPPORTED: "+fmt.Sprint(v.paramtype))
+			injected = append(injected, "THE METALANGUAGE FROM OUTERSPACE IS NOT SUPPORTED: "+fmt.Sprint(v.ParamType))
 		}
 	}
 	// return the page string

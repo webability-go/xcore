@@ -1,8 +1,8 @@
-// Copyright Philippe Thomassigny 2004-2019
+// Copyright Philippe Thomassigny 2004-2020
 // Use of this source code is governed by a MIT licence
 // license that can be found in the LICENSE file.
 
-// Package xcore is a set of basic objects for programmation (XCache, XDataset, XLanguage, XTemplate).
+// Package xcore is a set of basic objects for programmation (XCache for caches, XDataset for data sets, XLanguage for languages and XTemplate for templates).
 // For GO, the actual existing code includes:
 //
 // - XCache: Application Memory Caches for any purpose,
@@ -141,267 +141,218 @@
 //
 // XDataSet
 //
-/*
-
-1. Overview
-------------------------
-
-The XDataSetDef is an interface to build a standard set of data optionally nested and hierarchical, that can be used for any purpose:
-- Keep complex data in memory
-- Create JSON structures
-- Inject data into templates
-- Interchange database data (records set and record)
-etc
-
-You can store into it generic supported data, as well as any complex interface structures:
-- Int
-- Float
-- String
-- Time
-- Bool
-- []Int
-- []Float
-- []String
-- []Time
-- []Bool
-- XDataSetDef (anything extended with this interface)
-- XDataSetCollectionDef (anything extended with this interface)
-- Anything else ( interface{} )
-
-The generic supported data comes with a set of functions to get/set those data directly into the XDataset.
-
-Example:
-
-
-```
-import "github.com/webability-go/xcore"
-
-data := xcore.XDataset{}
-data["data1"] = "DATA1"
-data["data2"] = "DATA1"
-sm := xcore.XDataset{}
-sm["data31"] = "DATA31"
-data["data3"] = sm
-data["data4"] = 123
-data["data5"] = 123.432
-data["data6"] = true
-data["data7"] = func() string { return "ABC" }
-
-d8_r1 := &xcore.XDataset{}
-d8_r1.Set("data81", "rec 1: Entry 8-1")
-d8_r1.Set("data82", "rec 1: Entry 8-2")
-
-d8_r2 := &xcore.XDataset{}
-d8_r2.Set("data81", "rec 2: Entry 8-1")
-d8_r2.Set("data82", "rec 2: Entry 8-2")
-d8_r2.Set("data83", "rec 2: Entry 8-3")
-
-d8_r3 := &xcore.XDataset{}
-d8_r3.Set("data81", "rec 3: Entry 8-1")
-d8_r3.Set("data82", "rec 3: Entry 8-2")
-
-d := xcore.XDatasetCollection{}
-d.Push(d8_r1)
-d.Push(d8_r2)
-d.Push(d8_r3)
-
-data["data8"] = &d
-data["data9"] = "I exist"
-```
-
-2. Reference
-------------------------
-
-To use the package:
-
-import "github.com/webability-go/xcore"
-
-The XDatasetDef Interface:
----------------------
-The interface is used to extend any type of data as a Data Set. Any other components that needs an XDataSetDef to inject data (for instance a template or a database cursor) does not need explicitly an XDataSet but anything derived this this interface (for instance an XRecord from xdominion can be used to inject something into and XTemplate)
-
-The XDatasetDef interface needs those function declared:
-
-func (d *XDatasetDef)Stringify() string
-------------------------
-  Stringify will dump the content into a human readable string
-
-func (d *XDatasetDef)Set(key string, data interface{})
-------------------------
-  Set will associate the data to the key. If it already exists, it will be replaced
-
-func (d *XDatasetDef)Get(key string) (interface{}, bool)
-------------------------
-  Get will return the value associated to the key if it exists, or bool = false
-
-func (d *XDatasetDef)GetDataset(key string) (XDatasetDef, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a XDatasetDef if it exists, or bool = false
-
-func (d *XDatasetDef)GetCollection(key string) (XDatasetCollectionDef, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a XDatasetCollectionDef if it exists, or bool = false
-
-func (d *XDatasetDef)GetString(key string) (string, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a string if it exists, or bool = false
-
-func (d *XDatasetDef)GetBool(key string) (bool, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a Bool if it exists, or bool = false
-
-func (d *XDatasetDef)GetInt(key string) (int, bool)
-------------------------
-  Same as Get but will return the value associated to the key as an Int if it exists, or bool = false
-
-func (d *XDatasetDef)GetFloat(key string) (float64, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a float64 if it exists, or bool = false
-
-func (d *XDatasetDef)GetTime(key string) (time.Time, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a time.Time if it exists, or bool = false
-
-func (d *XDatasetDef)GetStringCollection(key string) ([]string, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a []string if it exists, or bool = false
-
-func (d *XDatasetDef)GetBoolCollection(key string) ([]bool, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a []Bool if it exists, or bool = false
-
-func (d *XDatasetDef)GetIntCollection(key string) ([]int, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a []int if it exists, or bool = false
-
-func (d *XDatasetDef)GetFloatCollection(key string) ([]float64, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a []float64 if it exists, or bool = false
-
-func (d *XDatasetDef)GetTimeCollection(key string) ([]time.Time, bool)
-------------------------
-  Same as Get but will return the value associated to the key as a []time.Time if it exists, or bool = false
-
-func (d *XDatasetDef)Del(key string)
-------------------------
-  Del will delete the data associated to the key and deletes the key entry
-
-func (d *XDatasetDef)Clone() XDatasetDef
-------------------------
-  Clone will do a deep clone of the dataset, duplicating any value that is native or with a Clone() function
-
-
-The basic XDataset type is a simple map[string]interface{}
-However, you can build any complex structure that extends the interface and implements all the required functions to stay compatible with the XDatasetDef.
-
-
-The XDatasetCollectionDef Interface:
----------------------
-The interface is used to extend any type of data as a Data Set Collection. This is a slice of any XDatasetDef compatible data
-
-The XDatasetCollectionDef interface needs those function declared:
-
-func (d *XDatasetCollectionDef)Stringify() string
----------------------
-  Stringify will dump the content into a human readable string
-
-func (d *XDatasetCollectionDef)Unshift(data XDatasetDef)
----------------------
-  Will add a datasetdef to the beginning of the collection
-
-func (d *XDatasetCollectionDef)Shift() XDatasetDef
----------------------
-  Will remove the first datasetdef of the collection and return it
-
-func (d *XDatasetCollectionDef)Push(data XDatasetDef)
----------------------
-  Will add a datasetdef to the end of the collection
-
-func (d *XDatasetCollectionDef)Pop() XDatasetDef
----------------------
-  Will remove the last datasetdef of the collection and return it
-
-func (d *XDatasetCollectionDef)Count() int
----------------------
-  Will count the quantity of entries
-
-func (d *XDatasetCollectionDef)Get(index int) (XDatasetDef, bool)
----------------------
-  Will get the entry by the index and let it in the collection
-
-func (d *XDatasetCollectionDef)GetData(key string) (interface{}, bool)
----------------------
-  Will search for the data associated to the key by priority (last entry is the most important)
-  returns bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)GetDataString(key string) (string, bool)
----------------------
-  Same as GetData but will convert the result to a string if possible
-  returns bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)GetDataInt(key string) (int, bool)
----------------------
-  Same as GetData but will convert the result to an int if possible
-  returns bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)GetDataBool(key string) (bool, bool)
----------------------
-  Same as GetData but will convert the result to a boolean if possible
-  returns second bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)GetDataFloat(key string) (float64, bool)
----------------------
-  Same as GetData but will convert the result to a float if possible
-  returns bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)GetDataTime(key string) (time.Time, bool)
----------------------
-  Same as GetData but will convert the result to a time.Time if possible
-  returns bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)GetCollection(key string) (XDatasetCollectionDef, bool)
----------------------
-  Same as GetData but will convert the result to a collection of data if possible
-  returns bool = false if nothing has been found
-
-func (d *XDatasetCollectionDef)Clone() XDatasetCollectionDef
-------------------------
-  Clone will do a deep clone of the datasetcollection, duplicating any value that is native or with a Clone() function
-
-
-
-
-The basic XDatasetCollection type is a simple []DatasetDef
-However, you can build any complex structure that extends the interface and implements all the required functions to stay compatible with the XDatasetCollectionDef.
-*/
+// 1. Overview
+//
+// The XDataSet is a set of interfaces and basic classes ready-to-use to build a standard set of data optionally nested and hierarchical, that can be used for any purpose:
+//
+// - Keep complex data in memory
+//
+// - Create JSON structures
+//
+// - Inject data into templates
+//
+// - Interchange database data (records set and record)
+//
+// You can store into it generic supported data, as well as any complex interface structures:
+//
+// - Int
+//
+// - Float
+//
+// - String
+//
+// - Time
+//
+// - Bool
+//
+// - []Int
+//
+// - []Float
+//
+// - []Time
+//
+// - []Bool
+//
+// - XDataSetDef (anything extended with this interface)
+//
+// - []String
+//
+// - Anything else ( interface{} )
+//
+// - XDataSetCollectionDef (anything extended with this interface)
+//
+// The generic supported data comes with a set of functions to get/set those data directly into the XDataset.
+//
+// Example:
+//
+//  import "github.com/webability-go/xcore"
+//
+//  data := xcore.XDataset{}
+//  data["data1"] = "DATA1"
+//  data["data2"] = "DATA1"
+//  sm := xcore.XDataset{}
+//  sm["data31"] = "DATA31"
+//  data["data3"] = sm
+//  data["data4"] = 123
+//  data["data5"] = 123.432
+//  data["data6"] = true
+//  data["data7"] = func() string { return "ABC" }
+//
+//  d8_r1 := &xcore.XDataset{}
+//  d8_r1.Set("data81", "rec 1: Entry 8-1")
+//  d8_r1.Set("data82", "rec 1: Entry 8-2")
+//
+//  d8_r2 := &xcore.XDataset{}
+//  d8_r2.Set("data81", "rec 2: Entry 8-1")
+//  d8_r2.Set("data82", "rec 2: Entry 8-2")
+//  d8_r2.Set("data83", "rec 2: Entry 8-3")
+//
+//  d8_r3 := &xcore.XDataset{}
+//  d8_r3.Set("data81", "rec 3: Entry 8-1")
+//  d8_r3.Set("data82", "rec 3: Entry 8-2")
+//
+//  d := xcore.XDatasetCollection{}
+//  d.Push(d8_r1)
+//  d.Push(d8_r2)
+//  d.Push(d8_r3)
+//
+//  data["data8"] = &d
+//  data["data9"] = "I exist"
+//
+// 2. XDatasetDef interface
+//
+// It is the interface to describe a simple set of data mapped as "name": value, where value can be of any type.
+//
+// The interface implements a good amount of basic methods to get the value on various format such as GetString("name"), GetInt("name"), etc (see below).
+//
+// If the value is another type as asked, the method should contert it if possible. For instance "key":123 required through GetString("key") should return "123".
+//
+// The XDataset type is a simple map[string]interface{} with all the implemented methods and should be enough to use for almost all required cases.
+//
+// However, you can build any complex structure that extends the interface and implements all the required functions to stay compatible with the XDatasetDef.
+//
+// 3. XDatasetCollectionDef Interface:
+//
+// This is the interface used to extend any type of data as a Collection, i-e an array of XDatasetDef. This is a slice of any XDatasetDef compatible data.
+//
+// The interface implements some methods to work on array structure such as Push, Pop, Shift, Unshift and some methods to search data into the array.
+//
+// The XDatasetCollection type is a simple []DatasetDef with all the implemented methods and should be enough to use for almost all required cases.
+//
 //
 // XTemplate
 //
+// 1. Overview
+//
+// This is a class to compile and keep a Template that can be injected with an XDataSet structure of data, with a metalanguage to inject the data.
+//
+// The metalanguage is extremely simple and is made to be useful and **really** separate programation from template code (not like other many generic template systems that just mix code and data).
+//
+// A template is a set of HTML/XML (or any other language) string with a meta language to inject variables and build a final string.
+//
+// The XCore XTemplate system is based on the injection of parameters, language translation strings and data fields directly into the HTML (Or any other language you need) template.
+//
+// The HTML itself (or any other language) is a text code not directly used by the template system, but used to dress the data you want to represent in your preferred language.
+//
+// The variables to inject must be into a XDataSet structure or into a structure extended from XDataSetDef interface.
+//
+// The injection of data is based on a XDataSet structure of values that can be nested into another XDataSet and XDataSetConnection and so on.
+//
+// The template compiler recognize nested arrays to automatically make loops on the information.
+//
+// Templates are made to store reusable HTML code, and overall easily changeable by **NON PROGRAMMING PEOPLE**.
+//
+// A template can be as simple as a single character (no variables to inject) to a very complex nested, conditional and loops sub-templates.
+//
+//  Hello world!
+//
+// Yes. this is a template, but a very simple one without need to inject any data.
+//
+// Let's go more complex:
+//
+//  %-- This is a comment. It will not appear in the final code. --%
+//  Let's put your name here: {{clientname}}<br />
+//  And lets put your hobbies here:<br />
+//  @@hobbies:hobby@@     %-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
+//
+//  %-- And you need the template for each hobby:--%
+//  [[hobby]]
+//  I love {{name}}<br />
+//  [[]]
+//
+// The data to inject could be:
+//
+//  { "clientname": "Fred",
+//    "hobbies": [
+//       { "name": "Football" },
+//       { "name": "Ping-pong" },
+//       { "name": "Swimming" },
+//       { "name": "Videogames" }
+//    ]
+//  }
+//
+// 2. Create and use XTemplateData
+//
+// In sight to create and use templates, you have all those possible options to use:
+//
+// Creates the XTemplat from a string or a file or any other source:
+//
+//  package main
+//
+//  import (
+//    "fmt"
+//    "github.com/webability-go/xcore"
+//  )
+//
+//  func main() {
+//    tmpl, _ := xcore.NewXTemplateFromString(`
+//  %-- This is a comment. It will not appear in the final code. --%
+//  Let's put your name here: {{clientname}}<br />
+//  And lets put your hobbies here:<br />
+//  @@hobbies:hobby@@     %-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
+//
+//  %-- And you need the template for each hobby:--%
+//  [[hobby]]
+//  I love {{name}}<br />
+//  [[]]
+//  `)
+//    // The creation of the data is obviously tedious here, in real life it should come from a JSON, a Database, etc
+//    data := xcore.XDataset{
+//      "clientname": "Fred",
+//      "hobbies": &XDatasetCollection{
+//        &XDataset{"name":"Football"},
+//        &XDataset{"name":"Ping-pong"},
+//        &XDataset{"name":"Swimming"},
+//        &XDataset{"name":"Videogames"},
+//      },
+//    }
+//
+//    fmt.Println(tmpl.Execute(&data)
+//  }
+//
+//
+// 3. Metalanguage Reference
+//
+// ** Comments
+//
+// You may use comments into your template.
+// The comments will be discarded immediately at the compilation of the template and not interfere with the rest of your code.
+//
+// Comments are defined by %-- and --%
+//
+// Example:
+//
+//  %-- This is a comment. It will not appear in the final code. --%
+//
+//  %--
+//  This subtemplate will not be compiled, usable or even visible since it is into a comment
+//  [[templateid]]
+//  Anything here
+//  [[]]
+//  --%
+//
+
 /*
-
-XTemplate
-=======================
-
-1. Overview
-------------------------
-
-class to compile and keep a Template string
-A template is a set of HTML/XML (or any other language) string with a meta language to inject variables and build a final string.
-
-The XCore XTemplate system is based on the injection of parameters, language translation strings and data fields directly into the HTML (Or any other language you need) template.
-The HTML itself (or any other language) is a fixed code not directly used by the template system, but used to dress the data you want to represent in your preferred language.
-
-The variables to inject are into a XDataSet structure or into a structure extended from XDataSetDef interface.
-The injection of data is based on a XDataSet structure of values that can be nested into another XDataSet and XDataSetConnection and so on.
-The template compiler recognize nested arrays to automatically make loops on the information.
-
-The macrolanguage is extremely simple and is made to be useful and **really** separate programation from template code (not like other may generic template systems that just mix code and data).
-
-!!Templates are made to store reusable HTML code, and overall easily changeable by **NON PROGRAMMING PEOPLE**.!!
-
-In sight to create and use templates, you have all those possible options to use:
-
-* Comments
 * Nested templates, to store many pieces of HTML
 * Simple elements, to replace by values in the template. There are various types of simple elements:
 ** Parameters
@@ -415,87 +366,7 @@ In sight to create and use templates, you have all those possible options to use
 ** Debug tools with ~~!!...!!~~, to show the data array.
 
 
-Exammples:
-
 ```
-* Load the template file:
-<pre>
-$buffer = file_get_contents('path/to/your/file.template');
-</pre>
-
-* Create the template object with your template file string:
-<pre>
-$template = new \core\WATemplate($buffer);
-</pre>
-
-* Inject elements and metaelements in the template object:
-<pre>
-$template->addElement('variable', 'value');
-$template->addElements(array('variable' => 'value'));
-$template->metaElements(array('variable' => 'value'));
-</pre>
-
-* Resolve the template to get the generated code:
-<pre>
-print $template->resolve();
-~~//~~ similar to
-print $template;
-</pre>
-```
-
-If you want to use caches and compiled files for much faster access (for instance if you use it in a CMS or so), it is better to use TemplateSource since it resolve all the caches workflow, up to stock the template in shared memory.
-
-How to use it:
-
-```
-* Create the template source:
-<pre>
-$SHM = new \core\WASHM(); ~~//~~ Do no forget to use a unique ID for your application
-$templatesource = new \datasources\TemplateSource(
-  new \datasources\FileSource('base/path/', 'local/path/', 'your_template_file.template'),
-  new \datasources\FastObjectSource(
-    new \datasources\FileSource('base/path/', 'local/path/', 'your_afo_file.afo'),
-    new \datasources\SHMSource('unique_memory_id', $SHM)
-    )
- );
-</pre>
-
-* Use the template source to retrieve the template object:
-<pre>
-$template = $templatesource->read();
-</pre>
-
-* Inject elements and metaelements in the template object:
-<pre>
-$template->addElement('variable', 'value');
-$template->addElements(array('variable' => 'value'));
-~~//~~ Same as
-$template->metaElements(array('variable' => 'value'));
-</pre>
-
-* Resolve the template to get the generated code:
-<pre>
-print $template->resolve();
-~~//~~ Similar to
-print $template;
-</pre>
-```
-
-As a reference, using the simple \core\WATemplate object will take approx 12 millisecond to load/compile/resolve the template.
-Using the shared memory cache will take only 2 milliseconds to get the template and resolve it (on a 2GHz Xeon processor).
-
-Talking about a good CMS or an application with many templates, using the \datasources\TemplateSource decreases dramatically file accesses and calculation time of your code.
-
-
-
-
-
-2. Meta Language Reference
-------------------------
-
-```
-Comments:
-   %-- comments --%
 Fields:
   {{field}}
   {{field>Subfield>Subfield}}
@@ -518,29 +389,6 @@ Meta elements:
 ```
 
 
-++ Comments
-
-You may use comments into your template.
-The comments will be discarded immediately at the compilation of the template and not interfere with the rest of your code.
-
-Comments are defined by ~~%--~~ and ~~--%~~
-
-Example:
-
-```
-<pre>
-
-~~%--~~ This is a comment. It will not appear in the final code. ~~--%~~
-
-~~%--~~
-This subtemplate will not be compiled, usable or even visible since it is into a comment
-~~[[templateid]]~~
-Anything here
-~~[[]]~~
-~~--%~~
-
-</pre>
-```
 
 
 ++ Nested Templates
@@ -994,6 +842,89 @@ Image with status=1:<br />
 ```
 
 
+
+
+Exammples:
+
+```
+* Load the template file:
+<pre>
+$buffer = file_get_contents('path/to/your/file.template');
+</pre>
+
+* Create the template object with your template file string:
+<pre>
+$template = new \core\WATemplate($buffer);
+</pre>
+
+* Inject elements and metaelements in the template object:
+<pre>
+$template->addElement('variable', 'value');
+$template->addElements(array('variable' => 'value'));
+$template->metaElements(array('variable' => 'value'));
+</pre>
+
+* Resolve the template to get the generated code:
+<pre>
+print $template->resolve();
+~~//~~ similar to
+print $template;
+</pre>
+```
+
+If you want to use caches and compiled files for much faster access (for instance if you use it in a CMS or so), it is better to use TemplateSource since it resolve all the caches workflow, up to stock the template in shared memory.
+
+How to use it:
+
+```
+* Create the template source:
+<pre>
+$SHM = new \core\WASHM(); ~~//~~ Do no forget to use a unique ID for your application
+$templatesource = new \datasources\TemplateSource(
+  new \datasources\FileSource('base/path/', 'local/path/', 'your_template_file.template'),
+  new \datasources\FastObjectSource(
+    new \datasources\FileSource('base/path/', 'local/path/', 'your_afo_file.afo'),
+    new \datasources\SHMSource('unique_memory_id', $SHM)
+    )
+ );
+</pre>
+
+* Use the template source to retrieve the template object:
+<pre>
+$template = $templatesource->read();
+</pre>
+
+* Inject elements and metaelements in the template object:
+<pre>
+$template->addElement('variable', 'value');
+$template->addElements(array('variable' => 'value'));
+~~//~~ Same as
+$template->metaElements(array('variable' => 'value'));
+</pre>
+
+* Resolve the template to get the generated code:
+<pre>
+print $template->resolve();
+~~//~~ Similar to
+print $template;
+</pre>
+```
+
+As a reference, using the simple \core\WATemplate object will take approx 12 millisecond to load/compile/resolve the template.
+Using the shared memory cache will take only 2 milliseconds to get the template and resolve it (on a 2GHz Xeon processor).
+
+Talking about a good CMS or an application with many templates, using the \datasources\TemplateSource decreases dramatically file accesses and calculation time of your code.
+
+
+
+
+
+
+
+
+
+
+
 +++ Debug tools
 
 There are two keywords to dump the content of the vector of values, i.e. the elements and the metaelements.
@@ -1061,7 +992,7 @@ func (t *XTemplate)Print() string {
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "0.2.3"
+const VERSION = "0.3.1"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
