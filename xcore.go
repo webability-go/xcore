@@ -295,7 +295,7 @@
 //
 // In sight to create and use templates, you have all those possible options to use:
 //
-// Creates the XTemplat from a string or a file or any other source:
+// Creates the XTemplate from a string or a file or any other source:
 //
 //  package main
 //
@@ -333,12 +333,10 @@
 //
 // 3. Metalanguage Reference
 //
-// ** Comments
+// ** Comments %-- and --%
 //
 // You may use comments into your template.
-// The comments will be discarded immediately at the compilation of the template and not interfere with the rest of your code.
-//
-// Comments are defined by %-- and --%
+// The comments will be discarded immediately at the compilation of the template and do not interfere with the rest of your code.
 //
 // Example:
 //
@@ -351,642 +349,444 @@
 //  [[]]
 //  --%
 //
-/*
-* Nested templates, to store many pieces of HTML
-* Simple elements, to replace by values in the template. There are various types of simple elements:
-** Parameters
-** Language entries
-** Fields of values
-* Meta elements, to build a code based on a data array. There are various types of meta elements:
-** Data access with ~~{{...}}~~, to show the value of a data into the data array
-** Subtemplates access with ~~&&...&&~~, to call a subtemplate based on the value of an entry in the data array.
-** Conditional access with ~~??...??~~, to show a piece of HTML based on the existence or value of an entry in the data array.
-** Loops access with ~~@@...@@~~, to repeat a piece of HTML based on a table of values.
-** Debug tools with ~~!!...!!~~, to show the data array.
-
-
-```
-Fields:
-  {{field}}
-  {{field>Subfield>Subfield}}
-Language injection
-  ##entry##
-Subtemplates:
-   xml/html code
-   [[id]]
-     xml/html code
-     [[id]]
-       xml/html code indented
-     [[]]
-     xml/html code
-   [[]]
-Meta elements:
-   ??xx??   conditions
-   @@xx@@   loops
-   &&xx&&   references
-   !!xx!!   debug (dump)
-```
-
-
-
-
-++ Nested Templates
-
-You can define new nested templates into your main template
-A nested template is defined by:
-
-```
-<pre>
-~~[[templateid]]~~
-your nested template
-~~[[]]~~
-</pre>
-```
-
-The id is any combination of letters (a-z, A-Z, accents are welcome too), numbers (0-9), and 3 special chars: .-_
-
-The old syntax also work and is deprecated. It will be definitively removed as of beginning of 2013.
-
-```
-<pre>
-%%SUBTEMPLATE(templateid)%%
-your nested template
-%%ENDSUBTEMPLATE%%
-</pre>
-```
-
-There is no limits into nesting templates.
-Any nested template will inheritate all the father elements and can use father elements too.
-
-Example:
-
-```
-<pre>&&header&&
-Welcome to my page
-&&footer&&
-
-~~[[header]]~~
-  &lt;hr />
-~~[[]]~~
-
-~~[[footer]]~~
-  &lt;hr />
-  &&amp;copyright&&
-
-  ~~[[copyright]]~~
-    © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
-  ~~[[]]~~
-
-~~[[]]~~
-</pre>
-```
-
-You may use more than one id into the same template to avoid repetition of the same code.
-The different id's are separated with a pipe |
-
-```
-<pre>
-~~[[templateid|anotherid|something.key|andmoreid]]~~
-your nested template
-~~[[]]~~
-</pre>
-```
-
-
-
-
-++ Elements
-
-The DomCore template system is based on a parameters replacement and a simple macrolanguage keywords.
-Note: The syntax of the parameters, languages and fields is only recommended. However, any character combination may be replaced by the template engine.
-
-The elements are replaced by the addElement() method into the template class.
-
-We "logically" define 3 type of elements. The separation is only for human logic. The system doesn't make a difference between them. Anything you give to the method will be replaced, however the syntax is. You may define new syntax and new types of elements at will.
-The official elements defined for the templates are:
-
-* parameters, which are any piece of information, generally used to build the HTML code.
-* language entries, which are any readable information in the language you choose.
-* field values, which are generally useful information from a database or data repository.
-
-!!We highly recommend to use the metaelements instead of simple elements.!!
-
-
-+++ Parameters replacement:
-
-Parameters generally have the following syntax: ~~__PARAMETER__~~
-They usually carry pieces of HTML code, for example a color, a size, a tag.
-
-Example:
-
-```
-<pre>
-&lt;div style="background-color: ~~__BGCOLOR__~~;">
-Welcome to my page.<br />
-You may use the same parameter as many time you wish.&lt;br />
-
-&lt;span onclick="alert('hello, world');" class="~~__BUTTONCLASS__~~">Click me!&lt;/span>
-&lt;span onclick="alert('hello again, world');" class="~~__BUTTONCLASS__~~">Click me again!&lt;/span>
-
-&lt;/div>
-</pre>
-```
-
-
-+++ Languages entries
-
-All the languages entries should have the format: ~~##entry##~~
-A language entry is generally anything written into your page that does not come from a database, and should adapt to the language of the client visiting your site.
-Using the languages entries may depend on the internationalization of your page.
-If your page is going to be in a single language forever, you really dont need to use languages entries.
-The languages entries generally carry titles, menu options, tables headers etc.
-
-Example:
-
-```
-<pre>
-&lt;div style="background-color: blue;">
-##welcome##&lt;br />
-You may use the same parameter as many time you wish.&lt;br />
-
-&lt;span onclick="alert('##hello##');" class="button">##clickme##!&lt;/span>
-&lt;span onclick="alert('##helloagain##');" class="button">##clickme## ##again##!&lt;/span>
-
-&lt;/div>
-</pre>
-```
-
-
-+++ Field values
-
-Fields values should have the format: {fieldname}
-Your fields source can be a database or any other preferred repository data source.
-Is it highly recommended to use this syntax for any data field you need to replace in your template.
-
-Example:
-
-```
-<pre>
-&lt;div style="background-color: blue;">
-Welcome to my site&lt;br />
-You may use the same parameter as many time you wish.&lt;br />
-
-Today's temperature is {degres} celsius&lt;br />
-or {fdegres} farenheit&lt;br />
-
-Is {degres} degres too cold ? Buy a pullover!&lt;br />
-
-&lt;/div>
-</pre>
-```
-
-
-++ MetaElements
-
-The metaelements are the recommended way to use with the templates.
-They consist into an injection of an associative array of values, called the **data array**, into the template.
-The macrolanguage is directly applied on the structure of the data array.
-
-The data array is a nested set of variables and values with the structure you want (there is no construction rules).
-
-You can inject nearly anything into a template metaelements.
-
-Example of a data array to inject:
-
-```
-<pre>$array = array(
-  'detail' => array(
-     'key1' => array('name' => 'Juan', 'status' => 1),
-     'key2' => array('name' => 'José', 'status' => 2),
-     'key3' => array('name' => 'Pedro', 'status' => 3),
-     'key4' => array('name' => 'Phil', 'status' => 1),
-     'key5' => array('name' => 'Patrick', 'status' => 2),
-  ),
-  'param1' => 'blue',
-  'param2' => 'red',
-  'param3' => '45px',
-  'param4' => '100%',
-);
-</pre>
-```
-
-- The **data array** can be any traversable, iterable, countable object too, as of version 1.01.11 and superior.
-
-- You can access directly any data into the array with its relative path (relative to the level you are when the metaelements are applied, see below).
-
-- There are 5 metaelements in the DomCore templates to use the **data array**:
-Data, Reference, Loops, Condition and Debug.
-
-The structure of the metaelements in the template must follow the structure of the data array.
-
-+++ ID access: id
-
-The id is 'a-z', 'A-Z', '0-9' and special chars '.-_'
-If you use any other character for the id, the compiler will not recognize the keyword as an id and will surely generate errors.
-
-+++ Scope:
-
-When you use an id to point a value, the template will first search into the available ids of the local level.
-If no id is found, the it will search into the upper levers if any
-
-Example:
-```
-<pre>$array = array(
-  'detail' => array(
-    'data1' => array(
-      'data2' => array(
-        'key1' => array('appname' => 'Nested App', 'name' => 'Juan', 'status' => 1),
-        'key2' => array('name' => 'José', 'status' => 2),
-        'appname' => 'DomCore'
-      )
-    )
-  )
-);
-</pre>
-
-At the level of 'data2', using ~~{{appname}}~~ will get back 'DomCore'
-At the level of 'key1', using ~~{{appname}}~~ will get back 'Nested App'
-At the level of 'key2', using ~~{{appname}}~~ will get back 'DomCore'
-At the level of 'data1', using ~~{{appname}}~~ will get back an empty string
-
-
-```
-
-
-+++ Path access: id>id>id>id
-
-At any level into the data array, you can access any entry into the subset array.
-
-For instance, if you have the following data array:
-
-```
-<pre>$array = array(
-  'detail' => array(
-    'data1' => array(
-      'data2' => array(
-        'key1' => array('name' => 'Juan', 'status' => 1),
-        'key2' => array('name' => 'José', 'status' => 2)
-      )
-    )
-  )
-);
-</pre>
-```
-
-Let's suppose we are into a nested metaelements at the 'data1' level. You may want to access directly the 'Juan' entry.
-The path will be:
-
-**data2>key1>name**
-
-The José's status value from the root will be:
-
-**detail>data1>data2>key2>status**
-
-
-
-+++ Data: ~~{{id}}~~
-
-The data entries are accesible through a macrolanguage keyword: ~~{{id}}~~
-
-The template can work with a strict mode (elements are accesible **only** with the ~~{{..}}~~ syntax).
-or in relax mode (any parameter name into the data array will be replaced, !!which is dangerous since you tend to use standard word to create variable names!!).
-
-!!By default as of version 1.01.11, the default mode is strict!!
-
-The **id** can be a direct name, or a path.
-
-Example:
-The two last nested metaelements at the 'data1' level will be:
-
-~~{{data2>key1>name}}~~ to access the 'Juan' entry from the 'data1' level.
-
-The José's status value from the root will be:
-
-~~{{detail>data1>data2>key2>status}}~~
-
-
-
-+++ References: &&<var2>id</var2>&& and &&<var2>id</var2>:<var1>templateid</var1>&&
-
-Makes a call to a sub template and replace the &&...&& with the result.
-
-If you use &&<var2>id</var2>&&, this is equivalent to &&<var2>id</var2>:<var2>id</var2>&&
-
-The <var1>templateid</var1> is the id of the ~~[[~~<var1>templateid</var1>~~]]~~ to use.
-The <var2>id</var2> is the variable id in the valors vector to inject in the template.
-If the id exists in the valors vector, then its value is used to replace elements into the subtemplate.
-If the id does not exists, then the subtemplate will be resolved only with the main template elements.
-
-The <var2>id</var2> can be a direct name, or a path to access a data into the **data array**.
-
-
-Example:
-
-```
-**Our vector of values:**
-<pre>$array = array(
-  '<var2>image</var2>' => array('<var5>src</var5>' => '/pics/logo.gif', '<var6>title</var6>' => 'Title of my image')
-);
-</pre>
-
-**The template: (strict mode)**
-<pre>
-&&<var1>header</var1>&&
-&&<var2>image</var2>:<var3>body</var3>&&
-&&<var4>footer</var4>&&
-
-using ~~{{src}}~~ and ~~{{title}}~~ out of the body template is useless, since they are into the ~~{{image}}~~ vector, thus to be used into the 'body' template.
-
-~~[[~~<var1>header</var1>~~]]~~
-  Data header&lt;hr />
-~~[[]]~~
-
-~~[[~~<var3>body</var3>~~]]~~
-  &lt;img src="~~{{~~<var5>src</var5>~~}}~~" title="~~{{~~<var6>title</var6>~~}}~~" />
-~~[[]]~~
-
-~~[[~~<var4>footer</var4>~~]]~~
-  &lt;hr />Data footer
-~~[[]]~~
-</pre>
-```
-
-
-+++ Loops: @@<var1>entry</var1>@@ @@<var1>entry</var1>:<var2>template</var2>@@ and @@<var1>entry</var1>:<var2>template</var2>:<var3>check</var3>@@
-
-Makes a call to a subtemplate for each value in the loop vector (like the values of a table).
-
-If you use @@<var1>entry</var1>@@, this is equivalent to @@<var1>entry</var1>:<var2>entry</var2>:@@
-If you use @@<var1>entry</var1>:<var2>templateid</var2>@@, this is equivalent to @@<var1>entry</var1>:<var2>templateid</var2>:@@
-
-If '<var1>entry</var1>' does not exists in the values vector, or is empty, or is not a vector, the <var2>templateid</var2> with suffix '.none' will be searched.
-If this template does not exists, nothing will be shown.
-
-If '<var1>entry</var1>' is a vector the following templates will be searched for each line, in that order:
-- <var2>templateid</var2>.key.[value]  value is the key of the vector line
-- <var2>templateid</var2>.sel.[value]  value is the value of the <var3>check</var3> field if it is defined and existing in the vector line
-- <var2>templateid</var2>.first if it is the first element of the array set (new from v1.01.11)
-- <var2>templateid</var2>.loopalt if the line number is even
-- <var2>templateid</var2>.loop
-- <var2>templateid</var2>
-
-The <var1>entry</var1> and <var3>check</var3> can be a direct name, or a path to access a data into the data array.
-
-
-Example:
-
-```
-**Our vector of values:**
-<pre>$array = array(
-  'detail' => array(
-     'key1' => array('name' => 'Juan', 'status' => 1),
-     'key2' => array('name' => 'José', 'status' => 2),
-     'key3' => array('name' => 'Pedro', 'status' => 1),
-     'key4' => array('name' => 'Phil', 'status' => 1),
-     'key5' => array('name' => 'Patrick', 'status' => 2),
-  )
-);
-</pre>
-**The template:**
-<pre>
-Here comes the loop:<br />
-@@detail:eachname:status@@
-
-~~[[eachname.none]]~~
-There is nobody in the list<br />
-~~[[]]~~
-
-~~%-- First element --%~~
-~~[[eachname.first]]~~
-&lt;font color="red">Default user:&lt;br />Name: ~~{{name}}~~, Status: ~~{{status}}~~&lt;/font>&lt;br />
-~~[[]]~~
-
-~~%-- Number 2 is special --%~~
-~~[[eachname.sel.key2]]~~
-&lt;font color="red">Name: ~~{{name}}~~, Status: ~~{{status}}~~&lt;/font>&lt;br />
-~~[[]]~~
-
-~~[[eachname]]~~
-Name: ~~{{name}}~~, Status: ~~{{status}}~~&lt;br />
-~~[[]]~~
-
-
-Another way to show the data:<br />
-@@detail@@
-
-~~[[detail.none]]~~
-There is nobody in the list&lt;br />
-~~[[]]~~
-
-~~[[detail.loopalt]]~~
-  &lt;div style="background-color: gray;">Name: ~~{{name}}~~, Status: ??~~{{status}}~~:status??&lt;/div>
-  ~~[[status.2]]~~&lt;font color="red">Fired&lt;/font>~~[[]]~~
-  ~~[[status]]Ok[[]]~~
-~~[[]]~~
-
-~~[[detail.loop]]~~
-  &lt;div style="background-color: white;">Name: ~~{{name}}~~, Status: ??~~{{status}}~~:status??&lt;/div>
-  ~~[[status.2]]~~&lt;font color="red">Fired&lt;/font>~~[[]]~~
-  ~~[[status]]Ok[[]]~~
-~~[[]]~~
-</pre>
-```
-
-
-+++ Conditional: ??<var1>entry</var1>?? ??<var1>entry</var1>:<var2>templateid</var2>?? and ??<var1>entry</var1>:<var2>templateid</var2>:<var3>check</var3>??
-
-Makes a call to a subtemplate only if the field exists and have a value.
-
-If you use ??<var1>entry</var1>??, this is equivalent to ??<var1>entry</var1>:<var2>entry</var2>:??
-If you use ??<var1>entry</var1>:<var2>templateid</var2>??, this is equivalent to ??<var1>entry</var1>:<var2>templateid</var2>:??
-
-If '<var1>entry</var1>' does not exists in the values vector, or is empty, or is not a vector, the <var2>templateid</var2> with suffix '.none' will be searched.
-If this template does not exists, nothing will be shown.
-
-The template with the suffix .none is **mandatory**.
-
-If '<var1>entry</var1>' is a vector the following templates will be searched, in that order:
-- <var2>templateid</var2>.[value]  value is the value of the <var3>check</var3> field if it is defined and existing in the vector line
-- <var2>templateid</var2>
-
-The <var1>entry</var1> and <var3>check</var3> can be a direct name, or a path to access a data into the data array.
-
-Example:
-
-```
-**Our vector of values:**
-<pre>$array = array(
-  'image1' => null,
-  'image2' => array('src' => '/pics/logo.gif', 'title' => 'Title of the image')
-  'image3' => array('src' => '/pics/logo.gif', 'title' => 'Another title of the image', 'status' => 1)
-);
-</pre>
-**The template:**
-
-??image1:image:status??
-??image2:image:status??
-??image3:image:status??
-
-~~[[image.none]][[]]~~
-
-~~[[image.1]]~~
-Image with status=1:<br />
-~~&lt;img src="{{src}}" style="border: 1px solid black;" alt="{{title}}" title="{{title}}" />&lt;br />~~
-~~[[]]~~
-
-~~[[image]]~~
-~~&lt;img src="{{src}}" alt="{{title}}" title="{{title}}" />&lt;br />~~
-~~[[]]~~
-
-```
-
-
-
-
-Exammples:
-
-```
-* Load the template file:
-<pre>
-$buffer = file_get_contents('path/to/your/file.template');
-</pre>
-
-* Create the template object with your template file string:
-<pre>
-$template = new \core\WATemplate($buffer);
-</pre>
-
-* Inject elements and metaelements in the template object:
-<pre>
-$template->addElement('variable', 'value');
-$template->addElements(array('variable' => 'value'));
-$template->metaElements(array('variable' => 'value'));
-</pre>
-
-* Resolve the template to get the generated code:
-<pre>
-print $template->resolve();
-~~//~~ similar to
-print $template;
-</pre>
-```
-
-If you want to use caches and compiled files for much faster access (for instance if you use it in a CMS or so), it is better to use TemplateSource since it resolve all the caches workflow, up to stock the template in shared memory.
-
-How to use it:
-
-```
-* Create the template source:
-<pre>
-$SHM = new \core\WASHM(); ~~//~~ Do no forget to use a unique ID for your application
-$templatesource = new \datasources\TemplateSource(
-  new \datasources\FileSource('base/path/', 'local/path/', 'your_template_file.template'),
-  new \datasources\FastObjectSource(
-    new \datasources\FileSource('base/path/', 'local/path/', 'your_afo_file.afo'),
-    new \datasources\SHMSource('unique_memory_id', $SHM)
-    )
- );
-</pre>
-
-* Use the template source to retrieve the template object:
-<pre>
-$template = $templatesource->read();
-</pre>
-
-* Inject elements and metaelements in the template object:
-<pre>
-$template->addElement('variable', 'value');
-$template->addElements(array('variable' => 'value'));
-~~//~~ Same as
-$template->metaElements(array('variable' => 'value'));
-</pre>
-
-* Resolve the template to get the generated code:
-<pre>
-print $template->resolve();
-~~//~~ Similar to
-print $template;
-</pre>
-```
-
-As a reference, using the simple \core\WATemplate object will take approx 12 millisecond to load/compile/resolve the template.
-Using the shared memory cache will take only 2 milliseconds to get the template and resolve it (on a 2GHz Xeon processor).
-
-Talking about a good CMS or an application with many templates, using the \datasources\TemplateSource decreases dramatically file accesses and calculation time of your code.
-
-
-
-
-
-
-
-
-
-
-
-+++ Debug tools
-
-There are two keywords to dump the content of the vector of values, i.e. the elements and the metaelements.
-This is very useful when you dont know the code that calls the template, don't remember some values, or for debug facilities.
-
-++++ ~~!!dump!!~~
-Shows the totality of the elements and metaelements, variables and values.
-
-++++ ~~!!list!!~~
-Shows only the variables names of the elements and metaelements, values are not shown.
-
-
-
-3. Functions Reference
-------------------------
-
-To use the package:
-
-import "github.com/webability-go/xcore"
-
-type XTemplateParam struct {
-  paramtype int
-  data string
-  children *XTemplateData
-}
-
-type XTemplateData []XTemplateParam
-
-type XTemplate struct {
-  Name string
-  Root *XTemplateData
-  SubTemplates map[string]*XTemplate
-}
-
-func NewXTemplate() *XTemplate {
-
-func NewXTemplateFromFile(file string) (*XTemplate, error) {
-
-func NewXTemplateFromString(data string) (*XTemplate, error) {
-
-func (t *XTemplate)LoadFile(file string) error {
-
-func (t *XTemplate)LoadString(data string) error {
-
-func (t *XTemplate)compile(data string) error {
-
-func (t *XTemplate)AddTemplate(name string, tmpl *XTemplate) {
-
-func (t *XTemplate)GetTemplate(name string) *XTemplate {
-
-func (t *XTemplate)Execute(data XDatasetDef) string {
-
-func (t *XTemplate)injector ( datacol XDatasetCollectionDef, language *XLanguage ) string {
-
-func searchConditionValue(id string, data XDatasetCollectionDef) string {
-
-func buildValue(data interface{}) string {
-
-func (t *XTemplate)Print() string {
-
-
----
-*/
+//
+// ** Nested Templates [[]] and &&
+//
+// You can define new nested templates into your main template
+// A nested template is defined by:
+//
+//  [[templateid]]
+//  your nested template here
+//  [[]]
+//
+// The templteid is any combination of lowers letters only (a-z), numbers (0-9), and 3 special chars: .-_
+//
+// The template is closed with [[]]
+//
+// There is no limits into nesting templates.
+//
+// Any nested template will inheritate all the father elements and can use father elements too.
+//
+// To call a sub-template, you need to use &&templateid&& syntax (described below in this document)
+//
+// Example:
+//
+//  &&header&&
+//  Welcome to my page
+//  &&footer&&
+//
+//  [[header]]
+//  <hr />
+//  [[]]
+//
+//  [[footer]]
+//  <hr />
+//  &&copyright&&
+//
+//    [[copyright]]
+//      © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
+//    [[]]
+//  [[]]
+//
+// You may use more than one id into the same template to avoid repetition of the same code.
+// The different id's are separated with a pipe |
+//
+//  [[looptemplate_first|looptemplate_last|looptemplate_odd]] %-- First element, last element and all odd elements will be red --%
+//    <div style="color: red;">{{data}}</div>
+//  [[]]
+//  [[looptemplate]] %-- All the other elements will be blue --%
+//    <div style="color: blue;">{{data}}</div>
+//  [[]]
+//
+// Important note:
+// A template will be visible only on the same level of its declaration. For example, if you put a subtemplate "b" into a subtemplate "a", it will not be visible by &&b&& from the top level, but only into the subtemplate "a".
+//
+//  &&header&&
+//  Welcome to my page
+//  &&footer&&
+//  &&copyright&& %-- WILL NOT WORK, into a sub-template --%
+//
+//  [[header]]
+//  <hr />
+//  [[]]
+//
+//  [[footer]]
+//  <hr />
+//  &&copyright&& %-- WILL WORK, same level --%
+//
+//    [[copyright]]
+//      © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
+//    [[]]
+//  [[]]
+//
+//
+//  ** Simple Elements {{ }} and ## ##
+//
+// There are 2 types of simple elements. Language elements and Data injector elements (also called field elements)
+//
+// We "logically" define the 2 type of elements. The separation is only for human logic and template filling, however the language information can perfectly fit into the data to inject (and not use ## entries)
+//
+// *** Languages elements ##entry##
+//
+// All the languages elements should have the format: ##entry##
+//
+// A language entry is generally anything written into your code or page that does not come from a database, and should adapt to the language of the client visiting your site.
+//
+// Using the languages elements may depend on the internationalization of your page.
+//
+// If your page is going to be in a single language forever, you really dont need to use languages entries.
+//
+// The language elements generally carry titles, menu options, tables headers etc.
+//
+// The language entries are set into the "language" entry of the main template XDataset to inject, and is a XLanguage table
+//
+// Example:
+//
+//  <div style="background-color: blue;">
+//  ##welcome##<br />
+//  You may use the same parameter as many time you wish.<br />
+//
+//  <span onclick="alert('##hello##');" class="button">##clickme##!</span>
+//  <span onclick="alert('##helloagain##');" class="button">##clickme## ##again##!</span>
+//
+//  </div>
+//
+// With data to inject:
+//  {
+//    "language": {
+//      "welcome": "Bienvenue",
+//      "clickme": "Clique sur moi",
+//      "again": "de nouveau"
+//    }
+//  }
+//
+//
+//  *** field elements {{field}}
+//
+// Fields values should have the format: {{fieldname}}
+//
+// Your fields source can be a database or any other preferred repository data source.
+//
+// Example:
+//
+//  <div style="background-color: blue;">
+//  Welcome to my site<br />
+//  You may use the same parameter as many time you wish.<br />
+//
+//  Today's temperature is {{degres}} celsius<br />
+//  or {{fdegres}} farenheit<br />
+//
+//  Is {{degres}} degres too cold ? Buy a pullover!<br />
+//
+//  </div>
+//
+// You can access an element with its path into the data set to inject separating each field level with a >
+//
+//  {{hobbies>1>name}}
+//
+// This will take the name of the second hobby in the dataset defined upper. (collections are 0 indexed)
+//
+// The 1 denotes the second record of the hobbies XDatasetCollection
+//
+// If the field is not found, it will be replaced with an empty string.
+//
+// Tecnically your field names can be any string in the dataset. However do not use { } or > into the names of your fields or the XTemplate may not use them correctly
+//
+// We recommend to use lowercase names with numbers and ._- Accents and UTF8 symbols are also welcome
+//
+// *** Scope:
+//
+// When you use an id to point a value, the template will first search into the available ids of the local level.
+// If no id is found, the it will search into the upper levers if any, and so on
+//
+// Example:
+//
+//  {
+//    "detail": {
+//      "data1": {
+//        "data2": {
+//          "key1": {"appname": "Nested App", "name": "Juan", "status": 1},
+//          "key2": {"name": "José", "status": 2},
+//          "appname" => "DomCore"
+//        }
+//      }
+//    }
+//  }
+//
+// At the level of 'data2', using {{appname}} will get back 'DomCore'
+//
+// At the level of 'key1', using {{appname}} will get back 'Nested App'
+//
+// At the level of 'key2', using {{appname}} will get back 'DomCore'
+//
+// At the level of root, 'data1' or 'detail', using {{appname}} will get back an empty string
+//
+//
+// *** Path access: id>id>id>id
+//
+// At any level into the data array, you can access any entry into the subset array.
+//
+// For instance, taking the previous array of data to inject:
+//
+// Let's suppose we are into a nested meta elements at the 'data1' level. You may want to access directly the 'Juan' entry. The path will be:
+//
+//  {{data2>key1>name}}
+//
+// The José's status value from the root will be:
+//
+//  {{detail>data1>data2>key2>status}}
+//
+//
+//
+// ** Meta Elements
+//
+// They consist into an injection of a XDataset, called the "data to inject", into the template.
+//
+// The meta language is directly applied on the structure of the data array.
+//
+// The data to inject is a nested set of variables and values with the structure you want (there is no specific construction rules).
+//
+// You can inject nearly anything into a template meta elements.
+//
+// Example of a data array to inject:
+//
+//    data := xcore.XDataset{
+//      "clientname": "Fred",
+//      "clientpicture": "face.jpg",
+//      "hobbies": &XDatasetCollection{
+//        &XDataset{"name":"Football","sport":"yes"},
+//        &XDataset{"name":"Ping-pong","sport":"yes"},
+//        &XDataset{"name":"Swimming","sport":"yes"},
+//        &XDataset{"name":"Videogames","sport":"no"},
+//      },
+//      "preferedhobby": &XDataset{
+//        "name":"Baseball",
+//        "sport":"yes",
+//      },
+//      "metadata": &XDataset{
+//        "preferred-color": "blue",
+//        "Salary": 3568.65,
+//        "hiredate": time.Time("2020-01-01T12:00:00"),
+//      },
+//    }
+//
+// You can access directly any data into the array with its relative path (relative to the level you are when the metaelements are applied, see below).
+//
+// There are 4 structured meta elements in the XTemplate templates to use the data to inject:
+//
+// Reference, Loops, Condition and Debug.
+//
+// The structure of the meta elements in the template must follow the structure of the data to inject.
+//
+//
+// *** References to another template: &&order&&
+//
+// - When order is a single id (characters a-z0-9.-_), it will make a call to a sub template with the same set of data and replace the &&...&& with the result.
+// The level in the data set is not changed.
+//
+// Example based on previous array of Fred's data:
+//
+//  &&header&&
+//  &&body&&
+//
+//  [[header]]
+//  Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//  {{clientname}} Data:
+//  <img src="{{clientpicture}}" title="{{clientname}}" />
+//  [[]]
+//
+//
+// - When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
+// The level in the data set is changed to this sub set.
+//
+// Example based on previous array of Fred's data:
+//
+//  &&header&&
+//  &&body:metadata&&
+//
+//  [[header]]
+//  Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//  {{clientname}} Data:  %-- Taken from the root data --%
+//  Salary: {{salary}}<br /> %-- taken from the metadata subset --%
+//  Hire date: {{hiredate}}<br /> %-- taken from the metadata subset--%
+//  [[]]
+//
+// - When order contains 3 parameters separated by a semicolumn :, the second and third parameters are used to search the name of the new template based on the data fields to inject.
+//
+// This is an indirect access to the template. The name of the subtemplate is build with parameter3 as prefix and the content of parameter2 value.
+// The third parameter must be empty.
+//
+//  &&header&&
+//  &&body:preferedhobby&&
+//
+//  [[header]]
+//  Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//  {{clientname}} Prefered hobby:
+//  &&:sport:sport.&&  %-- will build sport_ + [yes/no] contained into the sport field. Be sure you have a template for each value ! --%
+//
+//  [[sport.yes]]{{name}} - It's a sport, sell him things![[]]
+//  [[sport.no]]{{name}} - It's not a sport, recommend him next store.[[]]
+//  [[sport]]{{name}} - We do not know that it is.[[]]
+//  [[]]
+//
+//
+// *** Loops: @@order@@
+//
+// **** Overview
+//
+// This meta element will loop over each itterance of the set of data and concatenate each created template in the same order. You need to declare a sub template for this element.
+//
+// You may aso declare derivated sub templates for the different possible cases of the loop:
+// For instance, If your main subtemplate for your look is called "hobby", you may need a different template for the first element, last element, Nth element, Element with a value "no" in the sport field, etc.
+//
+// The supported postfixes are:
+//
+// When the array to iterate is empty
+//
+// - .none (for example "There is no hobby")
+//
+// When the array contains elements, it will search in order, the following template and use the first found:
+//
+// - templateid.key.[value]  value is the key of the vector line. If the collection has a named key (string) or is a direct array (0, 1, 2...)
+//
+// - templateid.field.[field].[value]  value is the value of the the pointed field if it is defined and existing in the data set
+//
+// - templateid.first if it is the first element of the array set (new from v1.01.11)
+//
+// - templateid.last if it is the first element of the array set (new from v1.01.11)
+//
+// - templateid.even if the line number is even
+//
+// - templateid in all other cases (odd is contained here if even is defined)
+//
+//
+// When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same subset of data with the same id and replace the @@...@@ for each itterance of the data with the result.
+//
+// Example based on previous array of Fred's data:
+//
+//  &&header&&
+//  &&body&&
+//
+//  [[header]]
+//  Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//  {{clientname}} Data:
+//  <img src="{{clientpicture}}" title="{{clientname}}" />
+//  Main hobby: {{preferedhobby>name}}<br />
+//  Other hobbies:<br />
+//  @@hobbies@@
+//  [[hobbies.none]]There is no hobby<br />[[]]
+//  [[hobbies]]{{name}}<br />[[]]
+//  [[]]
+//
+// When order contains 2 parameters separated by a semicolumn :, then first parameter is used to change the level of the data of array, with the subset with this id, and the second one for the template to use.
+//
+// Example based on previous array of Fred's data:
+//
+//  &&header&&
+//  &&body&&
+//
+//  [[header]]
+//  Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//  {{clientname}} Data:
+//  <img src="{{clientpicture}}" title="{{clientname}}" />
+//  Main hobby: {{preferedhobby>name}}<br />
+//  Other hobbies:<br />
+//  @@hobbies:hobby@@ %-- will iterate over hobbies in the data, but with hobby sub template --%
+//  [[hobby.none]]There is no hobby<br />[[]]
+//  [[hobby.field.sport.yes]]<span style="color: red;">{{name}}<span><br /><hr>[[]] %-- Paint the sports red --%
+//  [[hobby]]{{name}}<br />[[]]
+//  [[]]
+//
+//
+// *** Conditional: ??order??
+//
+// Makes a call to a subtemplate only if the field exists and have a value.
+// This is very userfull to call a sub template for instance when an image or a video is set.
+//
+// When the condition is not met, it will search for the [id].none template.
+// The conditional element does not change the level in the data set.
+//
+// - When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same field in the data and replace the ??...?? with the corresponding template
+//
+// Example based on previous array of Fred's data:
+//
+//  &&header&&
+//  &&body&&
+//
+//  [[header]]
+//   Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//   {{clientname}} Data:
+//   ??clientpicture??
+//   [[clientpicture]]<img src="{{clientpicture}}" title="{{clientname}}" />[[]]
+//   [[clientpicture.none]]There is no photo<br />[[]]
+//  [[]]
+//
+// - When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
+//
+// Example based on previous array of Fred's data:
+//
+//  &&header&&
+//  &&body&&
+//
+//  [[header]]
+//   Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//   {{clientname}} Data:
+//   ??clientpicture:photo??
+//   [[photo]]<img src="{{clientpicture}}" title="{{clientname}}" />[[]]
+//   [[photo.none]]There is no photo<br />[[]]
+//  [[]]
+//
+// If the asked field is a catalog, true/false, numberd, you may also use .[value] subtemplates
+//
+//  &&header&&
+//  &&body&&
+//
+//  [[header]]
+//   Sports shop<hr />
+//  [[]]
+//
+//  [[body]]
+//   {{clientname}} Data:
+//   ??preferedhobby>sport:preferedhobby??
+//   [[preferedhobby.yes]]{{preferedhobby>name}}<br />[[]]
+//   [[preferedhobby|preferedhobby.no|preferedhobby.none]]There is no prefered sport<br />[[]]
+//  [[]]
+//
+//
+// ** Debug Tools: !!order!!
+//
+// There are two keywords to dump the content of the data set.
+// This is very useful when you dont know the code that calls the template, don't remember some values, or for debug facilities.
+//
+// *** !!dump!!
+//
+// Will show the totality of the data set, with ids and values.
+//
+// *** !!list!!
+//
+// Will show only the tree of parameters, values are not shown.
+//
 //
 package xcore
 
