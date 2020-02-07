@@ -351,7 +351,6 @@
 //  [[]]
 //  --%
 //
-
 /*
 * Nested templates, to store many pieces of HTML
 * Simple elements, to replace by values in the template. There are various types of simple elements:
