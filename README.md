@@ -34,10 +34,11 @@ Version Changes Control
 v0.3.1 - 2020-02-
 -----------------------
 - XDatasetDef.Get must accept a path as key (id>id>id)
-- (Working) XTemplates now resolve @@ metalanguage with 1 and 2 Parameters
+- XTemplates now resolve {{ fields with path id>id>id
+- XTemplates now resolve @@ metalanguage with 1 and 2 Parameters
 - XTemplates now resolve && metalanguage with 1,2 and 3 Parameters
 - (Working) XTemplates now resolve ?? metalanguage with 1, and 2 Parameters
-- (Working) XTemplates now implements sub templates derivation (-none -first -last -(key) -(number) )
+- XTemplates now implements sub templates derivation (-none -first -last -(key) -(number) )
 - Manuals for XCache, XLanguage and XTemplate written with reference of the metalanguage
 
 v0.3.0 - 2020-02-06
