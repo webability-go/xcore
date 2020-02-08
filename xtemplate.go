@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -139,8 +140,8 @@ func (t *XTemplate) compile(data string) error {
 			`|(\{)\{(.+?)\}\}` + // index based 13
 
 			// ==== NESTED ELEMENTS (SUB TEMPLATES)
-			`|\[\[(\])\]` + // index based 15
-			`|(\[)\[([a-z0-9\.\-_]+?)\]\]` // index based 16
+			`|\[\[(\])\](\n|\r|\r\n|\n\r)?` + // index based 15
+			`|(\[)\[([a-z0-9\|\.\-_]+?)\]\](\n|\r|\r\n|\n\r)?` // index based 17
 
 	codex := regexp.MustCompile(code)
 	indexes := codex.FindAllStringIndex(data, -1)
@@ -158,37 +159,28 @@ func (t *XTemplate) compile(data string) error {
 			param.ParamType = MetaComment // comment
 			param.Data = matches[i][2]
 		} else if matches[i][3] == "#" {
-			param.ParamType = MetaLanguage // Entry Param
+			param.ParamType = MetaLanguage // Language entry
 			param.Data = matches[i][4]
 		} else if matches[i][5] == "&" {
-			param.ParamType = MetaReference // sysparam
-
-			// BUILD THE 2 & PARTS
+			param.ParamType = MetaReference // Reference to template
 			param.Data = matches[i][6]
-
 		} else if matches[i][7] == "@" {
-			param.ParamType = MetaRange // pageparam
-
-			// BUILD THE 3 @ PARTS
+			param.ParamType = MetaRange // Loop on data
 			param.Data = matches[i][8]
-
 		} else if matches[i][9] == "?" {
-			param.ParamType = MetaCondition // local pageparam
-
-			// BUILD THE 3 ? PARTS
+			param.ParamType = MetaCondition // Conditional on data
 			param.Data = matches[i][10]
-
 		} else if matches[i][11] == "!" {
-			param.ParamType = MetaDump // instance param
+			param.ParamType = MetaDump // Debug
 			param.Data = matches[i][12]
 		} else if matches[i][13] == "{" {
-			param.ParamType = MetaVariable // local instance param
+			param.ParamType = MetaVariable // Simple element
 			param.Data = matches[i][14]
-		} else if matches[i][16] == "[" {
-			param.ParamType = MetaTemplateStart // javascript call for header
-			param.Data = matches[i][17]
+		} else if matches[i][17] == "[" {
+			param.ParamType = MetaTemplateStart // Template start
+			param.Data = matches[i][18]
 		} else if matches[i][15] == "]" {
-			param.ParamType = MetaTemplateEnd // css call for header
+			param.ParamType = MetaTemplateEnd // Template end
 		} else {
 			param.ParamType = MetaUnused // unknown, will be removed
 		}
@@ -292,10 +284,10 @@ func (t *XTemplate) GetTemplate(name string) *XTemplate {
 func (t *XTemplate) Execute(data XDatasetDef) string {
 	// Does data has a language ?
 	if data != nil {
-		lang, _ := data.Get("#")
 		var language *XLanguage
+		lang, _ := data.Get("#")
 		if lang != nil {
-			language = lang.(*XLanguage)
+			language, _ = lang.(*XLanguage) // language is nil if it-s not a *XLanguage
 		}
 		stack := &XDatasetCollection{}
 		stack.Push(data)
@@ -320,22 +312,52 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			if language != nil {
 				injected = append(injected, language.Get(v.Data))
 			}
-		case MetaReference: // Reference
-			// search for the subtemplate and reinject anything into it
-			subt := t.GetTemplate(v.Data)
-			if subt != nil {
-				// if v.data is a substructure into data, then we stack the data and inject new stacked data
-
-				substr := subt.injector(datacol, language)
-				injected = append(injected, substr)
+		case MetaReference: // Reference &&
+			xid := strings.Split(v.Data, ":")
+			if len(xid) == 3 {
+				field := xid[1]
+				prefix := xid[2]
+				value, _ := datacol.GetDataString(field)
+				subt := t.GetTemplate(prefix + value)
+				if subt != nil {
+					substr := subt.injector(datacol, language)
+					injected = append(injected, substr)
+				} else {
+					subt := t.GetTemplate(prefix)
+					if subt != nil {
+						substr := subt.injector(datacol, language)
+						injected = append(injected, substr)
+					}
+				}
+			} else {
+				template := ""
+				if len(xid) >= 1 {
+					template = xid[0]
+				}
+				subt := t.GetTemplate(template)
+				if subt != nil {
+					withds := false
+					if len(xid) == 2 {
+						dcl, _ := datacol.GetData(xid[1])
+						ds, ok := dcl.(XDatasetDef)
+						if ok {
+							withds = true
+							datacol.Push(ds)
+						}
+					}
+					substr := subt.injector(datacol, language)
+					if withds {
+						datacol.Pop()
+					}
+					injected = append(injected, substr)
+				}
 			}
-		case MetaVariable:
+		case MetaVariable: // {{id>id>id...}}
 			if datacol != nil {
 				d, _ := datacol.GetDataString(v.Data)
 				injected = append(injected, d)
 			}
 		case MetaRange: // Range (loop over subset) @@id:id@@
-			// TODO(phil) subtemplate depends on first, last, loop # counter, key, condition etc
 			xdata := strings.Split(v.Data, ":")
 			subdataid := xdata[0]
 			subtemplateid := xdata[0]
@@ -345,32 +367,56 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 
 			subt := t.GetTemplate(subtemplateid)
 			if subt != nil {
-				// TODO(phil) We have to check the correct type of the collection
-
 				if datacol != nil {
 					cl, _ := datacol.GetCollection(subdataid)
 					if cl != nil {
 						for i := 0; i < cl.Count(); i++ {
-							// if v.data is a substructure into data, then we stack the data and inject new stacked data
+							var tmp *XTemplate
+							tmp = t.GetTemplate(subtemplateid + ".key." + strconv.Itoa(i))
+							//							if tmp == nil {
+							//								tmp = t.GetTemplate(subtemplateid + ".field." + field + "." + value)
+							//							}
+							if tmp == nil && i == 0 {
+								tmp = t.GetTemplate(subtemplateid + ".first")
+							}
+							if tmp == nil && i == cl.Count()-1 {
+								tmp = t.GetTemplate(subtemplateid + ".last")
+							}
+							if tmp == nil && i%2 == 0 {
+								tmp = t.GetTemplate(subtemplateid + ".even")
+							}
+							if tmp == nil {
+								tmp = subt
+							}
 							dcl, _ := cl.Get(i)
 							datacol.Push(dcl)
-							substr := subt.injector(datacol, language)
+							substr := tmp.injector(datacol, language)
 							injected = append(injected, substr)
 							// unstack extra data
 							datacol.Pop()
 						}
+					} else {
+						var tmp *XTemplate
+						tmp = t.GetTemplate(subtemplateid + ".none")
+						if tmp == nil {
+							tmp = subt
+						}
+						substr := tmp.injector(datacol, language)
+						injected = append(injected, substr)
 					}
 				}
 			}
-		case MetaCondition:
+		case MetaCondition: //  ??id??
 			// TODO(phil) subtemplate depends on condition completion
 			subt := t.GetTemplate(v.Data)
-			value := searchConditionValue(v.Data, datacol)
+			if subt != nil {
+				value := searchConditionValue(v.Data, datacol)
 
-			// if v.data is a substructure into data, then we stack the data and inject new stacked data
-			if value != "" {
-				substr := subt.injector(datacol, language)
-				injected = append(injected, substr)
+				// if v.data is a substructure into data, then we stack the data and inject new stacked data
+				if value != "" {
+					substr := subt.injector(datacol, language)
+					injected = append(injected, substr)
+				}
 			}
 		case MetaDump:
 			if datacol != nil {

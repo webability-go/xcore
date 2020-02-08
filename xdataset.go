@@ -2,11 +2,14 @@ package xcore
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
 // XDatasetDef is a special interface to implement a set of data that can be scanned recursively (by XTemplate for instance)
 //   to search data into it, Stringify it, and set/get/del entries of data
+//   The get* methods must accept a path id>id>id...
 type XDatasetDef interface {
 	// Stringify will dump the content into a human readable string
 	Stringify() string
@@ -67,6 +70,27 @@ func (d *XDataset) Set(key string, data interface{}) {
 
 // Get will read the value of the key variable
 func (d *XDataset) Get(key string) (interface{}, bool) {
+	xid := strings.Split(key, ">")
+	if len(xid) > 1 {
+		subset, ok := (*d)[xid[0]]
+		if !ok {
+			return nil, false
+		}
+		switch subset.(type) {
+		case XDatasetDef:
+			return (subset.(XDatasetDef)).Get(strings.Join(xid[1:], ">"))
+		case XDatasetCollectionDef:
+			entry, err := strconv.Atoi(xid[1])
+			if err != nil {
+				return nil, false
+			}
+			ds, _ := (subset.(XDatasetCollectionDef)).Get(entry)
+			if ds == nil {
+				return nil, false
+			}
+			return ds.Get(strings.Join(xid[2:], ">"))
+		}
+	}
 	data, ok := (*d)[key]
 	if ok {
 		return data, true
@@ -76,7 +100,7 @@ func (d *XDataset) Get(key string) (interface{}, bool) {
 
 // GetDataset will read the value of the key variable as a XDatasetDef cast type
 func (d *XDataset) GetDataset(key string) (XDatasetDef, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.(XDatasetDef); ok2 {
 			return val2, true
 		}
@@ -86,7 +110,7 @@ func (d *XDataset) GetDataset(key string) (XDatasetDef, bool) {
 
 // GetCollection will read the value of the key variable as a XDatasetCollection cast type
 func (d *XDataset) GetCollection(key string) (XDatasetCollectionDef, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.(XDatasetCollectionDef); ok2 {
 			return val2, true
 		}
@@ -96,9 +120,8 @@ func (d *XDataset) GetCollection(key string) (XDatasetCollectionDef, bool) {
 
 // GetString will read the value of the key variable as a string cast type
 func (d *XDataset) GetString(key string) (string, bool) {
-	data, ok := (*d)[key]
-	if ok {
-		return fmt.Sprint(data), true
+	if val, ok := d.Get(key); ok {
+		return fmt.Sprint(val), true
 	}
 	return "", false
 }
@@ -107,7 +130,7 @@ func (d *XDataset) GetString(key string) (string, bool) {
 // If the value is int, float, it will be convert with the rule 0: false, != 0: true
 // If the value is anything else and it exists, it will return true if it's not nil
 func (d *XDataset) GetBool(key string) (bool, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.(bool); ok2 {
 			return val2, true
 		}
@@ -161,7 +184,7 @@ func (d *XDataset) GetBool(key string) (bool, bool) {
 // If the value is bool, will return 0/1
 // If the value is float, will return integer part of value
 func (d *XDataset) GetInt(key string) (int, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.(bool); ok2 {
 			if val2 {
 				return 1, true
@@ -213,7 +236,7 @@ func (d *XDataset) GetInt(key string) (int, bool) {
 
 // GetFloat will read the value of the key variable as a float64 cast type
 func (d *XDataset) GetFloat(key string) (float64, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.(bool); ok2 {
 			if val2 {
 				return 1.0, true
@@ -265,7 +288,7 @@ func (d *XDataset) GetFloat(key string) (float64, bool) {
 
 // GetTime will read the value of the key variable as a time cast type
 func (d *XDataset) GetTime(key string) (time.Time, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.(time.Time); ok2 {
 			return val2, true
 		}
@@ -275,7 +298,7 @@ func (d *XDataset) GetTime(key string) (time.Time, bool) {
 
 // GetStringCollection will read the value of the key variable as a collection of strings cast type
 func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.([]string); ok2 {
 			return val2, true
 		}
@@ -285,7 +308,7 @@ func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
 
 // GetBoolCollection will read the value of the key variable as a collection of bool cast type
 func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.([]bool); ok2 {
 			return val2, true
 		}
@@ -295,7 +318,7 @@ func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
 
 // GetIntCollection will read the value of the key variable as a collection of int cast type
 func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.([]int); ok2 {
 			return val2, true
 		}
@@ -305,7 +328,7 @@ func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
 
 // GetFloatCollection will read the value of the key variable as a collection of float cast type
 func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.([]float64); ok2 {
 			return val2, true
 		}
@@ -315,7 +338,7 @@ func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
 
 // GetTimeCollection will read the value of the key variable as a collection of time cast type
 func (d *XDataset) GetTimeCollection(key string) ([]time.Time, bool) {
-	if val, ok := (*d)[key]; ok {
+	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.([]time.Time); ok2 {
 			return val2, true
 		}
@@ -334,8 +357,11 @@ func (d *XDataset) Clone() XDatasetDef {
 	for id, val := range *d {
 		clonedval := val
 		// If the object is also cloneable, we clone it
-		if cloneable, ok := val.(interface{ Clone() XDatasetDef }); ok {
-			clonedval = cloneable.Clone()
+		if cloneable1, ok := val.(interface{ Clone() XDatasetDef }); ok {
+			clonedval = cloneable1.Clone()
+		}
+		if cloneable2, ok := val.(interface{ Clone() XDatasetCollectionDef }); ok {
+			clonedval = cloneable2.Clone()
 		}
 		cloned.Set(id, clonedval)
 	}

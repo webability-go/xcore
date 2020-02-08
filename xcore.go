@@ -124,7 +124,7 @@
 //
 // To create a new XLanguage empty structure:
 //
-//  lang := NewXLanguage()
+//  lang := NewXLanguage(id, language)
 //
 // There are 4 functions to create the language from a file or string, flat text or XML text:
 //
@@ -438,7 +438,7 @@
 //
 // The language elements generally carry titles, menu options, tables headers etc.
 //
-// The language entries are set into the "language" entry of the main template XDataset to inject, and is a XLanguage table
+// The language entries are set into the "#" entry of the main template XDataset to inject, and is a XLanguage table
 //
 // Example:
 //
@@ -453,7 +453,7 @@
 //
 // With data to inject:
 //  {
-//    "language": {
+//    "#": {
 //      "welcome": "Bienvenue",
 //      "clickme": "Clique sur moi",
 //      "again": "de nouveau"
@@ -559,7 +559,7 @@
 //        &XDataset{"name":"Swimming","sport":"yes"},
 //        &XDataset{"name":"Videogames","sport":"no"},
 //      },
-//      "preferedhobby": &XDataset{
+//      "preferredhobby": &XDataset{
 //        "name":"Baseball",
 //        "sport":"yes",
 //      },
@@ -623,14 +623,14 @@
 // The third parameter must be empty.
 //
 //  &&header&&
-//  &&body:preferedhobby&&
+//  &&body:preferredhobby&&
 //
 //  [[header]]
 //  Sports shop<hr />
 //  [[]]
 //
 //  [[body]]
-//  {{clientname}} Prefered hobby:
+//  {{clientname}} Preferred hobby:
 //  &&:sport:sport.&&  %-- will build sport_ + [yes/no] contained into the sport field. Be sure you have a template for each value ! --%
 //
 //  [[sport.yes]]{{name}} - It's a sport, sell him things![[]]
@@ -650,15 +650,13 @@
 //
 // The supported postfixes are:
 //
-// When the array to iterate is empty
+// When the array to iterate is empty:
 //
 // - .none (for example "There is no hobby")
 //
 // When the array contains elements, it will search in order, the following template and use the first found:
 //
 // - templateid.key.[value]  value is the key of the vector line. If the collection has a named key (string) or is a direct array (0, 1, 2...)
-//
-// - templateid.field.[field].[value]  value is the value of the the pointed field if it is defined and existing in the data set
 //
 // - templateid.first if it is the first element of the array set (new from v1.01.11)
 //
@@ -683,7 +681,7 @@
 //  [[body]]
 //  {{clientname}} Data:
 //  <img src="{{clientpicture}}" title="{{clientname}}" />
-//  Main hobby: {{preferedhobby>name}}<br />
+//  Main hobby: {{preferredhobby>name}}<br />
 //  Other hobbies:<br />
 //  @@hobbies@@
 //  [[hobbies.none]]There is no hobby<br />[[]]
@@ -704,11 +702,11 @@
 //  [[body]]
 //  {{clientname}} Data:
 //  <img src="{{clientpicture}}" title="{{clientname}}" />
-//  Main hobby: {{preferedhobby>name}}<br />
+//  Main hobby: {{preferredhobby>name}}<br />
 //  Other hobbies:<br />
 //  @@hobbies:hobby@@ %-- will iterate over hobbies in the data, but with hobby sub template --%
 //  [[hobby.none]]There is no hobby<br />[[]]
-//  [[hobby.field.sport.yes]]<span style="color: red;">{{name}}<span><br /><hr>[[]] %-- Paint the sports red --%
+//  [[hobby.key.1]]<span style="color: red;">{{name}}<span><br /><hr>[[]] %-- Paint the second line red (0 indexed) --%
 //  [[hobby]]{{name}}<br />[[]]
 //  [[]]
 //
@@ -757,7 +755,7 @@
 //   [[photo.none]]There is no photo<br />[[]]
 //  [[]]
 //
-// If the asked field is a catalog, true/false, numberd, you may also use .[value] subtemplates
+// If the asked field is a catalog, true/false, numbered, you may also use .[value] subtemplates
 //
 //  &&header&&
 //  &&body&&
@@ -768,9 +766,9 @@
 //
 //  [[body]]
 //   {{clientname}} Data:
-//   ??preferedhobby>sport:preferedhobby??
-//   [[preferedhobby.yes]]{{preferedhobby>name}}<br />[[]]
-//   [[preferedhobby|preferedhobby.no|preferedhobby.none]]There is no prefered sport<br />[[]]
+//   ??preferredhobby>sport:preferredhobby??
+//   [[preferredhobby.yes]]{{preferredhobby>name}}<br />[[]]
+//   [[preferredhobby|preferredhobby.no|preferredhobby.none]]There is no preferred sport<br />[[]]
 //  [[]]
 //
 //
