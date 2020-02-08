@@ -19,13 +19,13 @@ Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webabi
 
 TO DO:
 ======
+- Implement Logging with import "log"
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
-- Implements 2 parameters for &&, 3 parameters for @@ and ??
-- Implements templates derivation (.first, .last, .#num, .keyvalue, .none, etc)
-
+- template.Print beautify, check stringify
+- language.Print beautify, check stringify
 - Some improvements to check, later:
-- XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
+XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
 
 Version Changes Control
@@ -37,7 +37,8 @@ v0.3.1 - 2020-02-
 - XTemplates now resolve {{ fields with path id>id>id
 - XTemplates now resolve @@ metalanguage with 1 and 2 Parameters
 - XTemplates now resolve && metalanguage with 1,2 and 3 Parameters
-- (Working) XTemplates now resolve ?? metalanguage with 1, and 2 Parameters
+- XTemplates now resolve ?? metalanguage with 1, and 2 Parameters
+- (Working) XTemplates now resolve !! debug orders
 - XTemplates now implements sub templates derivation (-none -first -last -(key) -(number) )
 - Manuals for XCache, XLanguage and XTemplate written with reference of the metalanguage
 

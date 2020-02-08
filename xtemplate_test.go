@@ -103,9 +103,13 @@ Sports shop:
 {{clientname}} Preferred hobby:
 &&:preferredhobby>sport:sport.&&  %-- will build sport_ + [yes/no] contained into the sport field. Be sure you have a template for each value ! --%
 
+??preferredhobby>sport:sport??
+
 [[sport.yes]]{{preferredhobby>name}} - It's a sport, sell him things![[]]
 [[sport.no]]{{preferredhobby>name}} - It's not a sport, recommend him next store.[[]]
 [[sport]]{{preferredhobby>name}} - We do not know that it is.[[]]
+
+
 
 @@hobbies:hobby@@
 [[hobby.first]]
