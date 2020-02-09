@@ -137,7 +137,7 @@ No hobbies
 		log.Fatal("Error: template could not compile")
 	}
 
-	tmp, _ := time.Parse("2020-01-01T12:00:00", time.RFC3339)
+	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00")
 	lang := NewXLanguage("mainpage", language.English)
 	lang.Set("welcome", "Welcome to you")
 	data := XDataset{
