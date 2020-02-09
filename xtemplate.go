@@ -257,8 +257,6 @@ func (t *XTemplate) compile(data string) error {
 		}
 	}
 
-	// TODO(phil) NOTE: MISSING OPEN/CLOSE SUBTEMPLATES = COMPILATION ERROR
-
 	compiled = compiled[:currentpointer]
 	t.Root = &compiled
 	return nil
@@ -407,23 +405,49 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 				}
 			}
 		case MetaCondition: //  ??id??
-			// TODO(phil) subtemplate depends on condition completion
-			subt := t.GetTemplate(v.Data)
-			if subt != nil {
-				value := searchConditionValue(v.Data, datacol)
+			xdata := strings.Split(v.Data, ":")
+			subdataid := xdata[0]
+			subtemplateid := xdata[0]
+			if len(xdata) > 1 {
+				subtemplateid = xdata[1]
+			}
 
-				// if v.data is a substructure into data, then we stack the data and inject new stacked data
-				if value != "" {
+			subt := t.GetTemplate(subtemplateid)
+			var value interface{}
+			if datacol != nil {
+				value, _ = datacol.GetData(subdataid)
+			}
+			if subt != nil && value != nil {
+				withds := false
+				svalue := ""
+				ds, ok := value.(XDatasetDef)
+				if ok {
+					withds = true
+					datacol.Push(ds)
+				} else {
+					svalue = fmt.Sprint(value)
+				}
+				if svalue != "" {
+					// subtemplate with .value?
+					tmp := t.GetTemplate(subtemplateid + "." + svalue)
+					if tmp != nil {
+						subt = tmp
+					}
 					substr := subt.injector(datacol, language)
 					injected = append(injected, substr)
+				}
+				if withds {
+					datacol.Pop()
 				}
 			}
 		case MetaDump:
 			if datacol != nil {
-				dsubstr, _ := datacol.Get(0)
-				if dsubstr != nil {
-					substr := dsubstr.Stringify()
-					injected = append(injected, substr)
+				if v.Data == "dump" || v.Data == "list" {
+					dsubstr, _ := datacol.Get(0)
+					if dsubstr != nil {
+						substr := dsubstr.Stringify()
+						injected = append(injected, substr)
+					}
 				}
 			}
 		default:
@@ -433,26 +457,6 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 	// return the page string
 	return strings.Join(injected, "")
 }
-
-// searchConditionValue will search one parameter value from the data
-func searchConditionValue(id string, data XDatasetCollectionDef) string {
-	// scan data for each dataset in order top to bottom
-	if data == nil {
-		return ""
-	}
-	v, _ := data.GetDataString(id)
-	return v
-}
-
-/*
-// buildValue will transform a data to a string
-func buildValue(data interface{}) string {
-	// if data is string, return data
-	// if data is a type, return conversion
-	// if data is a function, call the function then return the value
-	return fmt.Sprint(data)
-}
-*/
 
 // Print will creates the final string representing the code of the template
 func (t *XTemplate) Print() string {

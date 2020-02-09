@@ -420,7 +420,7 @@
 //  [[]]
 //
 //
-//  ** Simple Elements {{ }} and ## ##
+// ** Simple Elements {{ }} and ## ##
 //
 // There are 2 types of simple elements. Language elements and Data injector elements (also called field elements)
 //
@@ -461,7 +461,7 @@
 //  }
 //
 //
-//  *** field elements {{field}}
+// *** field elements {{field}}
 //
 // Fields values should have the format: {{fieldname}}
 //
@@ -484,15 +484,15 @@
 //
 //  {{hobbies>1>name}}
 //
-// This will take the name of the second hobby in the dataset defined upper. (collections are 0 indexed)
+// This will take the name of the second hobby in the dataset defined upper. (collections are 0 indexed).
 //
-// The 1 denotes the second record of the hobbies XDatasetCollection
+// The 1 denotes the second record of the hobbies XDatasetCollection.
 //
 // If the field is not found, it will be replaced with an empty string.
 //
 // Tecnically your field names can be any string in the dataset. However do not use { } or > into the names of your fields or the XTemplate may not use them correctly
 //
-// We recommend to use lowercase names with numbers and ._- Accents and UTF8 symbols are also welcome
+// We recommend to use lowercase names with numbers and ._- Accents and UTF8 symbols are also welcome.
 //
 // *** Scope:
 //
