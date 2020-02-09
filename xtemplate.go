@@ -442,10 +442,12 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			}
 		case MetaDump:
 			if datacol != nil {
-				dsubstr, _ := datacol.Get(0)
-				if dsubstr != nil {
-					substr := dsubstr.Stringify()
-					injected = append(injected, substr)
+				if v.Data == "dump" || v.Data == "list" {
+					dsubstr, _ := datacol.Get(0)
+					if dsubstr != nil {
+						substr := dsubstr.Stringify()
+						injected = append(injected, substr)
+					}
 				}
 			}
 		default:

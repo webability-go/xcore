@@ -60,7 +60,7 @@ type XDataset map[string]interface{}
 
 // Stringify will transform the XDataset into a readable string
 func (d *XDataset) Stringify() string {
-	return fmt.Sprint(*d)
+	return fmt.Sprintf("%+v\n", *d)
 }
 
 // Set will add a variable key with value data to the XDataset
@@ -425,7 +425,7 @@ type XDatasetCollection []XDatasetDef
 
 // Stringify will transform the XDatasetCollection into a readable string
 func (d *XDatasetCollection) Stringify() string {
-	return fmt.Sprint(d)
+	return fmt.Sprintf("%+v\n", d)
 }
 
 // Unshift will adds a XDatasetDef at the beginning of the collection

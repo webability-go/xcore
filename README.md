@@ -21,7 +21,7 @@ TO DO:
 ======
 - Implement Logging with import "log"
 - XTemplate must concatenate strings after compilation
-- Implements functions as data entry for template Execute (simple data or loop funcions, can get backs anything, creates an interface)
+- Implements functions as data entry for template Execute (simple data or loop functions, can get backs anything, creates an interface)
 - template.Print beautify, check stringify
 - language.Print beautify, check stringify
 - Some improvements to check, later:
@@ -31,16 +31,18 @@ XCache: activate persistant cache too (shared memory) ????? maybe not for go its
 Version Changes Control
 =======================
 
-v0.3.1 - 2020-02-
+v0.3.1 - 2020-02-09
 -----------------------
 - XDatasetDef.Get must accept a path as key (id>id>id)
 - XTemplates now resolve {{ fields with path id>id>id
 - XTemplates now resolve @@ metalanguage with 1 and 2 Parameters
 - XTemplates now resolve && metalanguage with 1,2 and 3 Parameters
 - XTemplates now resolve ?? metalanguage with 1, and 2 Parameters
-- (Working) XTemplates now resolve !! debug orders
-- XTemplates now implements sub templates derivation (-none -first -last -(key) -(number) )
+- XTemplates now resolve !! debug orders
+- XTemplates now implements sub templates derivation (.none .first .last .(number) )
 - Manuals for XCache, XLanguage and XTemplate written with reference of the metalanguage
+- Examples for dataset and xtemplate added (working version)
+- XDataset and XDatasetCollection .Stringify now prints also field names.
 
 v0.3.0 - 2020-02-06
 -----------------------
