@@ -31,6 +31,11 @@ XCache: activate persistant cache too (shared memory) ????? maybe not for go its
 Version Changes Control
 =======================
 
+v1.0.0 - 2020-02-09
+-----------------------
+- Version leveling
+- Manual corrections
+
 v0.3.1 - 2020-02-09
 -----------------------
 - XDatasetDef.Get must accept a path as key (id>id>id)

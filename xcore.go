@@ -1,20 +1,19 @@
-// Copyright Philippe Thomassigny 2004-2020
-// Use of this source code is governed by a MIT licence
+// Copyright Philippe Thomassigny 2004-2020.
+// Use of this source code is governed by a MIT licence.
 // license that can be found in the LICENSE file.
 
 // Package xcore is a set of basic objects for programation (XCache for caches, XDataset for data sets, XLanguage for languages and XTemplate for templates).
 // For GO, the actual existing code includes:
 //
-// - XCache: Application Memory Caches for any purpose,
+// - XCache: Application Memory Caches for any purpose, with time control and quantity control of object in the cache and also check changes against original source. It is a thread safe cache.
 //
-// - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc),
+// - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc).
 //
-// - XLanguage: language dependent text tables,
+// - XLanguage: language dependent text tables for internationalization of code. The sources can be text or XML file definitions.
 //
-// - XTemplate: template system with meta language.
+// - XTemplate: template system with meta language to create complex documents (compatible with any text language, HTML, CSS, JS, PDF, XML, etc), heavily used on CMS systems and others.
 //
-// The Package hast been used for years on professional PHP projects in the WebAbility Core for PHP program and is now available for GO.
-// It is already used on sites that serve more than 60 million pages a month.
+// It is already used on sites that serve more than 60 million pages a month (500 pages per second on pike hour) and can be used on multithreading environment safely.
 //
 // XCache
 //
@@ -36,7 +35,9 @@
 //  // No direct limits on the cache
 //  var myotherdbtable = xcore.NewXCache("mydb-table", 0, 0)
 //
-// 2. Once you have declared the cache, you can fill it with anything you want. The main cache object is an interface{}
+// 2. Fill in the cache:
+//
+// Once you have declared the cache, you can fill it with anything you want. The main cache object is an interface{}
 // so you can put here anything you need, from simple variables to complex structures. You need to use the Set funcion:
 //
 //  func main() {
@@ -58,7 +59,9 @@
 //    // do something with the fetched data
 //  }
 //
-// 4. To maintain the cache you may need Del function, to delete a specific entry (maybe because you deleted the record in database).
+// 4. To maintain the cache:
+//
+// You may need Del function, to delete a specific entry (maybe because you deleted the record in database).
 // You may also need Clean function to deletes a percentage of the cache, or Flush to deletes it all.
 // The Verify function is used to check cache entries against their sources through the Validator function.
 // Be very careful, if the cache is big or the Validator function is complex (maybe ask for a remote server information),
@@ -79,6 +82,36 @@
 //    fmt.Println(mydbtable.Count())
 //  }
 //
+// 5. How to use Verify Function:
+//
+// This function is recommended when the source is local and fast to check (for instance a language file or a template file).
+// When the source is distant (other cluster database, any rpc source on another network, integration of many parts, etc), it is more recommended to create a
+// function that will delete the cache when needed (on demand cache change).
+//
+// The validator funcion is a func(id, time,Time) bool function. The first parameter is the ID entry in the cache, the second parameter the time of the entry was created.
+// The validator funcion returns trul is the cache is still valid, or false if it needs to be invalidated.
+//
+//  var myfiles = xcore.NewXCache("myfiles", 50, 0)
+//  myfiles.Validator = FileValidator
+//
+//  // FileValidator verify the file source. In this case, the ID is directly the filename full path
+//  func FileValidator(key string, otime time.Time) bool {
+//
+//	  fi, err := os.Stat(key)
+//	  if err != nil {
+//		  // Does not exists anymore, invalid
+//		  return false
+//	  }
+//	  mtime := fi.ModTime()
+//	  if mtime.After(otime) {
+//		  // file is newer, invalid
+//	  	return false
+//  	}
+//	  // All ok, valid
+//	  return true
+//  }
+//
+//
 // The XCache is thread safe.
 // The cache can be limited in quantity of entries and timeout for data. The cache is automanaged (for invalid expired data) and can be cleaned partially or totally manually.
 //
@@ -86,8 +119,10 @@
 // XLanguage
 //
 // The XLanguage table of text entries can be loaded from XML file, XML string or normal text file or string.
+// It is used to keep a table of id=value set of entries in any languages you need, so it is easy to switch between XLanguage instance based on the required language needed.
+// Obviously, any XLanguage you load in any language should have the same id entries translated, for the same use.
 //
-// 1. loading
+// 1. loading:
 //
 // You can load any file or XML string directly into the object.
 //
@@ -103,8 +138,10 @@
 // NAMEOFTABLE is the name of your table entry, for example "loginform", "user_report", etc.
 //
 // LG is the ISO-3369 2 letters language ID, for example "es" for spanish, "en" for english, "fr" for french, etc.
-// ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
-// ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
+//
+// ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton".
+//
+// ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english.
 //
 // 1.2 The flat text format is:
 //
@@ -112,15 +149,17 @@
 //  ENTRYNAME=ENTRYVALUE
 //  etc.
 //
-// ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton"
-// ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english
+// ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton".
 //
-// There is no name of table or language in this format (you "know" what you are loading)
+// ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english.
+//
+// There is no name of table or language in this format (you "know" what you are loading).
 //
 // The advantage to use XML format is to have more control over your language, and eventyally add attributes into your entries,
-// for instance translated="yes/no", verified="yes/no", and any other data that your system could insert
+// for instance you may add attributes translated="yes/no", verified="yes/no", and any other data that your system could insert.
+// The XLanguage will ignore those attributes loading the table.
 //
-// 2. creation
+// 2. creation:
 //
 // To create a new XLanguage empty structure:
 //
@@ -135,23 +174,23 @@
 //
 // Then you can use the set of basic access functions:
 //
-// SetName/SetLanguage functions are used to set the table name and language of the object (generally to build an object from scratch)
-// GetName/GetLanguage functions are used to get the table name and language of the object (generally when you load it from some source)
+// SetName/SetLanguage functions are used to set the table name and language of the object (generally to build an object from scratch).
+// GetName/GetLanguage functions are used to get the table name and language of the object (generally when you load it from some source).
 // Set/Get/Del functions are used to add or modify a new entry, read an entry, or deletes an entry in the object.
 //
 // XDataSet
 //
-// 1. Overview
+// 1. Overview:
 //
 // The XDataSet is a set of interfaces and basic classes ready-to-use to build a standard set of data optionally nested and hierarchical, that can be used for any purpose:
 //
-// - Keep complex data in memory
+// - Keep complex data in memory.
 //
-// - Create JSON structures
+// - Create JSON structures.
 //
-// - Inject data into templates
+// - Inject data into templates.
 //
-// - Interchange database data (records set and record)
+// - Interchange database data (records set and record).
 //
 // You can store into it generic supported data, as well as any complex interface structures:
 //
@@ -219,7 +258,10 @@
 //  data["data8"] = &d
 //  data["data9"] = "I exist"
 //
-// 2. XDatasetDef interface
+// Note that all references to XDataset and XDatasetCollection are pointers, always (to be able to modify the values of them).
+//
+//
+// 2. XDatasetDef interface:
 //
 // It is the interface to describe a simple set of data mapped as "name": value, where value can be of any type.
 //
@@ -242,7 +284,7 @@
 //
 // XTemplate
 //
-// 1. Overview
+// 1. Overview:
 //
 // This is a class to compile and keep a Template that can be injected with an XDataSet structure of data, with a metalanguage to inject the data.
 //
@@ -260,7 +302,7 @@
 //
 // The template compiler recognize nested arrays to automatically make loops on the information.
 //
-// Templates are made to store reusable HTML code, and overall easily changeable by **NON PROGRAMMING PEOPLE**.
+// Templates are made to store reusable HTML code, and overall easily changeable by people that do not know how to write programs.
 //
 // A template can be as simple as a single character (no variables to inject) to a very complex nested, conditional and loops sub-templates.
 //
@@ -269,6 +311,19 @@
 // Yes. this is a template, but a very simple one without need to inject any data.
 //
 // Let's go more complex:
+//
+// Having an array of data, we want to paint it beautifull:
+//
+//  { "clientname": "Fred",
+//    "hobbies": [
+//       { "name": "Football" },
+//       { "name": "Ping-pong" },
+//       { "name": "Swimming" },
+//       { "name": "Videogames" }
+//    ]
+//  }
+//
+// We can create a template to inject this data into it:
 //
 //  %-- This is a comment. It will not appear in the final code. --%
 //  Let's put your name here: {{clientname}}<br />
@@ -280,18 +335,8 @@
 //  I love {{name}}<br />
 //  [[]]
 //
-// The data to inject could be:
 //
-//  { "clientname": "Fred",
-//    "hobbies": [
-//       { "name": "Football" },
-//       { "name": "Ping-pong" },
-//       { "name": "Swimming" },
-//       { "name": "Videogames" }
-//    ]
-//  }
-//
-// 2. Create and use XTemplateData
+// 2. Create and use XTemplateData:
 //
 // In sight to create and use templates, you have all those possible options to use:
 //
@@ -331,9 +376,9 @@
 //  }
 //
 //
-// 3. Metalanguage Reference
+// 3. Metalanguage Reference:
 //
-// ** Comments %-- and --%
+// 3.1 Comments: %-- and --%
 //
 // You may use comments into your template.
 // The comments will be discarded immediately at the compilation of the template and do not interfere with the rest of your code.
@@ -350,7 +395,7 @@
 //  --%
 //
 //
-// ** Nested Templates [[]] and &&
+// 3.2 Nested Templates: [[...]] and [[]]
 //
 // You can define new nested templates into your main template
 // A nested template is defined by:
@@ -359,15 +404,15 @@
 //  your nested template here
 //  [[]]
 //
-// The templteid is any combination of lowers letters only (a-z), numbers (0-9), and 3 special chars: .-_
+// The templteid is any combination of lowers letters only (a-z), numbers (0-9), and 3 special chars: . (point) - (dash) and _ (underline).
 //
-// The template is closed with [[]]
+// The template is closed with [[]].
 //
 // There is no limits into nesting templates.
 //
 // Any nested template will inheritate all the father elements and can use father elements too.
 //
-// To call a sub-template, you need to use &&templateid&& syntax (described below in this document)
+// To call a sub-template, you need to use &&templateid&& syntax (described below in this document).
 //
 // Example:
 //
@@ -420,15 +465,16 @@
 //  [[]]
 //
 //
-// ** Simple Elements {{ }} and ## ##
+// 3.3 Simple Elements: ##...## and {{...}}
 //
-// There are 2 types of simple elements. Language elements and Data injector elements (also called field elements)
+// There are 2 types of simple elements. Language elements and Data injector elements (also called field elements).
 //
-// We "logically" define the 2 type of elements. The separation is only for human logic and template filling, however the language information can perfectly fit into the data to inject (and not use ## entries)
+// We "logically" define the 2 type of elements. The separation is only for human logic and template filling, however the language information can perfectly fit into the data to inject (and not use ## entries).
 //
-// *** Languages elements ##entry##
 //
-// All the languages elements should have the format: ##entry##
+// 3.3.1 Languages elements: ##entry##
+//
+// All the languages elements should have the format: ##entry##.
 //
 // A language entry is generally anything written into your code or page that does not come from a database, and should adapt to the language of the client visiting your site.
 //
@@ -438,7 +484,7 @@
 //
 // The language elements generally carry titles, menu options, tables headers etc.
 //
-// The language entries are set into the "#" entry of the main template XDataset to inject, and is a XLanguage table
+// The language entries are set into the "#" entry of the main template XDataset to inject, and is a XLanguage table.
 //
 // Example:
 //
@@ -452,6 +498,7 @@
 //  </div>
 //
 // With data to inject:
+//
 //  {
 //    "#": {
 //      "welcome": "Bienvenue",
@@ -461,9 +508,9 @@
 //  }
 //
 //
-// *** field elements {{field}}
+// 3.3.2 Field elements: {{fieldname}}
 //
-// Fields values should have the format: {{fieldname}}
+// Fields values should have the format: {{fieldname}}.
 //
 // Your fields source can be a database or any other preferred repository data source.
 //
@@ -480,7 +527,7 @@
 //
 //  </div>
 //
-// You can access an element with its path into the data set to inject separating each field level with a >
+// You can access an element with its path into the data set to inject separating each field level with a > (greater than).
 //
 //  {{hobbies>1>name}}
 //
@@ -490,14 +537,14 @@
 //
 // If the field is not found, it will be replaced with an empty string.
 //
-// Tecnically your field names can be any string in the dataset. However do not use { } or > into the names of your fields or the XTemplate may not use them correctly
+// Tecnically your field names can be any string in the dataset. However do not use { } or > into the names of your fields or the XTemplate may not use them correctly.
 //
 // We recommend to use lowercase names with numbers and ._- Accents and UTF8 symbols are also welcome.
 //
-// *** Scope:
+// 3.3.3 Scope:
 //
 // When you use an id to point a value, the template will first search into the available ids of the local level.
-// If no id is found, the it will search into the upper levers if any, and so on
+// If no id is found, the it will search into the upper levers if any, and so on.
 //
 // Example:
 //
@@ -513,22 +560,21 @@
 //    }
 //  }
 //
-// At the level of 'data2', using {{appname}} will get back 'DomCore'
+// At the level of 'data2', using {{appname}} will get back 'DomCore'.
 //
-// At the level of 'key1', using {{appname}} will get back 'Nested App'
+// At the level of 'key1', using {{appname}} will get back 'Nested App'.
 //
-// At the level of 'key2', using {{appname}} will get back 'DomCore'
+// At the level of 'key2', using {{appname}} will get back 'DomCore'.
 //
-// At the level of root, 'data1' or 'detail', using {{appname}} will get back an empty string
+// At the level of root, 'data1' or 'detail', using {{appname}} will get back an empty string.
 //
 //
-// *** Path access: id>id>id>id
+// 3.3.4 Path access: id>id>id>id
 //
 // At any level into the data array, you can access any entry into the subset array.
 //
-// For instance, taking the previous array of data to inject:
-//
-// Let's suppose we are into a nested meta elements at the 'data1' level. You may want to access directly the 'Juan' entry. The path will be:
+// For instance, taking the previous array of data to inject,
+// let's suppose we are into a nested meta elements at the 'data1' level. You may want to access directly the 'Juan' entry. The path will be:
 //
 //  {{data2>key1>name}}
 //
@@ -538,7 +584,7 @@
 //
 //
 //
-// ** Meta Elements
+// 3.4 Meta Elements
 //
 // They consist into an injection of a XDataset, called the "data to inject", into the template.
 //
@@ -579,9 +625,9 @@
 // The structure of the meta elements in the template must follow the structure of the data to inject.
 //
 //
-// *** References to another template: &&order&&
+// 3.4.1 References to another template: &&order&&
 //
-// - When order is a single id (characters a-z0-9.-_), it will make a call to a sub template with the same set of data and replace the &&...&& with the result.
+// 3.4.1.1 When order is a single id (characters a-z0-9.-_), it will make a call to a sub template with the same set of data and replace the &&...&& with the result.
 // The level in the data set is not changed.
 //
 // Example based on previous array of Fred's data:
@@ -599,7 +645,7 @@
 //  [[]]
 //
 //
-// - When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
+// 3.4.1.2 When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
 // The level in the data set is changed to this sub set.
 //
 // Example based on previous array of Fred's data:
@@ -617,7 +663,7 @@
 //  Hire date: {{hiredate}}<br /> %-- taken from the metadata subset--%
 //  [[]]
 //
-// - When order contains 3 parameters separated by a semicolumn :, the second and third parameters are used to search the name of the new template based on the data fields to inject.
+// 3.4.1.3 When order contains 3 parameters separated by a semicolumn :, the second and third parameters are used to search the name of the new template based on the data fields to inject.
 //
 // This is an indirect access to the template. The name of the subtemplate is build with parameter3 as prefix and the content of parameter2 value.
 // The third parameter must be empty.
@@ -639,9 +685,9 @@
 //  [[]]
 //
 //
-// *** Loops: @@order@@
+// 3.4.2 Loops: @@order@@
 //
-// **** Overview
+// 3.4.2.1 Overview
 //
 // This meta element will loop over each itterance of the set of data and concatenate each created template in the same order. You need to declare a sub template for this element.
 //
@@ -667,7 +713,7 @@
 // - templateid in all other cases (odd is contained here if even is defined)
 //
 //
-// When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same subset of data with the same id and replace the @@...@@ for each itterance of the data with the result.
+// 3.4.2.2 When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same subset of data with the same id and replace the @@...@@ for each itterance of the data with the result.
 //
 // Example based on previous array of Fred's data:
 //
@@ -688,7 +734,7 @@
 //  [[hobbies]]{{name}}<br />[[]]
 //  [[]]
 //
-// When order contains 2 parameters separated by a semicolumn :, then first parameter is used to change the level of the data of array, with the subset with this id, and the second one for the template to use.
+// 3.4.2.3 When order contains 2 parameters separated by a semicolumn :, then first parameter is used to change the level of the data of array, with the subset with this id, and the second one for the template to use.
 //
 // Example based on previous array of Fred's data:
 //
@@ -711,7 +757,7 @@
 //  [[]]
 //
 //
-// *** Conditional: ??order??
+// 3.4.3 Conditional: ??order??
 //
 // Makes a call to a subtemplate only if the field exists and have a value.
 // This is very userfull to call a sub template for instance when an image or a video is set.
@@ -719,7 +765,7 @@
 // When the condition is not met, it will search for the [id].none template.
 // The conditional element does not change the level in the data set.
 //
-// - When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same field in the data and replace the ??...?? with the corresponding template
+// 3.4.3.1 When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same field in the data and replace the ??...?? with the corresponding template
 //
 // Example based on previous array of Fred's data:
 //
@@ -737,7 +783,7 @@
 //   [[clientpicture.none]]There is no photo<br />[[]]
 //  [[]]
 //
-// - When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
+// 3.4.3.2 When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
 //
 // Example based on previous array of Fred's data:
 //
@@ -772,16 +818,16 @@
 //  [[]]
 //
 //
-// ** Debug Tools: !!order!!
+// 3.5 Debug Tools: !!order!!
 //
 // There are two keywords to dump the content of the data set.
 // This is very useful when you dont know the code that calls the template, don't remember some values, or for debug facilities.
 //
-// *** !!dump!!
+// 3.5.1 !!dump!!
 //
 // Will show the totality of the data set, with ids and values.
 //
-// *** !!list!!
+// 3.5.1 !!list!!
 //
 // Will show only the tree of parameters, values are not shown.
 //
@@ -789,7 +835,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "0.3.1"
+const VERSION = "1.0.0"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
