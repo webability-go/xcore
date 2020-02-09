@@ -8,7 +8,7 @@ import (
 
 func ExampleXDataset() {
 
-	tmp, _ := time.Parse("2020-01-01T12:00:00", time.RFC3339)
+	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00")
 	data := XDataset{
 		"clientname":    "Fred",
 		"clientpicture": "face.jpg",
@@ -34,7 +34,7 @@ func ExampleXDataset() {
 
 func TestXDataset(t *testing.T) {
 
-	tmp, _ := time.Parse("2020-01-01T12:00:00", time.RFC3339)
+	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00")
 	data := XDataset{
 		"clientname":    "Fred",
 		"clientpicture": "face.jpg",

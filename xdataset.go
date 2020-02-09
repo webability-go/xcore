@@ -76,15 +76,15 @@ func (d *XDataset) Get(key string) (interface{}, bool) {
 		if !ok {
 			return nil, false
 		}
-		switch subset.(type) {
-		case XDatasetDef:
-			return (subset.(XDatasetDef)).Get(strings.Join(xid[1:], ">"))
-		case XDatasetCollectionDef:
+		if ds, ok := subset.(XDatasetDef); ok {
+			return ds.Get(strings.Join(xid[1:], ">"))
+		}
+		if dsc, ok := subset.(XDatasetCollectionDef); ok {
 			entry, err := strconv.Atoi(xid[1])
 			if err != nil {
 				return nil, false
 			}
-			ds, _ := (subset.(XDatasetCollectionDef)).Get(entry)
+			ds, _ := dsc.Get(entry)
 			if ds == nil {
 				return nil, false
 			}
