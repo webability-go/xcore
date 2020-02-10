@@ -35,6 +35,7 @@ v1.0.0 - 2020-02-09
 -----------------------
 - Version leveling
 - Manual corrections
+- Change functions Stringify() by String() and GoString() for language compatibility
 
 v0.3.1 - 2020-02-09
 -----------------------

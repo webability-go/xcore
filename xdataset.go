@@ -12,7 +12,8 @@ import (
 //   The get* methods must accept a path id>id>id...
 type XDatasetDef interface {
 	// Stringify will dump the content into a human readable string
-	Stringify() string
+	fmt.Stringer   // please implement String()
+	fmt.GoStringer // Please implement GoString()
 
 	// Set will associate the data to the key. If it already exists, it will be replaced
 	Set(key string, data interface{})
@@ -58,8 +59,13 @@ type XDatasetDef interface {
 // XDataset is the basic interface dataset interface
 type XDataset map[string]interface{}
 
-// Stringify will transform the XDataset into a readable string
-func (d *XDataset) Stringify() string {
+// String will transform the XDataset into a readable string
+func (d *XDataset) String() string {
+	return d.GoString()
+}
+
+// GoString will transform the XDataset into a readable string for humans
+func (d *XDataset) GoString() string {
 	return fmt.Sprintf("%+v\n", *d)
 }
 
@@ -87,6 +93,9 @@ func (d *XDataset) Get(key string) (interface{}, bool) {
 			ds, _ := dsc.Get(entry)
 			if ds == nil {
 				return nil, false
+			}
+			if len(xid) == 2 {
+				return ds, true
 			}
 			return ds.Get(strings.Join(xid[2:], ">"))
 		}
@@ -371,7 +380,8 @@ func (d *XDataset) Clone() XDatasetDef {
 // XDatasetCollectionDef is the definition of a collection of XDatasetDefs
 type XDatasetCollectionDef interface {
 	// Stringify will dump the content into a human readable string
-	Stringify() string
+	fmt.Stringer   // please implement String()
+	fmt.GoStringer // Please implement GoString()
 
 	// Will add a datasetdef to the beginning of the collection
 	Unshift(data XDatasetDef)
@@ -423,9 +433,14 @@ type XDatasetCollectionDef interface {
 // XDatasetCollection is the basic collection of XDatasetDefs
 type XDatasetCollection []XDatasetDef
 
-// Stringify will transform the XDatasetCollection into a readable string
-func (d *XDatasetCollection) Stringify() string {
-	return fmt.Sprintf("%+v\n", d)
+// String will transform the XDataset into a readable string
+func (d *XDatasetCollection) String() string {
+	return d.GoString()
+}
+
+// GoString will transform the XDataset into a readable string for humans
+func (d *XDatasetCollection) GoString() string {
+	return fmt.Sprintf("%+v\n", *d)
 }
 
 // Unshift will adds a XDatasetDef at the beginning of the collection

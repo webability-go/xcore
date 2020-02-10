@@ -3,7 +3,6 @@ package xcore
 import (
 	"fmt"
 	"golang.org/x/text/language"
-	"log"
 	"testing"
 	"time"
 )
@@ -57,7 +56,7 @@ I love {{name}}<br />
 		},
 	}
 
-	fmt.Println(tmpl.Execute(&data))
+	t.Log(tmpl.Execute(&data))
 }
 
 func TestXTemplateComments(t *testing.T) {
@@ -87,7 +86,7 @@ And lets put your hobbies here:<br />
 		},
 	}
 
-	fmt.Println(tmpl.Execute(&data))
+	t.Log(tmpl.Execute(&data))
 }
 
 func TestXTemplateSimple(t *testing.T) {
@@ -133,8 +132,7 @@ No hobbies
 [[]]
   `)
 	if err != nil {
-		fmt.Println(err)
-		log.Fatal("Error: template could not compile")
+		t.Errorf(err)
 	}
 
 	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00")
@@ -165,5 +163,5 @@ No hobbies
 		"#": lang,
 	}
 
-	fmt.Println(tmpl.Execute(&data))
+	t.Log(tmpl.Execute(&data))
 }
