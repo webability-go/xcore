@@ -38,7 +38,8 @@
 // 2. Fill in the cache:
 //
 // Once you have declared the cache, you can fill it with anything you want. The main cache object is an interface{}
-// so you can put here anything you need, from simple variables to complex structures. You need to use the Set funcion:
+// so you can put here anything you need, from simple variables to complex structures. You need to use the Set function:
+// Note the ID is always a string, so convert a database key to string if needed.
 //
 //  func main() {
 //    myfiles.Set("https://developers.webability.info/", "somedata")
@@ -88,8 +89,8 @@
 // When the source is distant (other cluster database, any rpc source on another network, integration of many parts, etc), it is more recommended to create a
 // function that will delete the cache when needed (on demand cache change).
 //
-// The validator funcion is a func(id, time,Time) bool function. The first parameter is the ID entry in the cache, the second parameter the time of the entry was created.
-// The validator funcion returns trul is the cache is still valid, or false if it needs to be invalidated.
+// The validator function is a func(id, time.Time) bool function. The first parameter is the ID entry in the cache, the second parameter the time of the entry was created.
+// The validator function returns true is the cache is still valid, or false if it needs to be invalidated.
 //
 //  var myfiles = xcore.NewXCache("myfiles", 50, 0)
 //  myfiles.Validator = FileValidator
@@ -835,7 +836,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "1.0.0"
+const VERSION = "1.0.1"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.

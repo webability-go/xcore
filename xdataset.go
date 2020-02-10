@@ -61,12 +61,17 @@ type XDataset map[string]interface{}
 
 // String will transform the XDataset into a readable string
 func (d *XDataset) String() string {
-	return d.GoString()
+	str := "XDataset[\n"
+	for key, val := range *d {
+		str += "  " + key + ": " + fmt.Sprint(val) + "\n"
+	}
+	str += "]\n"
+	return str
 }
 
 // GoString will transform the XDataset into a readable string for humans
 func (d *XDataset) GoString() string {
-	return fmt.Sprintf("%+v\n", *d)
+	return d.String()
 }
 
 // Set will add a variable key with value data to the XDataset
@@ -435,12 +440,17 @@ type XDatasetCollection []XDatasetDef
 
 // String will transform the XDataset into a readable string
 func (d *XDatasetCollection) String() string {
-	return d.GoString()
+	str := "XDatasetCollection[\n"
+	for key, val := range *d {
+		str += "  " + strconv.Itoa(key) + ": " + fmt.Sprint(val) + "\n"
+	}
+	str += "]\n"
+	return str
 }
 
 // GoString will transform the XDataset into a readable string for humans
 func (d *XDatasetCollection) GoString() string {
-	return fmt.Sprintf("%+v\n", *d)
+	return d.String()
 }
 
 // Unshift will adds a XDatasetDef at the beginning of the collection
