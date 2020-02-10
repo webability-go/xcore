@@ -445,7 +445,7 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 				if v.Data == "dump" || v.Data == "list" {
 					dsubstr, _ := datacol.Get(0)
 					if dsubstr != nil {
-						substr := dsubstr.Stringify()
+						substr := dsubstr.GoString()
 						injected = append(injected, substr)
 					}
 				}
