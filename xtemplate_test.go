@@ -132,7 +132,7 @@ No hobbies
 [[]]
   `)
 	if err != nil {
-		t.Errorf(err)
+		t.Error(err)
 	}
 
 	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00")

@@ -31,10 +31,15 @@ XCache: activate persistant cache too (shared memory) ????? maybe not for go its
 Version Changes Control
 =======================
 
+v1.0.1 - 2020-02-10
+-----------------------
+- Documentation corrections
+- Bug on String() and GoString() corrected
+
 v1.0.0 - 2020-02-09
 -----------------------
 - Version leveling
-- Manual corrections
+- Documentation corrections
 - Change functions Stringify() by String() and GoString() for language compatibility
 - Tests functions enhanced
 
