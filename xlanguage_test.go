@@ -185,4 +185,9 @@ func TestXLanguageAssign(t *testing.T) {
 		t.Errorf("The value of language is not correct %s", lang)
 		return
 	}
+
+	// Print
+	str := fmt.Sprint(manualES)
+	fmt.Println(str)
+
 }
