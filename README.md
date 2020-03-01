@@ -4,10 +4,10 @@
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
 [![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
 
-XCore for GO v0
+XCore for GO v1
 =============================
 
-The XCore package is used to build basic object for programmtion. for the WebAbility compatility code
+The XCore package is used to build basic object for programation. for the WebAbility compatility code
 For GO, the actual existing code includes:
 - XCache: Application Memory Caches
 - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc)
@@ -30,6 +30,11 @@ XCache: activate persistant cache too (shared memory) ????? maybe not for go its
 
 Version Changes Control
 =======================
+
+v1.0.2 - 2020-03-01
+-----------------------
+- Modularization of XCore
+- XLanguage tests and examples are now conform to Go test units
 
 v1.0.1 - 2020-02-10
 -----------------------
@@ -147,23 +152,3 @@ V0.0.2 - 2018-12-17
 V0.0.1 - 2018-11-14
 -----------------------
 - First basic commit with XLanguage object created
-
-
-XLanguage:
-
-Example:
-
-```
-lang, err := xcore.NewXLanguageFromXMLString(`
-<?xml version="1.0" encoding="UTF-8"?>
-<language id="language-demo" lang="en">
-  <entry id="entry1">Welcome to</entry>
-  <entry id="entry2">XCore</entry>
-</language>
-`)
-
-tr1 = lang.Get("entry1")
-tr2 = lang.Get("entry2")
-
-fmt.Println(tr1, tr2)
-```
