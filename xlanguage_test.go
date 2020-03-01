@@ -186,8 +186,17 @@ func TestXLanguageAssign(t *testing.T) {
 		return
 	}
 
-	// Print
+	// String
 	str := fmt.Sprint(manualES)
-	fmt.Println(str)
+	if str != "xcore.XLanguage{fileerror:Error leyendo el archivo panicerror:Error crítico del sistema systemerror:Error del sistema}" {
+		t.Errorf("The print value language is not correct %s", str)
+		return
+	}
 
+	// Gostring
+	str = fmt.Sprintf("%#v", manualES)
+	if str != "#xcore.XLanguage{fileerror:\"Error leyendo el archivo\" panicerror:\"Error crítico del sistema\" systemerror:\"Error del sistema\"}" {
+		t.Errorf("The print #value language is not correct %s", str)
+		return
+	}
 }

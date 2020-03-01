@@ -31,10 +31,12 @@ XCache: activate persistant cache too (shared memory) ????? maybe not for go its
 Version Changes Control
 =======================
 
-v1.0.2 - 2020-03-01
+v1.1.0 - 2020-03-01
 -----------------------
 - Modularization of XCore
 - XLanguage tests and examples are now conform to Go test units
+- Implementation of XLanguage.String and XLanguage.GoString, removed Print
+- XCache tests and examples are now conform to Go test units
 
 v1.0.1 - 2020-02-10
 -----------------------

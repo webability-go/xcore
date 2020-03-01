@@ -17,9 +17,8 @@ func ExampleXDataset() {
 		"vpi": 3.1415927,
 	}
 	fmt.Println(ds)
-	// Output: XDataset[v1:123 v2:abc v3:true vpi:3.1415927 vt:0001-01-01 00:00:00 +0000 UTC]
 
-	data := XDataset{
+	data := &XDataset{
 		"clientname":    "Fred",
 		"clientpicture": "face.jpg",
 		"hobbies": &XDatasetCollection{
@@ -40,6 +39,9 @@ func ExampleXDataset() {
 	}
 
 	fmt.Println(data)
+	// Output:
+	// xcore.XDataset{v1:123 v2:abc v3:true vpi:3.1415927 vt:0001-01-01 00:00:00 +0000 UTC}
+	// xcore.XDataset{clientname:Fred clientpicture:face.jpg hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:xcore.XDataset{Salary:3568.65 hiredate:0001-01-01 00:00:00 +0000 UTC preferred-color:blue} preferredhobby:xcore.XDataset{name:Baseball sport:yes}}
 }
 
 func TestCreateSimpleXDataset(t *testing.T) {
