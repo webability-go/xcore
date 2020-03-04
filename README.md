@@ -19,11 +19,8 @@ Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webabi
 
 TO DO:
 ======
-- Implement Logging with import "log"
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop functions, can get backs anything, creates an interface)
-- template.Print beautify, check stringify
-- language.Print beautify, check stringify
 - Some improvements to check, later:
 XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
