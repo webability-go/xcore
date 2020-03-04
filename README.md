@@ -37,6 +37,11 @@ v1.1.0 - 2020-03-01
 - XLanguage tests and examples are now conform to Go test units
 - Implementation of XLanguage.String and XLanguage.GoString, removed Print
 - XCache tests and examples are now conform to Go test units
+- XDataset tests and examples are now conform to Go test units
+- Implementation of XDataset.String and XDataset.GoString, removed Print
+- Implementation of XDatasetCollection.String and XDatasetCollection.GoString, removed Print
+- XTemplate tests and examples are now conform to Go test units
+- Implementation of XTemplate.String and XTemplate.GoString, removed Print
 
 v1.0.1 - 2020-02-10
 -----------------------
