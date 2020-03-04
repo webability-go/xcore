@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -127,21 +128,21 @@ func (t *XTemplate) compile(data string) error {
 		`(?s)` + // . is multiline
 
 			// ==== COMENTS
-			`(%)--(.*?)--%\n?` + // index based 1
+			`(%)--(.*?)--%(\n|\r|\r\n|\n\r)?` + // index based 1
 
 			// ==== LANGUAGE INJECTION
-			`|(#)#(.+?)##` + // index based 3
+			`|(#)#(.+?)##` + // index based 4
 
 			// ==== ELEMENTS
-			`|(&)&(.+?)&&` + // index based 5
-			`|(@)@(.+?)@@` + // index based 7
-			`|(\?)\?(.+?)\?\?` + // index based 9
-			`|(\!)\!(.+?)\!\!` + // index based 11
-			`|(\{)\{(.+?)\}\}` + // index based 13
+			`|(&)&(.+?)&&` + // index based 6
+			`|(@)@(.+?)@@` + // index based 8
+			`|(\?)\?(.+?)\?\?` + // index based 10
+			`|(\!)\!(.+?)\!\!` + // index based 12
+			`|(\{)\{(.+?)\}\}` + // index based 14
 
 			// ==== NESTED ELEMENTS (SUB TEMPLATES)
-			`|\[\[(\])\](\n|\r|\r\n|\n\r)?` + // index based 15
-			`|(\[)\[([a-z0-9\|\.\-_]+?)\]\](\n|\r|\r\n|\n\r)?` // index based 17
+			`|\[\[(\])\](\n|\r|\r\n|\n\r)?` + // index based 16
+			`|(\[)\[([a-z0-9\|\.\-_]+?)\]\](\n|\r|\r\n|\n\r)?` // index based 18
 
 	codex := regexp.MustCompile(code)
 	indexes := codex.FindAllStringIndex(data, -1)
@@ -158,28 +159,28 @@ func (t *XTemplate) compile(data string) error {
 		if matches[i][1] == "%" {
 			param.ParamType = MetaComment // comment
 			param.Data = matches[i][2]
-		} else if matches[i][3] == "#" {
+		} else if matches[i][4] == "#" {
 			param.ParamType = MetaLanguage // Language entry
-			param.Data = matches[i][4]
-		} else if matches[i][5] == "&" {
+			param.Data = matches[i][5]
+		} else if matches[i][6] == "&" {
 			param.ParamType = MetaReference // Reference to template
-			param.Data = matches[i][6]
-		} else if matches[i][7] == "@" {
+			param.Data = matches[i][7]
+		} else if matches[i][8] == "@" {
 			param.ParamType = MetaRange // Loop on data
-			param.Data = matches[i][8]
-		} else if matches[i][9] == "?" {
+			param.Data = matches[i][9]
+		} else if matches[i][10] == "?" {
 			param.ParamType = MetaCondition // Conditional on data
-			param.Data = matches[i][10]
-		} else if matches[i][11] == "!" {
+			param.Data = matches[i][11]
+		} else if matches[i][12] == "!" {
 			param.ParamType = MetaDump // Debug
-			param.Data = matches[i][12]
-		} else if matches[i][13] == "{" {
+			param.Data = matches[i][13]
+		} else if matches[i][14] == "{" {
 			param.ParamType = MetaVariable // Simple element
-			param.Data = matches[i][14]
-		} else if matches[i][17] == "[" {
+			param.Data = matches[i][15]
+		} else if matches[i][18] == "[" {
 			param.ParamType = MetaTemplateStart // Template start
-			param.Data = matches[i][18]
-		} else if matches[i][15] == "]" {
+			param.Data = matches[i][19]
+		} else if matches[i][16] == "]" {
 			param.ParamType = MetaTemplateEnd // Template end
 		} else {
 			param.ParamType = MetaUnused // unknown, will be removed
@@ -458,7 +459,17 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 	return strings.Join(injected, "")
 }
 
-// Print will creates the final string representing the code of the template
-func (t *XTemplate) Print() string {
-	return fmt.Sprint(t)
+// String will transform the XDataset into a readable string for humans
+func (t *XTemplate) String() string {
+	sdata := []string{}
+	for _, val := range *t.Root {
+		sdata = append(sdata, fmt.Sprintf("%v", val))
+	}
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "xcore.XLanguage{" + strings.Join(sdata, " ") + "}"
+}
+
+// GoString will transform the XDataset into a readable string for humans
+func (t *XTemplate) GoString() string {
+	return t.String()
 }
