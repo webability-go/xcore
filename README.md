@@ -22,6 +22,7 @@ TO DO:
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop functions, can get backs anything, creates an interface)
 - Some improvements to check, later:
+Adds mutex on XLanguage, XDataset, XTemplate ?? (they should be used locally on every thread, or not ??), maybe adds a flag "thread safe" ?
 XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
 
