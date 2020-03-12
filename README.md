@@ -7,7 +7,7 @@
 XCore for GO v1
 =============================
 
-The XCore package is used to build basic object for programation. for the WebAbility compatility code
+The XCore package is used to build basic object for programmation. for the WebAbility compatility code
 For GO, the actual existing code includes:
 - XCache: Application Memory Caches
 - XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc)
