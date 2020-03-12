@@ -2,6 +2,7 @@ package xcore
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -59,19 +60,24 @@ type XDatasetDef interface {
 // XDataset is the basic interface dataset interface
 type XDataset map[string]interface{}
 
-// String will transform the XDataset into a readable string
+// String will transform the XDataset into a readable string for humans
 func (d *XDataset) String() string {
-	str := "XDataset[\n"
+	sdata := []string{}
 	for key, val := range *d {
-		str += "  " + key + ": " + fmt.Sprint(val) + "\n"
+		sdata = append(sdata, key+":"+fmt.Sprintf("%v", val))
 	}
-	str += "]\n"
-	return str
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "xcore.XDataset{" + strings.Join(sdata, " ") + "}"
 }
 
 // GoString will transform the XDataset into a readable string for humans
 func (d *XDataset) GoString() string {
-	return d.String()
+	sdata := []string{}
+	for key, val := range *d {
+		sdata = append(sdata, key+":"+fmt.Sprintf("%#v", val))
+	}
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "#xcore.XDataset{" + strings.Join(sdata, " ") + "}"
 }
 
 // Set will add a variable key with value data to the XDataset
@@ -440,11 +446,11 @@ type XDatasetCollection []XDatasetDef
 
 // String will transform the XDataset into a readable string
 func (d *XDatasetCollection) String() string {
-	str := "XDatasetCollection[\n"
+	str := "XDatasetCollection["
 	for key, val := range *d {
-		str += "  " + strconv.Itoa(key) + ": " + fmt.Sprint(val) + "\n"
+		str += strconv.Itoa(key) + ":" + fmt.Sprint(val) + " "
 	}
-	str += "]\n"
+	str += "]"
 	return str
 }
 

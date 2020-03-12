@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="errors" lang="es">
+  <entry id="panicerror">Error crítico del sistema</entry>
+  <entry id="systemerror">Error del sistema</entry>
+  <entry id="fileerror">Error leyendo el archivo</entry>
+</language>

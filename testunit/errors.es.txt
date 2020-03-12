@@ -1,0 +1,3 @@
+panicerror=Error crítico del sistema
+systemerror=Error del sistema
+fileerror=Error leyendo el archivo

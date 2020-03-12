@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 
 	"golang.org/x/text/language"
@@ -205,7 +206,22 @@ func (l *XLanguage) Del(entry string) {
 	delete(l.Entries, entry)
 }
 
-// Print will get the language table as a readable string
-func (l *XLanguage) Print() string {
-	return fmt.Sprint(l)
+// String will transform the XDataset into a readable string for humans
+func (l *XLanguage) String() string {
+	sdata := []string{}
+	for key, val := range l.Entries {
+		sdata = append(sdata, key+":"+fmt.Sprintf("%v", val))
+	}
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "xcore.XLanguage{" + strings.Join(sdata, " ") + "}"
+}
+
+// GoString will transform the XDataset into a readable string for humans
+func (l *XLanguage) GoString() string {
+	sdata := []string{}
+	for key, val := range l.Entries {
+		sdata = append(sdata, key+":"+fmt.Sprintf("%#v", val))
+	}
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "#xcore.XLanguage{" + strings.Join(sdata, " ") + "}"
 }
