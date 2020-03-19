@@ -8,6 +8,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"sync"
 
 	"golang.org/x/text/language"
 )
@@ -16,18 +17,19 @@ import (
 type XLanguage struct {
 	Name     string
 	Language language.Tag
-	Entries  map[string]string
+	entries  map[string]string
+	mutex    sync.RWMutex
 }
 
 // NewXLanguage will create an empty Language structure with a name and a language
 func NewXLanguage(name string, lang language.Tag) *XLanguage {
-	return &XLanguage{Name: name, Language: lang, Entries: make(map[string]string)}
+	return &XLanguage{Name: name, Language: lang, entries: make(map[string]string)}
 }
 
 // NewXLanguageFromXMLFile will create an XLanguage structure with the data into the XML file
 //   Returns nil if there is an error
 func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
-	lang := &XLanguage{Entries: make(map[string]string)}
+	lang := &XLanguage{entries: make(map[string]string)}
 	err := lang.LoadXMLFile(file)
 	if err != nil {
 		return nil, err
@@ -38,7 +40,7 @@ func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
 // NewXLanguageFromXMLString will create an XLanguage structure with the data into the XML String
 //   Returns nil if there is an error
 func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
-	lang := &XLanguage{Entries: make(map[string]string)}
+	lang := &XLanguage{entries: make(map[string]string)}
 	err := lang.LoadXMLString(xml)
 	if err != nil {
 		return nil, err
@@ -49,7 +51,7 @@ func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
 // NewXLanguageFromFile will create an XLanguage structure with the data into the text file
 //   Returns nil if there is an error
 func NewXLanguageFromFile(file string) (*XLanguage, error) {
-	l := &XLanguage{Entries: make(map[string]string)}
+	l := &XLanguage{entries: make(map[string]string)}
 	err := l.LoadFile(file)
 	if err != nil {
 		return nil, err
@@ -60,7 +62,7 @@ func NewXLanguageFromFile(file string) (*XLanguage, error) {
 // NewXLanguageFromString will create an XLanguage structure with the data into the string
 //   Returns nil if there is an error
 func NewXLanguageFromString(data string) (*XLanguage, error) {
-	l := &XLanguage{Entries: make(map[string]string)}
+	l := &XLanguage{entries: make(map[string]string)}
 	err := l.LoadString(data)
 	if err != nil {
 		return nil, err
@@ -98,7 +100,7 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	type xlang struct {
 		Name     string   `xml:"id,attr"`
 		Language string   `xml:"lang,attr"`
-		Entries  []xentry `xml:"entry"`
+		entries  []xentry `xml:"entry"`
 	}
 
 	// Unmarshal
@@ -111,8 +113,8 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	// Scan to our XLanguage Object
 	l.Name = temp.Name
 	l.Language, _ = language.Parse(temp.Language)
-	for _, e := range temp.Entries {
-		l.Entries[e.ID] = e.Entry
+	for _, e := range temp.entries {
+		l.entries[e.ID] = e.Entry
 	}
 	return nil
 }
@@ -159,7 +161,7 @@ func (l *XLanguage) LoadString(data string) error {
 		if len(line) > posequal {
 			value = strings.TrimSpace(line[posequal+1:])
 		}
-		l.Entries[key] = value
+		l.entries[key] = value
 	}
 	if err := scanner.Err(); err != nil {
 		return err
@@ -189,12 +191,12 @@ func (l *XLanguage) GetLanguage() language.Tag {
 
 // Set will add an entry id-value into the language table
 func (l *XLanguage) Set(entry string, value string) {
-	l.Entries[entry] = value
+	l.entries[entry] = value
 }
 
 // Get will read an entry id-value from the language table
 func (l *XLanguage) Get(entry string) string {
-	v, ok := l.Entries[entry]
+	v, ok := l.entries[entry]
 	if ok {
 		return v
 	}
@@ -203,13 +205,13 @@ func (l *XLanguage) Get(entry string) string {
 
 // Del will remove an entry id-value from the language table
 func (l *XLanguage) Del(entry string) {
-	delete(l.Entries, entry)
+	delete(l.entries, entry)
 }
 
 // String will transform the XDataset into a readable string for humans
 func (l *XLanguage) String() string {
 	sdata := []string{}
-	for key, val := range l.Entries {
+	for key, val := range l.entries {
 		sdata = append(sdata, key+":"+fmt.Sprintf("%v", val))
 	}
 	sort.Strings(sdata) // Lets be sure the print is always the same presentation
@@ -219,7 +221,7 @@ func (l *XLanguage) String() string {
 // GoString will transform the XDataset into a readable string for humans
 func (l *XLanguage) GoString() string {
 	sdata := []string{}
-	for key, val := range l.Entries {
+	for key, val := range l.entries {
 		sdata = append(sdata, key+":"+fmt.Sprintf("%#v", val))
 	}
 	sort.Strings(sdata) // Lets be sure the print is always the same presentation

@@ -4,7 +4,7 @@
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
 [![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
 
-XCore for GO v1
+XCore for GO v2
 =============================
 
 The XCore package is used to build basic object for programmation. for the WebAbility compatility code
@@ -28,6 +28,19 @@ XCache: activate persistant cache too (shared memory) ????? maybe not for go its
 
 Version Changes Control
 =======================
+
+v2.0.0 - 2020-03-18
+-----------------------
+- xdataset.go now as a coverage of 100% with xdataset_test.go
+- XCache now uses R/W mutex
+- New interfaces.go file to keep all the interfaces in it (XDatasetDef, XDatasetCollectionDef)
+- New xdatasetcollection.go for the collection of dataset (separation from xdataset.go)
+- New xdatasetcollection_test.go for collection tests
+- New xdatasetts.go for thread safe dataset
+- New xdatasetts_test.go for thread safe dataset tests
+- New xdatasetcollectionts.go for thread safe dataset
+- New xdatasetcollectionts_test.go for thread safe datasetcollection tests
+- XLanguage are now thread safe with R/W mutexes
 
 v1.1.0 - 2020-03-01
 -----------------------
