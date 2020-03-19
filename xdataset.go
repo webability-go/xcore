@@ -282,6 +282,7 @@ func (d *XDataset) GetTime(key string) (time.Time, bool) {
 		if val2, ok2 := val.(time.Time); ok2 {
 			return val2, true
 		}
+		// int, float, conversion ?
 	}
 	return time.Time{}, false
 }
@@ -292,6 +293,7 @@ func (d *XDataset) GetStringCollection(key string) ([]string, bool) {
 		if val2, ok2 := val.([]string); ok2 {
 			return val2, true
 		}
+		// other types: conversion?
 	}
 	return nil, false
 }
@@ -302,6 +304,7 @@ func (d *XDataset) GetBoolCollection(key string) ([]bool, bool) {
 		if val2, ok2 := val.([]bool); ok2 {
 			return val2, true
 		}
+		// other types: conversion?
 	}
 	return nil, false
 }
@@ -312,16 +315,21 @@ func (d *XDataset) GetIntCollection(key string) ([]int, bool) {
 		if val2, ok2 := val.([]int); ok2 {
 			return val2, true
 		}
+		// other types: conversion?
 	}
 	return nil, false
 }
 
 // GetFloatCollection will read the value of the key variable as a collection of float cast type
+// If the field is not an array it will be converted to an array.
+// If the field is an array of another type, it will be converted.
 func (d *XDataset) GetFloatCollection(key string) ([]float64, bool) {
 	if val, ok := d.Get(key); ok {
 		if val2, ok2 := val.([]float64); ok2 {
 			return val2, true
 		}
+		// other types: conversion?
+
 	}
 	return nil, false
 }

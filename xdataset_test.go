@@ -653,10 +653,6 @@ func TestXDataset_Del(t *testing.T) {
 	}
 }
 
-func TestLoadJSONInXDataset(t *testing.T) {
-
-}
-
 func TestXDataset_Clone(t *testing.T) {
 
 	ds := &XDataset{

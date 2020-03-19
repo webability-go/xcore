@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// XDatasetTS is a not thread safe xdataset encapsulator
+// XDatasetTS is a thread safe xdataset (not thread safe) encapsulator
 // XDatasetTS IS thread safe
 type XDatasetTS struct {
 	mutex sync.RWMutex
