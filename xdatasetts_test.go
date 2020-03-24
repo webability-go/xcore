@@ -700,3 +700,5 @@ func TestXDatasetTS_Clone(t *testing.T) {
 		return
 	}
 }
+
+// Try race conditions

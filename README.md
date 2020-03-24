@@ -9,21 +9,23 @@ XCore for GO v2
 
 The XCore package is used to build basic object for programmation. for the WebAbility compatility code
 For GO, the actual existing code includes:
-- XCache: Application Memory Caches
-- XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc)
-- XLanguage: language dependent text tables
-- XTemplate: template system with meta language
+- XCache: Application Memory Caches, thread safe.
+- XDataset: Basic nested data structures for any purpose (template injection, configuration files, database records, etc) Support thread safe operations on thread safe structures (XDatasetTS and XDatasetCollectionTS)
+- XLanguage: language dependent text tables, thread safe
+- XTemplate: template system with meta language, thread safe cloning
 
 Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
 
 
 TO DO:
 ======
+- XDataset.Set should accept path too > > >
+- Get*Collection should convert types too
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop functions, can get backs anything, creates an interface)
-- Some improvements to check, later:
-Adds mutex on XLanguage, XDataset, XTemplate ?? (they should be used locally on every thread, or not ??), maybe adds a flag "thread safe" ?
-XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
+Some improvements to check, later:
+- Adds mutex on XLanguage, XDataset, XTemplate ?? (they should be used locally on every thread, or not ??), maybe adds a flag "thread safe" ?
+- XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
 
 Version Changes Control
