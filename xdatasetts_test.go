@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func ExampleXDataset() {
+func ExampleXDatasetTS() {
 
 	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00.0Z")
 	ds := &XDataset{
@@ -17,7 +17,8 @@ func ExampleXDataset() {
 		"v3":  true,
 		"vpi": 3.1415927,
 	}
-	fmt.Println(ds)
+	dsts := NewXDatasetTS(ds)
+	fmt.Println(dsts)
 
 	data := &XDataset{
 		"clientname":    "Fred",
@@ -39,23 +40,25 @@ func ExampleXDataset() {
 		},
 	}
 
-	fmt.Println(data)
+	datats := NewXDatasetTS(data)
+	fmt.Println(datats)
 	// Output:
 	// xcore.XDataset{v1:123 v2:abc v3:true vpi:3.1415927 vt:2020-01-01 12:00:00 +0000 UTC}
 	// xcore.XDataset{clientname:Fred clientpicture:face.jpg hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:xcore.XDataset{Salary:3568.65 hiredate:2020-01-01 12:00:00 +0000 UTC preferred-color:blue} preferredhobby:xcore.XDataset{name:Baseball sport:yes}}
 }
 
-func TestXDataset_simple_print(t *testing.T) {
+func TestXDatasetTS_simple_print(t *testing.T) {
 
 	// 1. Create a simple XDataset
 	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00.0Z")
-	ds := &XDataset{
+	dst := &XDataset{
 		"v1":  123,
 		"v2":  "abc",
 		"vt":  tmp,
 		"v3":  true,
 		"vpi": 3.1415927,
 	}
+	ds := NewXDatasetTS(dst)
 
 	// 2. print
 	str := fmt.Sprintf("%v", ds)
@@ -71,7 +74,7 @@ func TestXDataset_simple_print(t *testing.T) {
 	}
 }
 
-func getComplexDataset() *XDataset {
+func getComplexDatasetTS() *XDatasetTS {
 
 	// Create a complex XDataset with subsets
 	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00.0Z")
@@ -100,12 +103,12 @@ func getComplexDataset() *XDataset {
 			"numdata2":        17,
 		},
 	}
-	return data
+	return NewXDatasetTS(data)
 }
 
-func TestXDataset_complex_print(t *testing.T) {
+func TestXDatasetTS_complex_print(t *testing.T) {
 
-	data := getComplexDataset()
+	data := getComplexDatasetTS()
 
 	str := fmt.Sprintf("%v", data)
 	if str != "xcore.XDataset{clientname:Fred clientpicture:face.jpg hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:xcore.XDataset{hascat:true hasdog:false hiredate:2020-01-01 12:00:00 +0000 UTC numdata1:0 numdata2:17 preferred-color:blue previoussalary:0 resume: salary:3568.65} preferredhobby:xcore.XDataset{name:Baseball sport:yes}}" {
@@ -120,9 +123,9 @@ func TestXDataset_complex_print(t *testing.T) {
 	}
 }
 
-func TestXDataset_Get(t *testing.T) {
+func TestXDatasetTS_Get(t *testing.T) {
 
-	data := getComplexDataset()
+	data := getComplexDatasetTS()
 
 	// 2. Gets and paths
 	v1, _ := data.GetString("clientname") // implicity use Get
@@ -172,9 +175,9 @@ func TestXDataset_Get(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetDataset(t *testing.T) {
+func TestXDatasetTS_GetDataset(t *testing.T) {
 
-	data := getComplexDataset()
+	data := getComplexDatasetTS()
 
 	// 2. Gets a real dataset
 	v1, _ := data.GetDataset("hobbies>2") // is a dataset
@@ -204,9 +207,9 @@ func TestXDataset_GetDataset(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetCollection(t *testing.T) {
+func TestXDatasetTS_GetCollection(t *testing.T) {
 
-	data := getComplexDataset()
+	data := getComplexDatasetTS()
 
 	// 2. Gets a real dataset
 	v1, _ := data.GetCollection("hobbies") // is a collection
@@ -236,9 +239,9 @@ func TestXDataset_GetCollection(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetString(t *testing.T) {
+func TestXDatasetTS_GetString(t *testing.T) {
 
-	data := getComplexDataset()
+	data := getComplexDatasetTS()
 
 	// 2. Gets a real dataset
 	v1, _ := data.GetString("hobbies") // is a collection, printed
@@ -267,7 +270,7 @@ func TestXDataset_GetString(t *testing.T) {
 	}
 }
 
-func GetTypesDataSet() *XDataset {
+func GetTypesDataSetTS() *XDatasetTS {
 	// gets ints and floats
 	// Note: byte is not part of tests since it's an alias for uint8
 	tm1, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00.0Z")
@@ -322,12 +325,12 @@ func GetTypesDataSet() *XDataset {
 		"pointer0":      nilptr,
 		"pointer1":      &XDataset{},
 	}
-	return data
+	return NewXDatasetTS(data)
 }
 
-func TestXDataset_GetBool(t *testing.T) {
+func TestXDatasetTS_GetBool(t *testing.T) {
 
-	data := GetTypesDataSet()
+	data := GetTypesDataSetTS()
 
 	tests := map[string]bool{
 		"bool0":    false,
@@ -376,9 +379,9 @@ func TestXDataset_GetBool(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetInt(t *testing.T) {
+func TestXDatasetTS_GetInt(t *testing.T) {
 
-	data := GetTypesDataSet()
+	data := GetTypesDataSetTS()
 
 	tests := map[string]int{
 		"bool0":         0,
@@ -439,9 +442,9 @@ func TestXDataset_GetInt(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetFloat(t *testing.T) {
+func TestXDatasetTS_GetFloat(t *testing.T) {
 
-	data := GetTypesDataSet()
+	data := GetTypesDataSetTS()
 
 	tests := map[string]float64{
 		"bool0":         0,
@@ -502,9 +505,9 @@ func TestXDataset_GetFloat(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetTime(t *testing.T) {
+func TestXDatasetTS_GetTime(t *testing.T) {
 
-	data := GetTypesDataSet()
+	data := GetTypesDataSetTS()
 
 	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00.0Z")
 	tests := map[string]time.Time{
@@ -531,13 +534,14 @@ func TestXDataset_GetTime(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetStringCollection(t *testing.T) {
+func TestXDatasetTS_GetStringCollection(t *testing.T) {
 
-	data := &XDataset{
+	ds := &XDataset{
 		"sc": []string{
 			"s1", "s2", "s3", "s4",
 		},
 	}
+	data := NewXDatasetTS(ds)
 
 	r, ok := data.GetStringCollection("sc")
 	strv1 := fmt.Sprintf("%v", r)
@@ -552,13 +556,14 @@ func TestXDataset_GetStringCollection(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetBoolCollection(t *testing.T) {
+func TestXDatasetTS_GetBoolCollection(t *testing.T) {
 
-	data := &XDataset{
+	ds := &XDataset{
 		"sc": []bool{
 			false, false, true, false,
 		},
 	}
+	data := NewXDatasetTS(ds)
 
 	r, ok := data.GetBoolCollection("sc")
 	strv1 := fmt.Sprintf("%v", r)
@@ -573,13 +578,14 @@ func TestXDataset_GetBoolCollection(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetIntCollection(t *testing.T) {
+func TestXDatasetTS_GetIntCollection(t *testing.T) {
 
-	data := &XDataset{
+	ds := &XDataset{
 		"sc": []int{
 			0, 1, math.MaxInt32, math.MinInt64,
 		},
 	}
+	data := NewXDatasetTS(ds)
 
 	r, ok := data.GetIntCollection("sc")
 	strv1 := fmt.Sprintf("%v", r)
@@ -594,13 +600,14 @@ func TestXDataset_GetIntCollection(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetFloatCollection(t *testing.T) {
+func TestXDatasetTS_GetFloatCollection(t *testing.T) {
 
-	data := &XDataset{
+	ds := &XDataset{
 		"sc": []float64{
 			0, 1, math.Pi, math.MaxFloat64,
 		},
 	}
+	data := NewXDatasetTS(ds)
 
 	r, ok := data.GetFloatCollection("sc")
 	strv1 := fmt.Sprintf("%v", r)
@@ -615,13 +622,14 @@ func TestXDataset_GetFloatCollection(t *testing.T) {
 	}
 }
 
-func TestXDataset_GetTimeCollection(t *testing.T) {
+func TestXDatasetTS_GetTimeCollection(t *testing.T) {
 
-	data := &XDataset{
+	ds := &XDataset{
 		"sc": []time.Time{
 			{}, {},
 		},
 	}
+	data := NewXDatasetTS(ds)
 
 	r, ok := data.GetTimeCollection("sc")
 	strv1 := fmt.Sprintf("%v", r)
@@ -636,9 +644,9 @@ func TestXDataset_GetTimeCollection(t *testing.T) {
 	}
 }
 
-func TestXDataset_Del(t *testing.T) {
+func TestXDatasetTS_Del(t *testing.T) {
 
-	data := GetTypesDataSet()
+	data := GetTypesDataSetTS()
 
 	r, ok := data.GetInt("int1")
 	if r != 1 || !ok {
@@ -653,9 +661,9 @@ func TestXDataset_Del(t *testing.T) {
 	}
 }
 
-func TestXDataset_Clone(t *testing.T) {
+func TestXDatasetTS_Clone(t *testing.T) {
 
-	ds := &XDataset{
+	data := &XDataset{
 		"v1": 123,
 		"v2": "abc",
 		"v3": true,
@@ -671,6 +679,8 @@ func TestXDataset_Clone(t *testing.T) {
 			&XDataset{"v1": "p4"},
 		},
 	}
+	ds := NewXDatasetTS(data)
+
 	original := fmt.Sprintf("%v", ds)
 
 	cds := ds.Clone()
@@ -682,7 +692,7 @@ func TestXDataset_Clone(t *testing.T) {
 	}
 
 	// Verify it has been really cloned
-	(*(*ds)["v4"].(*XDataset))["p5"] = "val5"
+	ds.Set("v4>p5", "val5")
 	val5o, _ := ds.GetString("v4>p5")  // should be "val5"
 	val5c, _ := cds.GetString("v4>p5") // should be ""
 	if val5o == val5c {
@@ -690,3 +700,5 @@ func TestXDataset_Clone(t *testing.T) {
 		return
 	}
 }
+
+// Try race conditions
