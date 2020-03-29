@@ -31,7 +31,7 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
-v2.0.0 - 2020-03-18
+v2.0.0 - 2020-03-29
 -----------------------
 - xdataset.go now as a coverage of 100% with xdataset_test.go
 - XCache now uses R/W mutex
@@ -42,7 +42,7 @@ v2.0.0 - 2020-03-18
 - New xdatasetcollection_test.go for collection tests
 - New xdatasetcollectionts.go for thread safe dataset
 - New xdatasetcollectionts_test.go for thread safe datasetcollection tests
-- XLanguage are now thread safe with R/W mutexes
+- XLanguage is now thread safe with R/W mutexes
 
 v1.1.0 - 2020-03-01
 -----------------------
