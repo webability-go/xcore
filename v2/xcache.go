@@ -29,7 +29,7 @@ type XCache struct {
 	Expire time.Duration
 	// Not available from outside for security, access of data is based on a mutex
 	// "mutex": The cache owns a mutex to lock access to data to read/write/delete/clean the data, to allow concurrency and multithreading of the cache.
-	mutex sync.Mutex
+	mutex sync.RWMutex
 	// "pile": The pile keeps the "ordered by date of reading" object keys, so it's fast to clean the data.
 	items map[string]*XCacheEntry
 	// "items": The items are a map to cache entries, acceved by the key of entries.
@@ -76,6 +76,7 @@ func (c *XCache) Set(key string, indata interface{}) {
 }
 
 // removeFromPile will remove an entry key from the ordered pile.
+// No lock into this func since it has been set by entry func already
 func (c *XCache) removeFromPile(key string) {
 	// removes the key and append it to the end
 	for i, x := range c.pile {
@@ -95,9 +96,9 @@ func (c *XCache) removeFromPile(key string) {
 // If the entry exists and is invalidated by time or validator function, then returns nil, true.
 // If the entry is good, return <value>, false.
 func (c *XCache) Get(key string) (interface{}, bool) {
-	c.mutex.Lock()
+	c.mutex.RLock()
 	if x, ok := c.items[key]; ok {
-		c.mutex.Unlock()
+		c.mutex.RUnlock()
 		if c.Validator != nil {
 			if b := c.Validator(key, x.ctime); !b {
 				if LOG {
@@ -124,11 +125,13 @@ func (c *XCache) Get(key string) (interface{}, bool) {
 			}
 		}
 		x.rtime = time.Now()
+		c.mutex.Lock()
 		c.removeFromPile(key)
 		c.pile = append(c.pile, key)
+		c.mutex.Unlock()
 		return x.data, false
 	}
-	c.mutex.Unlock()
+	c.mutex.RUnlock()
 	return nil, false
 }
 
@@ -143,9 +146,9 @@ func (c *XCache) Del(key string) {
 
 // Count will return the quantity of entries in the cache.
 func (c *XCache) Count() int {
-	c.mutex.Lock()
+	c.mutex.RLock()
 	x := len(c.items)
-	c.mutex.Unlock()
+	c.mutex.RUnlock()
 	return x
 }
 
