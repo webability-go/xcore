@@ -1,4 +1,4 @@
-module github.com/webability-go/xcore/v2
+module github.com/webability-go/xcore
 
 go 1.14
 

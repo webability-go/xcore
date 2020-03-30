@@ -31,6 +31,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.0.1, v2.0.2 - 2020-03-29
+-----------------------
+- Version adjustment for github and go modules v2
+
 v2.0.0 - 2020-03-29
 -----------------------
 - xdataset.go now as a coverage of 100% with xdataset_test.go
