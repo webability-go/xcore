@@ -1,0 +1,10 @@
+
+%-- This is a comment. It will not appear in the final code. This files is LF coded, not CRLF, as the string in test (unix end of line) --%
+Let's put your name here: {{clientname}}<br />
+And lets put your hobbies here:<br />
+%-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
+@@hobbies:hobby@@
+%-- And you need the template for each hobby:--%
+[[hobby]]
+I love {{name}}<br />
+[[]]
