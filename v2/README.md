@@ -31,6 +31,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.0.3 - 2020-04-08
+-----------------------
+- XLanguage: Error corrected on loadXMLString: the data was not loading correctly into the XLanguage object.
+
 v2.0.1, v2.0.2 - 2020-03-29
 -----------------------
 - Version adjustment for github and go modules v2
