@@ -110,7 +110,7 @@ func TestXLanguage(t *testing.T) {
 		}
 		v2 := loadxmlES.Get(id)
 		if v2 != val {
-			//	t.Errorf("Error reading value of loadxmlES::%s", v2)
+			t.Errorf("Error reading value of loadxmlES::%s", v2)
 			return
 		}
 		v3 := loadtextES.Get(id)

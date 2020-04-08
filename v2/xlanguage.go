@@ -73,15 +73,7 @@ func NewXLanguageFromString(data string) (*XLanguage, error) {
 // LoadXMLFile will Load a language from an XML file and replace the content of the XLanguage structure with the new data
 //   Returns nil if there is an error
 func (l *XLanguage) LoadXMLFile(file string) error {
-	xmlFile, err := os.Open(file)
-	if err != nil {
-		return err
-	}
-	data, err := ioutil.ReadAll(xmlFile)
-	if err != nil {
-		return err
-	}
-	err = xmlFile.Close()
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}
@@ -100,12 +92,13 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	type xlang struct {
 		Name     string   `xml:"id,attr"`
 		Language string   `xml:"lang,attr"`
-		entries  []xentry `xml:"entry"`
+		Entries  []xentry `xml:"entry"`
 	}
 
 	// Unmarshal
 	temp := &xlang{}
 	err := xml.Unmarshal([]byte(data), temp)
+
 	if err != nil {
 		return err
 	}
@@ -113,7 +106,7 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	// Scan to our XLanguage Object
 	l.Name = temp.Name
 	l.Language, _ = language.Parse(temp.Language)
-	for _, e := range temp.entries {
+	for _, e := range temp.Entries {
 		l.entries[e.ID] = e.Entry
 	}
 	return nil
