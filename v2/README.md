@@ -31,6 +31,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.0.4 - 2020-04-13
+-----------------------
+- XLanguage: Added GetEntries() func (not thread safe yet)
+
 v2.0.3 - 2020-04-08
 -----------------------
 - XLanguage: Error corrected on loadXMLString: the data was not loading correctly into the XLanguage object.
