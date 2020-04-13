@@ -201,6 +201,14 @@ func (l *XLanguage) Del(entry string) {
 	delete(l.entries, entry)
 }
 
+func (l *XLanguage) GetEntries() map[string]string {
+	// mutext lock
+	// if no mutex:
+	return l.entries
+	// else makes a clone copy of entries
+	// mutex realese
+}
+
 // String will transform the XDataset into a readable string for humans
 func (l *XLanguage) String() string {
 	sdata := []string{}

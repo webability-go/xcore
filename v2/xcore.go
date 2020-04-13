@@ -836,7 +836,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "2.0.3"
+const VERSION = "2.0.4"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
