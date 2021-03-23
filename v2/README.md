@@ -37,6 +37,7 @@ v2.0.5 - 2021-03-23
 - XDatasetTS added to the manual
 - XLanguage is now thread safe
 - XTemplate: Error corrected in string() function (was saying XLanguage)
+- Each cache entry is now able to manage its own TLL if set. New function SetTTL(id, duration)
 
 v2.0.4 - 2020-04-13
 -----------------------

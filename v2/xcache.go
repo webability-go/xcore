@@ -13,6 +13,8 @@ type XCacheEntry struct {
 	ctime time.Time
 	// - rtime is the last read time (used to clean the cache: the less accessed objects are removed).
 	rtime time.Time
+	// - ttl is the max duration of object in cache (ctime + ttl > now = invalid)
+	ttl time.Duration
 	// The data as itself is an interface to whatever the user need to cache.
 	data interface{}
 }
@@ -75,6 +77,19 @@ func (c *XCache) Set(key string, indata interface{}) {
 	}
 }
 
+// Set will set a TTL on the entry in the cache.
+// If the entry exists, just ads the TTL to the entry
+// If the entry does not exist, it does nothing
+// Returns nothing.
+func (c *XCache) SetTTL(key string, duration time.Duration) {
+	c.mutex.Lock()
+	_, ok := c.items[key]
+	if ok {
+		c.items[key].ttl = duration
+	}
+	c.mutex.Unlock()
+}
+
 // removeFromPile will remove an entry key from the ordered pile.
 // No lock into this func since it has been set by entry func already
 func (c *XCache) removeFromPile(key string) {
@@ -99,6 +114,16 @@ func (c *XCache) Get(key string) (interface{}, bool) {
 	c.mutex.RLock()
 	if x, ok := c.items[key]; ok {
 		c.mutex.RUnlock()
+		// expired by TTL ?
+		if x.ttl != 0 {
+			if x.ctime.Add(x.ttl).Before(time.Now()) {
+				c.mutex.Lock()
+				delete(c.items, key)
+				c.removeFromPile(key)
+				c.mutex.Unlock()
+				return nil, true
+			}
+		}
 		if c.Validator != nil {
 			if b := c.Validator(key, x.ctime); !b {
 				if LOG {

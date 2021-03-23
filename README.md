@@ -28,15 +28,6 @@ Version Changes Control
 
 # Please use xcore/v2
 
-v1.1.2 - 2021-03-05
------------------------
-- update to go 1.15 for go.mod.
-
-
-v1.1.1 - 2020-06-01
------------------------
-- Each cache entry is now able to manage its own TLL if set. New function SetTTL(id, duration)
-
 v1.1.0 - 2020-03-01
 -----------------------
 - Modularization of XCore
