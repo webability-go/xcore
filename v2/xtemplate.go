@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	//	"sync"
 )
 
 /*
@@ -72,6 +73,7 @@ type XTemplate struct {
 	Name         string
 	Root         *XTemplateData
 	SubTemplates map[string]*XTemplate
+	//	mutex        sync.Mutex
 }
 
 // NewXTemplate will create a new empty template
@@ -466,7 +468,7 @@ func (t *XTemplate) String() string {
 		sdata = append(sdata, fmt.Sprintf("%v", val))
 	}
 	sort.Strings(sdata) // Lets be sure the print is always the same presentation
-	return "xcore.XLanguage{" + strings.Join(sdata, " ") + "}"
+	return "xcore.XTemplate{" + strings.Join(sdata, " ") + "}"
 }
 
 // GoString will transform the XDataset into a readable string for humans

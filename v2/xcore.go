@@ -122,6 +122,7 @@
 // The XLanguage table of text entries can be loaded from XML file, XML string or normal text file or string.
 // It is used to keep a table of id=value set of entries in any languages you need, so it is easy to switch between XLanguage instance based on the required language needed.
 // Obviously, any XLanguage you load in any language should have the same id entries translated, for the same use.
+// The XLanguage object is thread safe
 //
 // 1. loading:
 //
@@ -281,6 +282,32 @@
 // The interface implements some methods to work on array structure such as Push, Pop, Shift, Unshift and some methods to search data into the array.
 //
 // The XDatasetCollection type is a simple []DatasetDef with all the implemented methods and should be enough to use for almost all required cases.
+//
+// XDataSetTS
+//
+// 1. Overview:
+//
+// The XDataSetTS is a DatasetDef structure, thread safe.
+// It is build on the XDataset with the same properties, but is thread safe to protect Read/Write accesses from different thread.
+//
+// Example:
+//
+//  import "github.com/webability-go/xcore/v2"
+//
+//  data := &xcore.XDatasetTS{} // data is a XDatasetDef
+//  data.Set("data1", "DATA1")
+//  data.Set("newkey", 123.45)
+//
+// You may also build a XDatasetTS to encapsulate a XDatasetDef that is not thread safe, to use it safely
+//
+//  import "github.com/webability-go/xcore/v2"
+//
+//  datanots := xcore.NewXDataset()
+//  datats := xcore.NewXDatasetTS(datanots)
+//
+// Note that all references to XDatasetTS are pointers, always (to be able to modify the values of them).
+//
+// The DatasetTS meet the XDatasetDef interface
 //
 //
 // XTemplate
@@ -836,7 +863,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "2.0.4"
+const VERSION = "2.0.5"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.

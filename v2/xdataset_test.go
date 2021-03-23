@@ -45,6 +45,37 @@ func ExampleXDataset() {
 	// xcore.XDataset{clientname:Fred clientpicture:face.jpg hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:xcore.XDataset{Salary:3568.65 hiredate:2020-01-01 12:00:00 +0000 UTC preferred-color:blue} preferredhobby:xcore.XDataset{name:Baseball sport:yes}}
 }
 
+func TestXDataset_new(t *testing.T) {
+
+	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00.0Z")
+	data := map[string]interface{}{
+		"clientname":    "Fred",
+		"clientpicture": "face.jpg",
+		"hobbies": []map[string]interface{}{
+			{"name": "Football", "sport": "yes"},
+			{"name": "Ping-pong", "sport": "yes"},
+			{"name": "Swimming", "sport": "yes"},
+			{"name": "Videogames", "sport": "no"},
+		},
+		"preferredhobby": map[string]interface{}{
+			"name":  "Baseball",
+			"sport": "yes",
+		},
+		"metadata": map[string]interface{}{
+			"preferred-color": "blue",
+			"Salary":          3568.65,
+			"hiredate":        tmp,
+		},
+	}
+
+	ds := NewXDataset(data)
+	str := fmt.Sprintf("%#v", ds)
+	if str != "#xcore.XDataset{clientname:\"Fred\" clientpicture:\"face.jpg\" hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:#xcore.XDataset{Salary:3568.65 hiredate:time.Time{wall:0x0, ext:63713476800, loc:(*time.Location)(nil)} preferred-color:\"blue\"} preferredhobby:#xcore.XDataset{name:\"Baseball\" sport:\"yes\"}}" {
+		t.Error("Error creating and #printing new complex XDataset " + str)
+		return
+	}
+}
+
 func TestXDataset_simple_print(t *testing.T) {
 
 	// 1. Create a simple XDataset

@@ -13,6 +13,16 @@ import (
 // XDatasetCollection is the basic collection of XDatasetDefs
 type XDatasetCollection []XDatasetDef
 
+// NewXDatasetCollection is used to build an XDatasetCollection from a standard []map
+func NewXDatasetCollection(data []map[string]interface{}) XDatasetCollectionDef {
+	// Scan data and encapsulate it into the XDataset
+	dsc := &XDatasetCollection{}
+	for _, v := range data {
+		dsc.Push(NewXDataset(v))
+	}
+	return dsc
+}
+
 // String will transform the XDataset into a readable string
 func (d *XDatasetCollection) String() string {
 	str := "XDatasetCollection["
