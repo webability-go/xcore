@@ -1,8 +1,8 @@
 @UTF-8
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore/v2)](https://goreportcard.com/report/github.com/webability-go/xcore/v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
-[![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore/v2.svg)](https://golangci.com)
+[![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
 
 XCore for GO v2
 =============================
