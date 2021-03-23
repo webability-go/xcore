@@ -16,6 +16,23 @@ import (
 // XDataset IS NOT thread safe
 type XDataset map[string]interface{}
 
+// NewXDataset is used to build an XDataset from a standard map
+func NewXDataset(data map[string]interface{}) XDatasetDef {
+	// Scan data and encapsulate it into the XDataset
+	ds := &XDataset{}
+	for i, v := range data {
+		switch v.(type) {
+		case []map[string]interface{}:
+			ds.Set(i, NewXDatasetCollection(v.([]map[string]interface{})))
+		case map[string]interface{}:
+			ds.Set(i, NewXDataset(v.(map[string]interface{})))
+		default:
+			ds.Set(i, v)
+		}
+	}
+	return ds
+}
+
 // String will transform the XDataset into a readable string for humans
 func (d *XDataset) String() string {
 	sdata := []string{}
