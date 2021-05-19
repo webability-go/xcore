@@ -31,6 +31,15 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.0.8 - 2021-05-18
+-----------------------
+- XTemplate is now clonable: newtemplate := template.Clone()
+
+v2.0.7 - 2021-03-23
+-----------------------
+- []interface{} added to NewXDataset to be decoded as []map[string]interface{} because of decoded JSON
+
+
 v2.0.5 - 2021-03-23
 -----------------------
 - function NewXDataset(data) and NewXDatasetCollection(data) added, to build XDatasets based on a classic map[string]interface{}

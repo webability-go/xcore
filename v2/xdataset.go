@@ -22,6 +22,16 @@ func NewXDataset(data map[string]interface{}) XDatasetDef {
 	ds := &XDataset{}
 	for i, v := range data {
 		switch v.(type) {
+		case []interface{}:
+			dsc := &XDatasetCollection{}
+			for _, it := range v.([]interface{}) {
+				dscit, ok := it.(map[string]interface{})
+				if ok {
+					dscc := NewXDataset(dscit)
+					dsc.Push(dscc)
+				}
+			}
+			ds.Set(i, dsc)
 		case []map[string]interface{}:
 			ds.Set(i, NewXDatasetCollection(v.([]map[string]interface{})))
 		case map[string]interface{}:
