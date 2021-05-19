@@ -187,6 +187,56 @@ func TestXTemplateSimple(t *testing.T) {
 	}
 }
 
+func TestXTemplateClone(t *testing.T) {
+	tmpl, err := NewXTemplateFromFile("testunit/b.template")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	newtmpl := tmpl.Clone()
+
+	tmp, _ := time.Parse(time.RFC3339, "2020-01-01T12:00:00")
+	lang := NewXLanguage("mainpage", language.English)
+	lang.Set("welcome", "Welcome to you")
+	data := XDataset{
+		"clientname":    "Fred",
+		"clientpicture": "face.jpg",
+		"hobbies": &XDatasetCollection{
+			&XDataset{"name": "Football", "sport": "yes"},
+			&XDataset{"name": "Ping-pong", "sport": "yes"},
+			&XDataset{"name": "Swimming", "sport": "yes"},
+			&XDataset{"name": "Videogames", "sport": "no"},
+			&XDataset{"name": "other 1", "sport": "no"},
+			&XDataset{"name": "other 2", "sport": "no"},
+			&XDataset{"name": "other 3", "sport": "yes"},
+			&XDataset{"name": "other 4", "sport": "no"},
+		},
+		"preferredhobby": &XDataset{
+			"name":  "Baseball",
+			"sport": "yes",
+		},
+		"metadata": &XDataset{
+			"preferred-color": "blue",
+			"Salary":          3568.65,
+			"hiredate":        tmp,
+		},
+		"#": lang,
+	}
+
+	str1 := tmpl.Execute(&data)
+	if str1 == "" {
+		t.Errorf("Error build complex template")
+	}
+	str2 := newtmpl.Execute(&data)
+	if str2 == "" {
+		t.Errorf("Error build complex template cloned")
+	}
+	if str2 != str1 {
+		t.Errorf("Error comparing template cloned")
+	}
+}
+
 /*
 package main
 

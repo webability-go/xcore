@@ -65,6 +65,11 @@ type XTemplateParam struct {
 	//	children  *XTemplateData
 }
 
+// Clone will make a copy of the param
+func (tp *XTemplateParam) Clone() *XTemplateParam {
+	return &XTemplateParam{ParamType: tp.ParamType, Data: tp.Data}
+}
+
 // XTemplateData is an Array of all the parameters into the template
 type XTemplateData []XTemplateParam
 
@@ -73,7 +78,7 @@ type XTemplate struct {
 	Name         string
 	Root         *XTemplateData
 	SubTemplates map[string]*XTemplate
-	//	mutex        sync.Mutex
+	// mutex        sync.RWMutex
 }
 
 // NewXTemplate will create a new empty template
@@ -471,7 +476,33 @@ func (t *XTemplate) String() string {
 	return "xcore.XTemplate{" + strings.Join(sdata, " ") + "}"
 }
 
-// GoString will transform the XDataset into a readable string for humans
+// GoString will transform the XDataset into a readable string for humans with values indexes
 func (t *XTemplate) GoString() string {
-	return t.String()
+	sdata := []string{}
+	for _, val := range *t.Root {
+		sdata = append(sdata, fmt.Sprintf("%#v", val))
+	}
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "#xcore.XTemplate{" + strings.Join(sdata, " ") + "}"
+}
+
+// Clone will make a full new copy of the template into a new memory space
+func (t *XTemplate) Clone() *XTemplate {
+	cloned := &XTemplate{Name: t.Name}
+	if t.Root != nil {
+		var newroot XTemplateData
+		for _, td := range *t.Root {
+			newroot = append(newroot, *td.Clone())
+		}
+		cloned.Root = &newroot
+	}
+	if t.SubTemplates != nil {
+		newsubtemplates := map[string]*XTemplate{}
+		for id, xt := range t.SubTemplates {
+			newsubtemplates[id] = xt.Clone()
+		}
+		cloned.SubTemplates = newsubtemplates
+	}
+
+	return cloned
 }
