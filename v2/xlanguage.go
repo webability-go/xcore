@@ -107,10 +107,10 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	l.Name = temp.Name
 	l.Language, _ = language.Parse(temp.Language)
 	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	for _, e := range temp.Entries {
 		l.entries[e.ID] = e.Entry
 	}
-	l.mutex.Unlock()
 	return nil
 }
 
@@ -157,8 +157,8 @@ func (l *XLanguage) LoadString(data string) error {
 			value = strings.TrimSpace(line[posequal+1:])
 		}
 		l.mutex.Lock()
+		defer l.mutex.Unlock()
 		l.entries[key] = value
-		l.mutex.Unlock()
 	}
 	if err := scanner.Err(); err != nil {
 		return err
@@ -189,15 +189,15 @@ func (l *XLanguage) GetLanguage() language.Tag {
 // Set will add an entry id-value into the language table
 func (l *XLanguage) Set(entry string, value string) {
 	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	l.entries[entry] = value
-	l.mutex.Unlock()
 }
 
 // Get will read an entry id-value from the language table
 func (l *XLanguage) Get(entry string) string {
 	l.mutex.RLock()
+	defer l.mutex.RUnlock()
 	v, ok := l.entries[entry]
-	l.mutex.RUnlock()
 	if ok {
 		return v
 	}
@@ -207,18 +207,18 @@ func (l *XLanguage) Get(entry string) string {
 // Del will remove an entry id-value from the language table
 func (l *XLanguage) Del(entry string) {
 	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	delete(l.entries, entry)
-	l.mutex.Unlock()
 }
 
 // GetEntries will return a COPY of the key-values pairs of the language.
 func (l *XLanguage) GetEntries() map[string]string {
 	clone := map[string]string{}
 	l.mutex.RLock()
+	defer l.mutex.RUnlock()
 	for k, v := range l.entries {
 		clone[k] = v
 	}
-	l.mutex.RUnlock()
 	return clone
 }
 
@@ -226,10 +226,10 @@ func (l *XLanguage) GetEntries() map[string]string {
 func (l *XLanguage) String() string {
 	sdata := []string{}
 	l.mutex.RLock()
+	defer l.mutex.RUnlock()
 	for key, val := range l.entries {
 		sdata = append(sdata, key+":"+fmt.Sprintf("%v", val))
 	}
-	l.mutex.RUnlock()
 	sort.Strings(sdata) // Lets be sure the print is always the same presentation
 	return "xcore.XLanguage{" + strings.Join(sdata, " ") + "}"
 }
@@ -238,10 +238,10 @@ func (l *XLanguage) String() string {
 func (l *XLanguage) GoString() string {
 	sdata := []string{}
 	l.mutex.RLock()
+	defer l.mutex.RUnlock()
 	for key, val := range l.entries {
 		sdata = append(sdata, key+":"+fmt.Sprintf("%#v", val))
 	}
-	l.mutex.RUnlock()
 	sort.Strings(sdata) // Lets be sure the print is always the same presentation
 	return "#xcore.XLanguage{" + strings.Join(sdata, " ") + "}"
 }

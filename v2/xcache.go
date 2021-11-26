@@ -63,6 +63,7 @@ func NewXCache(id string, maxitems int, expire time.Duration) *XCache {
 // Returns nothing.
 func (c *XCache) Set(key string, indata interface{}) {
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	// check if the entry already exists
 	_, ok := c.items[key]
 	c.items[key] = &XCacheEntry{ctime: time.Now(), rtime: time.Now(), data: indata}
@@ -70,10 +71,9 @@ func (c *XCache) Set(key string, indata interface{}) {
 		c.removeFromPile(key)
 	}
 	c.pile = append(c.pile, key)
-	c.mutex.Unlock()
 	if c.Maxitems > 0 && len(c.items) >= c.Maxitems {
 		// We need a cleaning
-		c.Clean(10)
+		c.mClean(10)
 	}
 }
 
@@ -83,11 +83,11 @@ func (c *XCache) Set(key string, indata interface{}) {
 // Returns nothing.
 func (c *XCache) SetTTL(key string, duration time.Duration) {
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	_, ok := c.items[key]
 	if ok {
 		c.items[key].ttl = duration
 	}
-	c.mutex.Unlock()
 }
 
 // removeFromPile will remove an entry key from the ordered pile.
@@ -106,21 +106,30 @@ func (c *XCache) removeFromPile(key string) {
 	}
 }
 
+// mGet will get the entry of the cache.
+func (c *XCache) mGet(key string) (*XCacheEntry, bool) {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
+	x, ok := c.items[key]
+	return x, ok
+}
+
 // Get will get the value of an entry.
 // If the entry does not exists, returns nil, false.
 // If the entry exists and is invalidated by time or validator function, then returns nil, true.
 // If the entry is good, return <value>, false.
 func (c *XCache) Get(key string) (interface{}, bool) {
-	c.mutex.RLock()
-	if x, ok := c.items[key]; ok {
-		c.mutex.RUnlock()
+	if x, ok := c.mGet(key); ok {
 		// expired by TTL ?
 		if x.ttl != 0 {
 			if x.ctime.Add(x.ttl).Before(time.Now()) {
-				c.mutex.Lock()
-				delete(c.items, key)
-				c.removeFromPile(key)
-				c.mutex.Unlock()
+				c.Del(key)
+				/*
+					c.mutex.Lock()
+					delete(c.items, key)
+					c.removeFromPile(key)
+					c.mutex.Unlock()
+				*/
 				return nil, true
 			}
 		}
@@ -129,10 +138,13 @@ func (c *XCache) Get(key string) (interface{}, bool) {
 				if LOG {
 					log.Println("Validator invalids entry: " + key)
 				}
-				c.mutex.Lock()
-				delete(c.items, key)
-				c.removeFromPile(key)
-				c.mutex.Unlock()
+				c.Del(key)
+				/*
+					c.mutex.Lock()
+					delete(c.items, key)
+					c.removeFromPile(key)
+					c.mutex.Unlock()
+				*/
 				return nil, true
 			}
 		}
@@ -142,51 +154,52 @@ func (c *XCache) Get(key string) (interface{}, bool) {
 				if LOG {
 					log.Println("Cache timeout Expired: " + key)
 				}
-				c.mutex.Lock()
-				delete(c.items, key)
-				c.removeFromPile(key)
-				c.mutex.Unlock()
+				c.Del(key)
+				/*
+					c.mutex.Lock()
+					delete(c.items, key)
+					c.removeFromPile(key)
+					c.mutex.Unlock()
+				*/
 				return nil, true
 			}
 		}
 		x.rtime = time.Now()
 		c.mutex.Lock()
+		defer c.mutex.Unlock()
 		c.removeFromPile(key)
 		c.pile = append(c.pile, key)
-		c.mutex.Unlock()
 		return x.data, false
 	}
-	c.mutex.RUnlock()
 	return nil, false
 }
 
 // Del will delete the entry of the cache if it exists.
 func (c *XCache) Del(key string) {
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	delete(c.items, key)
 	// we should check if the entry exists before trying to removing
 	c.removeFromPile(key)
-	c.mutex.Unlock()
 }
 
 // Count will return the quantity of entries in the cache.
 func (c *XCache) Count() int {
 	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 	x := len(c.items)
-	c.mutex.RUnlock()
 	return x
 }
 
-// Clean will delete expired entries, and free perc% of max items based on time.
+// mClean will delete expired entries, and free perc% of max items based on time. It does not set locks. The caller must do it
 // perc = 0 to 100 (percentage to clean).
 // Returns quantity of removed entries.
 // It Will **not** verify the cache against its source (if Validator is set). If you want to scan that, use the Verify function.
-func (c *XCache) Clean(perc int) int {
+func (c *XCache) mClean(perc int) int {
 	if LOG {
 		log.Println("Cleaning cache")
 	}
 	i := 0
-	c.mutex.Lock()
 	// 1. clean all expired items
 	if c.Expire != 0 {
 		for k, x := range c.items {
@@ -210,8 +223,17 @@ func (c *XCache) Clean(perc int) int {
 		delete(c.items, c.pile[i])
 	}
 	c.pile = c.pile[i:]
-	c.mutex.Unlock()
 	return i
+}
+
+// Clean will delete expired entries, and free perc% of max items based on time.
+// perc = 0 to 100 (percentage to clean).
+// Returns quantity of removed entries.
+// It Will **not** verify the cache against its source (if Validator is set). If you want to scan that, use the Verify function.
+func (c *XCache) Clean(perc int) int {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.mClean(perc)
 }
 
 // Verify will first, Clean(0) keeping all the entries, then will delete expired entries using the Validator function.
@@ -227,9 +249,13 @@ func (c *XCache) Verify() int {
 				if LOG {
 					log.Println("Validator invalids entry: " + k)
 				}
-				c.mutex.Lock()
-				delete(c.items, k)
-				c.mutex.Unlock()
+				c.Del(k)
+				/*
+					c.mutex.Lock()
+					delete(c.items, k)
+					c.removeFromPile(k)
+					c.mutex.Unlock()
+				*/
 				i++
 			}
 		}
@@ -241,7 +267,7 @@ func (c *XCache) Verify() int {
 // Returns nothing.
 func (c *XCache) Flush() {
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	// how to really deletes the data ? ( to free memory)
 	c.items = make(map[string]*XCacheEntry)
-	c.mutex.Unlock()
 }
