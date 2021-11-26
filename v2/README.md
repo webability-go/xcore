@@ -31,6 +31,11 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.0.9 - 2021-11-25
+-----------------------
+- XCache modified to defer mutex unlocks instead of directly unlock into the code, to avoid dead locks in case of thread panic and crashes.
+- XLanguage modified to defer mutex unlocks instead of directly unlock into the code, to avoid dead locks in case of thread panic and crashes.
+
 v2.0.8 - 2021-05-18
 -----------------------
 - XTemplate is now clonable: newtemplate := template.Clone()
