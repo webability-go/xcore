@@ -157,8 +157,8 @@ func (l *XLanguage) LoadString(data string) error {
 			value = strings.TrimSpace(line[posequal+1:])
 		}
 		l.mutex.Lock()
-		defer l.mutex.Unlock()
 		l.entries[key] = value
+		l.mutex.Unlock()
 	}
 	if err := scanner.Err(); err != nil {
 		return err

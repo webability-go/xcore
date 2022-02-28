@@ -64,7 +64,7 @@ func TestXDatasetCollectionTS_simple_print(t *testing.T) {
 	}
 
 	str = fmt.Sprintf("%#v", ds)
-	if str != "#xcore.XDataset{v1:123 v2:\"abc\" v3:true vpi:3.1415927 vt:time.Time{wall:0x0, ext:63713476800, loc:(*time.Location)(nil)}}" {
+	if str != "#xcore.XDataset{v1:123 v2:\"abc\" v3:true vpi:3.1415927 vt:time.Date(2020, time.January, 1, 12, 0, 0, 0, time.UTC)}" {
 		t.Error("Error creating and #printing simple XDataset " + str)
 		return
 	}

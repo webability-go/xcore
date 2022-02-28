@@ -20,7 +20,7 @@ For GO, the actual existing code includes:
 
 Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
 
-The version 1 is obsolete.
+# The version 1 is obsolete.
 
 
 Version Changes Control

@@ -68,7 +68,7 @@ func TestXDatasetTS_simple_print(t *testing.T) {
 	}
 
 	str = fmt.Sprintf("%#v", ds)
-	if str != "#xcore.XDataset{v1:123 v2:\"abc\" v3:true vpi:3.1415927 vt:time.Time{wall:0x0, ext:63713476800, loc:(*time.Location)(nil)}}" {
+	if str != "#xcore.XDataset{v1:123 v2:\"abc\" v3:true vpi:3.1415927 vt:time.Date(2020, time.January, 1, 12, 0, 0, 0, time.UTC)}" {
 		t.Error("Error creating and #printing simple XDataset " + str)
 		return
 	}
@@ -117,7 +117,7 @@ func TestXDatasetTS_complex_print(t *testing.T) {
 	}
 
 	str = fmt.Sprintf("%#v", data)
-	if str != "#xcore.XDataset{clientname:\"Fred\" clientpicture:\"face.jpg\" hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:#xcore.XDataset{hascat:true hasdog:false hiredate:time.Time{wall:0x0, ext:63713476800, loc:(*time.Location)(nil)} numdata1:0 numdata2:17 preferred-color:\"blue\" previoussalary:0 resume:\"\" salary:3568.65} preferredhobby:#xcore.XDataset{name:\"Baseball\" sport:\"yes\"}}" {
+	if str != "#xcore.XDataset{clientname:\"Fred\" clientpicture:\"face.jpg\" hobbies:XDatasetCollection[0:xcore.XDataset{name:Football sport:yes} 1:xcore.XDataset{name:Ping-pong sport:yes} 2:xcore.XDataset{name:Swimming sport:yes} 3:xcore.XDataset{name:Videogames sport:no} ] metadata:#xcore.XDataset{hascat:true hasdog:false hiredate:time.Date(2020, time.January, 1, 12, 0, 0, 0, time.UTC) numdata1:0 numdata2:17 preferred-color:\"blue\" previoussalary:0 resume:\"\" salary:3568.65} preferredhobby:#xcore.XDataset{name:\"Baseball\" sport:\"yes\"}}" {
 		t.Error("Error creating and #printing complex XDataset " + str)
 		return
 	}

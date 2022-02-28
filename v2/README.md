@@ -7,6 +7,8 @@
 XCore for GO v2
 =============================
 
+Minimum version of GO: 1.17 (for time.Time compatibility)
+
 The XCore package is used to build basic object for programmation. for the WebAbility compatility code
 For GO, the actual existing code includes:
 - XCache: Application Memory Caches, thread safe.
@@ -30,6 +32,12 @@ Some improvements to check, later:
 
 Version Changes Control
 =======================
+
+v2.1.0 - 2022-02-27
+-----------------------
+- XLanguage: bug corrected on unlock of stringload and loadFromFile (was blocking the system)
+- XTemplate: The metalanguage keywords are now only recognized if they match authorized characters (for instance &&keyword&&), to avoid bugs in JS with && and || and !!.
+- Print functions of time.Time corrected (as in go 1.17, the print format changes) into the *test.go test functions
 
 v2.0.9 - 2021-11-25
 -----------------------
