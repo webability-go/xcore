@@ -138,14 +138,14 @@ func (t *XTemplate) compile(data string) error {
 			`(%)--(.*?)--%(\n|\r|\r\n|\n\r)?` + // index based 1
 
 			// ==== LANGUAGE INJECTION
-			`|(#)#(.+?)##` + // index based 4
+			`|(#)#([a-zA-Z0-9-_\.]+?)##` + // index based 4
 
 			// ==== ELEMENTS
-			`|(&)&(.+?)&&` + // index based 6
-			`|(@)@(.+?)@@` + // index based 8
-			`|(\?)\?(.+?)\?\?` + // index based 10
-			`|(\!)\!(.+?)\!\!` + // index based 12
-			`|(\{)\{(.+?)\}\}` + // index based 14
+			`|(&)&([a-zA-Z0-9-_\:\|\.]+?)&&` + // index based 6
+			`|(@)@([a-zA-Z0-9-_\:\|\.]+?)@@` + // index based 8
+			`|(\?)\?([a-zA-Z0-9-_\:\|\.]+?)\?\?` + // index based 10
+			`|(\!)\!([a-zA-Z0-9-_\:\|\.]+?)\!\!` + // index based 12
+			`|(\{)\{([a-zA-Z0-9-_\:\|\.]+?)\}\}` + // index based 14
 
 			// ==== NESTED ELEMENTS (SUB TEMPLATES)
 			`|\[\[(\])\](\n|\r|\r\n|\n\r)?` + // index based 16
