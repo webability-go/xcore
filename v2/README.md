@@ -33,6 +33,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.1.1 - 2022-03-01
+-----------------------
+- XTemplate: Added > to metalanguage string tags to resolve also the paths (bug corrected).
+
 v2.1.0 - 2022-02-27
 -----------------------
 - XLanguage: bug corrected on unlock of stringload and loadFromFile (was blocking the system)

@@ -235,6 +235,7 @@ func TestXTemplateClone(t *testing.T) {
 	if str2 != str1 {
 		t.Errorf("Error comparing template cloned")
 	}
+	fmt.Println(str1)
 }
 
 /*
