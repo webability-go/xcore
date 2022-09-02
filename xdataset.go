@@ -141,6 +141,9 @@ func (d *XDataset) GetCollection(key string) (XDatasetCollectionDef, bool) {
 // GetString will read the value of the key variable as a string cast type
 func (d *XDataset) GetString(key string) (string, bool) {
 	if val, ok := d.Get(key); ok {
+		if val == nil {
+			return "", true
+		}
 		return fmt.Sprint(val), true
 	}
 	return "", false
@@ -511,6 +514,9 @@ func (d *XDatasetCollection) GetData(key string) (interface{}, bool) {
 func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
 	v, ok := d.GetData(key)
 	if ok {
+		if v == nil {
+			return "", true
+		}
 		return fmt.Sprint(v), true
 	}
 	return "", false

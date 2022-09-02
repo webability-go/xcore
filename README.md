@@ -1,5 +1,3 @@
-@UTF-8
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
 [![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
@@ -27,6 +25,11 @@ Version Changes Control
 =======================
 
 # Please use xcore/v2
+
+v1.1.1 - 2020-09-02
+-----------------------
+- Bug corrected on XDataset.GetString() and XDatasetCollection.GetDataString(). 
+  If the value is NIL int the dataset, it returns now "" and not "<nil>"
 
 v1.1.0 - 2020-03-01
 -----------------------
