@@ -33,6 +33,11 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.1.3 - 2022-09-02
+-----------------------
+- Bug corrected on XDataset.GetString() and XDatasetCollection.GetDataString(). 
+  If the value is NIL int the dataset, it returns now "" and not "<nil>"
+
 v2.1.2 - 2022-03-02
 -----------------------
 - XTemplate: Added = to metalanguage string tags to resolve also the paths (bug corrected).
