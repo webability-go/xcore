@@ -88,9 +88,11 @@ func (d *XDatasetCollection) GetData(key string) (interface{}, bool) {
 
 // GetDataString will retrieve the first available data identified by key from the collection ordered by index and return it as a string
 func (d *XDatasetCollection) GetDataString(key string) (string, bool) {
-	v, ok := d.GetData(key)
-	if ok {
-		return fmt.Sprint(v), true
+	if val, ok := d.GetData(key); ok {
+		if val == nil {
+			return "", true
+		}
+		return fmt.Sprint(val), true
 	}
 	return "", false
 }

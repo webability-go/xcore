@@ -168,6 +168,7 @@ func TestXTemplateSimple(t *testing.T) {
 			&XDataset{"name": "other 2", "sport": "no"},
 			&XDataset{"name": "other 3", "sport": "yes"},
 			&XDataset{"name": "other 4", "sport": "no"},
+			&XDataset{"name": "other 5", "sport": nil},
 		},
 		"preferredhobby": &XDataset{
 			"name":  "Baseball",
@@ -211,6 +212,7 @@ func TestXTemplateClone(t *testing.T) {
 			&XDataset{"name": "other 2", "sport": "no"},
 			&XDataset{"name": "other 3", "sport": "yes"},
 			&XDataset{"name": "other 4", "sport": "no"},
+			&XDataset{"name": "other 5", "sport": nil},
 		},
 		"preferredhobby": &XDataset{
 			"name":  "Baseball",
