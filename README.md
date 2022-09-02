@@ -26,7 +26,7 @@ Version Changes Control
 
 # Please use xcore/v2
 
-v1.1.1 - 2020-09-02
+v1.1.1 - 2022-09-02
 -----------------------
 - Bug corrected on XDataset.GetString() and XDatasetCollection.GetDataString(). 
   If the value is NIL int the dataset, it returns now "" and not "<nil>"
