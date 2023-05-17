@@ -33,6 +33,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.1.4 - 2023-05-17
+-----------------------
+- Bug corrected on @@ loops subtemplates, the .none template was not reach when the array is set but empty
+
 v2.1.3 - 2022-09-02
 -----------------------
 - Bug corrected on XDataset.GetString() and XDatasetCollection.GetDataString(). 

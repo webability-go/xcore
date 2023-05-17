@@ -375,7 +375,7 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 			if subt != nil {
 				if datacol != nil {
 					cl, _ := datacol.GetCollection(subdataid)
-					if cl != nil {
+					if cl != nil && cl.Count() > 0 {
 						for i := 0; i < cl.Count(); i++ {
 							var tmp *XTemplate
 							tmp = t.GetTemplate(subtemplateid + ".key." + strconv.Itoa(i))
