@@ -33,6 +33,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.1.5 - 2023-05-17
+-----------------------
+- Bump golang.org/x/text from 0.3.5 to 0.3.8 for security upgrade
+
 v2.1.4 - 2023-05-17
 -----------------------
 - Bug corrected on @@ loops subtemplates, the .none template was not reach when the array is set but empty
