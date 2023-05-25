@@ -33,6 +33,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.1.6 - 2023-05-25
+-----------------------
+- Bug corrected into GetCollection(id) function, if the dataset is not an XDatasetCollection, it should return nil, not a panic error
+
 v2.1.5 - 2023-05-17
 -----------------------
 - Bump golang.org/x/text from 0.3.5 to 0.3.8 for security upgrade

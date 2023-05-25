@@ -142,7 +142,10 @@ func (d *XDatasetCollection) GetCollection(key string) (XDatasetCollectionDef, b
 	v, ok := d.GetData(key)
 	// Verify v IS actually a XDatasetCollectionDef to avoid the error
 	if ok {
-		return v.(XDatasetCollectionDef), true
+		dsd, ok2 := v.(XDatasetCollectionDef)
+		if ok2 {
+			return dsd, true
+		}
 	}
 	return nil, false
 }
