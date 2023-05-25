@@ -41,7 +41,7 @@ I love {{name}}<br />
 	// I love Videogames<br />
 }
 
-func ExampleNewXTemplateEmptyLoop() {
+func TestNewXTemplateEmptyLoop(t *testing.T) {
 	tmpl, _ := NewXTemplateFromString(`
 %-- This is a comment. It will not appear in the final code. --%
 Let's put your name here: {{clientname}}<br />
@@ -60,6 +60,36 @@ I love nothing<br />
 	data := XDataset{
 		"clientname": "Fred",
 		"hobbies":    &XDatasetCollection{},
+	}
+
+	fmt.Println(tmpl.Execute(&data))
+	// Output:
+	// Let's put your name here: Fred<br />
+	// And lets put your hobbies here:<br />
+	// I love nothing<br />
+}
+
+func TestNewXTemplateNilCollection(t *testing.T) {
+
+	tmpl, _ := NewXTemplateFromString(`
+%-- This is a comment. It will not appear in the final code. --%
+Let's put your name here: {{clientname}}<br />
+And lets put your hobbies here:<br />
+%-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
+@@hobbies@@
+%-- And you need the template for each hobby:--%
+[[hobbies]]
+I love {{name}}<br />
+[[]]
+[[hobbies.none]]
+I love nothing<br />
+[[]]
+`)
+	// The creation of the data is obviously tedious here, in real life it should come from a JSON, a Database, etc
+	var col XDatasetCollection
+	data := XDataset{
+		"clientname": "Fred",
+		"hobbies":    col,
 	}
 
 	fmt.Println(tmpl.Execute(&data))
