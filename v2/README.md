@@ -33,6 +33,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.1.7 - 2023-06-15
+-----------------------
+- Added the missing counter for @@ meta language. Using {{.counter}} into the loop template, you can add the number of the dataset, 1-based.
+
 v2.1.6 - 2023-05-25
 -----------------------
 - Bug corrected into GetCollection(id) function, if the dataset is not an XDatasetCollection, it should return nil, not a panic error

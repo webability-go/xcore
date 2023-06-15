@@ -17,19 +17,19 @@ Sports shop:
 
 @@hobbies:hobby@@
 [[hobby.first]]
-1. {{name}} {{sport}}
+1. -{{.counter}}- {{name}} {{sport}}
 [[]]
 [[hobby.last]]
-last. {{name}} {{sport}}
+last. -{{.counter}}- {{name}} {{sport}}
 [[]]
 [[hobby.even]]
-2x. {{name}} {{sport}}
+2x. -{{.counter}}- {{name}} {{sport}}
 [[]]
 [[hobby.key.3]]
-3. {{name}} {{sport}}
+3. -{{.counter}}- {{name}} {{sport}}
 [[]]
 [[hobby]]
-{{name}} {{sport}}
+-{{.counter}}- {{name}} {{sport}}
 [[]]
 [[hobby.none]]
 No hobbies

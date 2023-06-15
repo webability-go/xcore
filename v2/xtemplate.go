@@ -395,6 +395,7 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 								tmp = subt
 							}
 							dcl, _ := cl.Get(i)
+							dcl.Set(".counter", i+1)
 							datacol.Push(dcl)
 							substr := tmp.injector(datacol, language)
 							injected = append(injected, substr)

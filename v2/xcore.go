@@ -745,6 +745,7 @@
 //
 // - templateid in all other cases (odd is contained here if even is defined)
 //
+// Since v2.1.7, you can also use the pseudo field {{.counter}} into the loop subtemplate, to get the number of the counter of the loop, it is 1-based (first loop is 1, not 0)
 //
 // 3.4.2.2 When order is a single id (characters a-z0-9.-_), it will make a call to the sub template id with the same subset of data with the same id and replace the @@...@@ for each itterance of the data with the result.
 //
@@ -868,7 +869,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "2.1.6"
+const VERSION = "2.1.7"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.

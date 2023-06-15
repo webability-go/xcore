@@ -2,6 +2,13 @@
 // Use of this source code is governed by a MIT licence.
 // license that can be found in the LICENSE file.
 
+// **Please use xcore/v2**
+//
+//  import "github.com/webability-go/xcore/v2"
+//
+// **The version 1 is obsolete.**
+//
+//
 // Package xcore is a set of basic objects for programation (XCache for caches, XDataset for data sets, XLanguage for languages and XTemplate for templates).
 // For GO, the actual existing code includes:
 //
