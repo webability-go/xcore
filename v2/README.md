@@ -1,11 +1,9 @@
-@UTF-8
+XCore v2 for GO
+=============================
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
 [![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
-
-XCore for GO v2
-=============================
 
 Minimum version of GO: 1.17 (for time.Time compatibility)
 
@@ -19,8 +17,8 @@ For GO, the actual existing code includes:
 Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
 
 
-TO DO:
-======
+TO DO, maybe:
+=============
 - XDataset.Set should accept path too > > >
 - Get*Collection should convert types too
 - XTemplate must concatenate strings after compilation
@@ -32,6 +30,11 @@ Some improvements to check, later:
 
 Version Changes Control
 =======================
+
+v2.2.0 - 2023-08-31
+-----------------------
+- Added the parameter status to xlanguage XML and function to get/set the parameter.
+- Added the function GetXML() to marshal the structure to an XML file.
 
 v2.1.7 - 2023-06-15
 -----------------------

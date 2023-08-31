@@ -202,4 +202,7 @@ func TestXLanguageAssign(t *testing.T) {
 		t.Errorf("The print #value language is not correct %s", str)
 		return
 	}
+
+	str = manualES.GetXML()
+	fmt.Println(str)
 }
