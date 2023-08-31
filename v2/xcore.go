@@ -132,8 +132,8 @@
 //
 //  <?xml version="1.0" encoding="UTF-8"?>
 //  <language id="NAMEOFTABLE" lang="LG">
-//    <entry id="ENTRYNAME">ENTRYVALUE</entry>
-//    <entry id="ENTRYNAME">ENTRYVALUE</entry>
+//    <entry id="ENTRYNAME" status="STATUSVALUE">ENTRYVALUE</entry>
+//    <entry id="ENTRYNAME" status="STATUSVALUE">ENTRYVALUE</entry>
 //    etc.
 //  </language>
 //
@@ -144,6 +144,9 @@
 // ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton".
 //
 // ENTRYVALUE is the text for your entry, for example "Hello", "You are:", "Save" if your table is in english.
+//
+// STATUSVALUE is the status of the entry- You may put any value to control your translation over time and processes.
+//
 //
 // 1.2 The flat text format is:
 //
@@ -179,6 +182,14 @@
 // SetName/SetLanguage functions are used to set the table name and language of the object (generally to build an object from scratch).
 // GetName/GetLanguage functions are used to get the table name and language of the object (generally when you load it from some source).
 // Set/Get/Del functions are used to add or modify a new entry, read an entry, or deletes an entry in the object.
+// SetStatus/GetStatus functions are used to add or get a status for the entry in the object.
+//
+// To create am XML file from the objet, you can use the GetXML() function
+//
+//   langfromxmlfile := NewXLanguageFromXMLFile("path/to/filename")
+//   str := langfromxmlfile.GetXML()
+//
+//
 //
 // XDataSet
 //
@@ -306,7 +317,6 @@
 //  datats := xcore.NewXDatasetTS(datanots)
 //
 // Note that all references to XDatasetTS are pointers, always (to be able to modify the values of them).
-//
 // The DatasetTS meet the XDatasetDef interface
 //
 //
@@ -869,7 +879,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "2.1.7"
+const VERSION = "2.2.0"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.

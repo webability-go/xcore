@@ -18,18 +18,19 @@ type XLanguage struct {
 	Name     string
 	Language language.Tag
 	entries  map[string]string
+	status   map[string]string
 	mutex    sync.RWMutex
 }
 
 // NewXLanguage will create an empty Language structure with a name and a language
 func NewXLanguage(name string, lang language.Tag) *XLanguage {
-	return &XLanguage{Name: name, Language: lang, entries: make(map[string]string)}
+	return &XLanguage{Name: name, Language: lang, entries: make(map[string]string), status: make(map[string]string)}
 }
 
 // NewXLanguageFromXMLFile will create an XLanguage structure with the data into the XML file
 //   Returns nil if there is an error
 func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
-	lang := &XLanguage{entries: make(map[string]string)}
+	lang := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := lang.LoadXMLFile(file)
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
 // NewXLanguageFromXMLString will create an XLanguage structure with the data into the XML String
 //   Returns nil if there is an error
 func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
-	lang := &XLanguage{entries: make(map[string]string)}
+	lang := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := lang.LoadXMLString(xml)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
 // NewXLanguageFromFile will create an XLanguage structure with the data into the text file
 //   Returns nil if there is an error
 func NewXLanguageFromFile(file string) (*XLanguage, error) {
-	l := &XLanguage{entries: make(map[string]string)}
+	l := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := l.LoadFile(file)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func NewXLanguageFromFile(file string) (*XLanguage, error) {
 // NewXLanguageFromString will create an XLanguage structure with the data into the string
 //   Returns nil if there is an error
 func NewXLanguageFromString(data string) (*XLanguage, error) {
-	l := &XLanguage{entries: make(map[string]string)}
+	l := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := l.LoadString(data)
 	if err != nil {
 		return nil, err
@@ -85,8 +86,9 @@ func (l *XLanguage) LoadXMLFile(file string) error {
 func (l *XLanguage) LoadXMLString(data string) error {
 	// Temporal structures for XML loading
 	type xentry struct {
-		ID    string `xml:"id,attr"`
-		Entry string `xml:",chardata"`
+		ID     string `xml:"id,attr"`
+		Entry  string `xml:",chardata"`
+		Status string `xml:"status,attr"`
 	}
 
 	type xlang struct {
@@ -110,6 +112,7 @@ func (l *XLanguage) LoadXMLString(data string) error {
 	defer l.mutex.Unlock()
 	for _, e := range temp.Entries {
 		l.entries[e.ID] = e.Entry
+		l.status[e.ID] = e.Status
 	}
 	return nil
 }
@@ -204,11 +207,30 @@ func (l *XLanguage) Get(entry string) string {
 	return ""
 }
 
+// Set will add an entry id-value into the language table
+func (l *XLanguage) SetStatus(entry string, value string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	l.status[entry] = value
+}
+
+// Get will read an entry id-value from the language table
+func (l *XLanguage) GetStatus(entry string) string {
+	l.mutex.RLock()
+	defer l.mutex.RUnlock()
+	v, ok := l.status[entry]
+	if ok {
+		return v
+	}
+	return ""
+}
+
 // Del will remove an entry id-value from the language table
 func (l *XLanguage) Del(entry string) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	delete(l.entries, entry)
+	delete(l.status, entry)
 }
 
 // GetEntries will return a COPY of the key-values pairs of the language.
@@ -220,6 +242,19 @@ func (l *XLanguage) GetEntries() map[string]string {
 		clone[k] = v
 	}
 	return clone
+}
+
+// GetXML will generate the XML to save the file
+func (l *XLanguage) GetXML() string {
+	sdata := []string{}
+	l.mutex.RLock()
+	defer l.mutex.RUnlock()
+	for key, val := range l.entries {
+		sdata = append(sdata, "  <entry id=\""+key+"\" status=\""+l.status[key]+"\"><![CDATA["+val+"]]></entry>")
+	}
+	sort.Strings(sdata) // Lets be sure the print is always the same presentation
+	return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<language id=\"" + l.Name + "\" lang=\"" + fmt.Sprint(l.Language) + "\">\n" +
+		strings.Join(sdata, "\n") + "\n</language>"
 }
 
 // String will transform the XDataset into a readable string for humans

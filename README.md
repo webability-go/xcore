@@ -1,11 +1,17 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
-[![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
-[![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
-
 XCore for GO v2
 =============================
 
 # Please use xcore/v2
+
+# The version 1 is obsolete.
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/webability-go/xcore)](https://goreportcard.com/report/github.com/webability-go/xcore)
+[![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
+[![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
+
+# Please use xcore/v2
+
+# The version 1 is obsolete.
 
 import "github.com/webability-go/xcore/v2"
 
@@ -18,13 +24,12 @@ For GO, the actual existing code includes:
 
 Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
 
-# The version 1 is obsolete.
+# Please use xcore/v2
 
+# The version 1 is obsolete.
 
 Version Changes Control
 =======================
-
-# Please use xcore/v2
 
 v1.1.1 - 2022-09-02
 -----------------------
