@@ -24,7 +24,7 @@
 //
 // 1. Declare a new XCache with NewXCache() function:
 //
-//  import "github.com/webability-go/xcore"
+//  import "github.com/webability-go/xcore/v2"
 //
 //  // 50 items max
 //  var myfiles = xcore.NewXCache("myfiles", 50, 0)
@@ -237,7 +237,7 @@
 //
 // Example:
 //
-//  import "github.com/webability-go/xcore"
+//  import "github.com/webability-go/xcore/v2"
 //
 //  data := xcore.XDataset{}
 //  data["data1"] = "DATA1"
@@ -384,7 +384,7 @@
 //
 //  import (
 //    "fmt"
-//    "github.com/webability-go/xcore"
+//    "github.com/webability-go/xcore/v2"
 //  )
 //
 //  func main() {
@@ -879,7 +879,7 @@
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "2.2.0"
+const VERSION = "2.2.1"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.
