@@ -69,6 +69,27 @@ I love nothing<br />
 	// I love nothing<br />
 }
 
+func TestNewXTemplateEmptyCondition(t *testing.T) {
+	tmpl, _ := NewXTemplateFromString(`
+TAGADA
+??familyname??
+[[familyname]]
+Hello {{familyname}}<br />
+[[]]
+[[familyname.none]]
+I don't know you<br />
+[[]]
+`)
+	// The creation of the data is obviously tedious here, in real life it should come from a JSON, a Database, etc
+	data := XDataset{
+		"clientname": "Fred",
+	}
+
+	fmt.Println(tmpl.Execute(&data))
+	// Output:
+	// I don't know you<br />
+}
+
 func TestNewXTemplateNilCollection(t *testing.T) {
 
 	tmpl, _ := NewXTemplateFromString(`

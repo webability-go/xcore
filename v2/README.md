@@ -14,7 +14,7 @@ For GO, the actual existing code includes:
 - XLanguage: language dependent text tables, thread safe
 - XTemplate: template system with meta language, thread safe cloning
 
-Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webability-go/xcore?status.png)](https://godoc.org/github.com/webability-go/xcore)
+Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
 
 
 TO DO, maybe:
@@ -30,6 +30,10 @@ Some improvements to check, later:
 
 Version Changes Control
 =======================
+
+v2.2.1 - 2023-09-29
+-----------------------
+- Added the missing sub template .none for ?? meta language into XTemplate.
 
 v2.2.0 - 2023-08-31
 -----------------------
