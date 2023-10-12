@@ -31,6 +31,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.2.2 - 2023-10-12
+-----------------------
+- Added a security on the sub template .none for ?? meta language into XTemplate, to not try to use an inexistant template and throw a panic error.
+
 v2.2.1 - 2023-09-29
 -----------------------
 - Added the missing sub template .none for ?? meta language into XTemplate.

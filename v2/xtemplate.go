@@ -454,8 +454,10 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 				if tmp != nil {
 					subt = tmp
 				}
-				substr := subt.injector(datacol, language)
-				injected = append(injected, substr)
+				if subt != nil {
+					substr := subt.injector(datacol, language)
+					injected = append(injected, substr)
+				}
 			}
 		case MetaDump:
 			if datacol != nil {
