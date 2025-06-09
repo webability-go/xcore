@@ -28,7 +28,8 @@ func NewXLanguage(name string, lang language.Tag) *XLanguage {
 }
 
 // NewXLanguageFromXMLFile will create an XLanguage structure with the data into the XML file
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
 	lang := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := lang.LoadXMLFile(file)
@@ -39,7 +40,8 @@ func NewXLanguageFromXMLFile(file string) (*XLanguage, error) {
 }
 
 // NewXLanguageFromXMLString will create an XLanguage structure with the data into the XML String
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
 	lang := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := lang.LoadXMLString(xml)
@@ -50,7 +52,8 @@ func NewXLanguageFromXMLString(xml string) (*XLanguage, error) {
 }
 
 // NewXLanguageFromFile will create an XLanguage structure with the data into the text file
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func NewXLanguageFromFile(file string) (*XLanguage, error) {
 	l := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := l.LoadFile(file)
@@ -61,7 +64,8 @@ func NewXLanguageFromFile(file string) (*XLanguage, error) {
 }
 
 // NewXLanguageFromString will create an XLanguage structure with the data into the string
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func NewXLanguageFromString(data string) (*XLanguage, error) {
 	l := &XLanguage{entries: make(map[string]string), status: make(map[string]string)}
 	err := l.LoadString(data)
@@ -72,7 +76,8 @@ func NewXLanguageFromString(data string) (*XLanguage, error) {
 }
 
 // LoadXMLFile will Load a language from an XML file and replace the content of the XLanguage structure with the new data
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func (l *XLanguage) LoadXMLFile(file string) error {
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -82,7 +87,8 @@ func (l *XLanguage) LoadXMLFile(file string) error {
 }
 
 // LoadXMLString will Load a language from an XML file and replace the content of the XLanguage structure with the new data
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func (l *XLanguage) LoadXMLString(data string) error {
 	// Temporal structures for XML loading
 	type xentry struct {
@@ -118,7 +124,8 @@ func (l *XLanguage) LoadXMLString(data string) error {
 }
 
 // LoadFile will Load a language from a file and replace the content of the XLanguage structure with the new data
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func (l *XLanguage) LoadFile(file string) error {
 	flatFile, err := os.Open(file)
 	if err != nil {
@@ -136,7 +143,8 @@ func (l *XLanguage) LoadFile(file string) error {
 }
 
 // LoadString will Load a language from a string and replace the content of the XLanguage structure with the new data
-//   Returns nil if there is an error
+//
+//	Returns nil if there is an error
 func (l *XLanguage) LoadString(data string) error {
 	scanner := bufio.NewScanner(strings.NewReader(data))
 	for scanner.Scan() {
