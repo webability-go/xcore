@@ -15,7 +15,7 @@
 //
 // It is already used on sites that serve more than 60 million pages a month (500 pages per second on pike hour) and can be used on multithreading environment safely.
 //
-// XCache
+// # XCache
 //
 // XCache is a library to cache all the data you want into current application memory for a very fast access to the data.
 // The access to the data support multithreading and concurrency. For the same reason, this type of cache is not persistent (if you exit the application)
@@ -24,16 +24,16 @@
 //
 // 1. Declare a new XCache with NewXCache() function:
 //
-//  import "github.com/webability-go/xcore/v2"
+//	import "github.com/webability-go/xcore/v2"
 //
-//  // 50 items max
-//  var myfiles = xcore.NewXCache("myfiles", 50, 0)
+//	// 50 items max
+//	var myfiles = xcore.NewXCache("myfiles", 50, 0)
 //
-//  // 10 minutes expiration
-//  var mydbtable = xcore.NewXCache("mydb-table", 0, 10 * time.Minute)
+//	// 10 minutes expiration
+//	var mydbtable = xcore.NewXCache("mydb-table", 0, 10 * time.Minute)
 //
-//  // No direct limits on the cache
-//  var myotherdbtable = xcore.NewXCache("mydb-table", 0, 0)
+//	// No direct limits on the cache
+//	var myotherdbtable = xcore.NewXCache("mydb-table", 0, 0)
 //
 // 2. Fill in the cache:
 //
@@ -41,24 +41,24 @@
 // so you can put here anything you need, from simple variables to complex structures. You need to use the Set function:
 // Note the ID is always a string, so convert a database key to string if needed.
 //
-//  func main() {
-//    myfiles.Set("https://developers.webability.info/", "somedata")
-//    myfiles.Set("/home/sites/file2.txt", "someotherdata")
-//  	myrecords := GetAllMyDatabaseTableData()
-//  	for _, rec := range myrecords {
-//      key, _ := rec.GetString("key")
-//  		mydbtable.Set(key, rec)
-//    }
-//  }
+//	func main() {
+//	  myfiles.Set("https://developers.webability.info/", "somedata")
+//	  myfiles.Set("/home/sites/file2.txt", "someotherdata")
+//		myrecords := GetAllMyDatabaseTableData()
+//		for _, rec := range myrecords {
+//	    key, _ := rec.GetString("key")
+//			mydbtable.Set(key, rec)
+//	  }
+//	}
 //
 // 3. To use the cache, just ask for your entry with Get function:
 //
-//  func usemycache() {
+//	func usemycache() {
 //
-//    filedata, invalid := myfiles.Get("https://developers.webability.info/");
-//    dbdata, invalid2 := mydbtable.Get("4455");
-//    // do something with the fetched data
-//  }
+//	  filedata, invalid := myfiles.Get("https://developers.webability.info/");
+//	  dbdata, invalid2 := mydbtable.Get("4455");
+//	  // do something with the fetched data
+//	}
 //
 // 4. To maintain the cache:
 //
@@ -69,19 +69,19 @@
 // the verification may be VERY slow and huge CPU use.
 // The Count function gives some stats about the cache.
 //
-//  func analyze() {
+//	func analyze() {
 //
-//    // Actual size of cache
-//    fmt.Println(mydbtable.Count())
-//    // Removes 30% of objects
-//    objectsremoved := mydbtable.Clean(30)
-//    // New size of cache
-//    fmt.Println(mydbtable.Count())
-//    // totally flush the cache
-//    mydbtable.Flush()
-//    // New size of cache, should be 0
-//    fmt.Println(mydbtable.Count())
-//  }
+//	  // Actual size of cache
+//	  fmt.Println(mydbtable.Count())
+//	  // Removes 30% of objects
+//	  objectsremoved := mydbtable.Clean(30)
+//	  // New size of cache
+//	  fmt.Println(mydbtable.Count())
+//	  // totally flush the cache
+//	  mydbtable.Flush()
+//	  // New size of cache, should be 0
+//	  fmt.Println(mydbtable.Count())
+//	}
 //
 // 5. How to use Verify Function:
 //
@@ -92,32 +92,30 @@
 // The validator function is a func(id, time.Time) bool function. The first parameter is the ID entry in the cache, the second parameter the time of the entry was created.
 // The validator function returns true is the cache is still valid, or false if it needs to be invalidated.
 //
-//  var myfiles = xcore.NewXCache("myfiles", 50, 0)
-//  myfiles.Validator = FileValidator
+//	 var myfiles = xcore.NewXCache("myfiles", 50, 0)
+//	 myfiles.Validator = FileValidator
 //
-//  // FileValidator verify the file source. In this case, the ID is directly the filename full path
-//  func FileValidator(key string, otime time.Time) bool {
+//	 // FileValidator verify the file source. In this case, the ID is directly the filename full path
+//	 func FileValidator(key string, otime time.Time) bool {
 //
-//	  fi, err := os.Stat(key)
-//	  if err != nil {
-//		  // Does not exists anymore, invalid
-//		  return false
-//	  }
-//	  mtime := fi.ModTime()
-//	  if mtime.After(otime) {
-//		  // file is newer, invalid
-//	  	return false
-//  	}
-//	  // All ok, valid
-//	  return true
-//  }
-//
+//		  fi, err := os.Stat(key)
+//		  if err != nil {
+//			  // Does not exists anymore, invalid
+//			  return false
+//		  }
+//		  mtime := fi.ModTime()
+//		  if mtime.After(otime) {
+//			  // file is newer, invalid
+//		  	return false
+//	 	}
+//		  // All ok, valid
+//		  return true
+//	 }
 //
 // The XCache is thread safe.
 // The cache can be limited in quantity of entries and timeout for data. The cache is automanaged (for invalid expired data) and can be cleaned partially or totally manually.
 //
-//
-// XLanguage
+// # XLanguage
 //
 // The XLanguage table of text entries can be loaded from XML file, XML string or normal text file or string.
 // It is used to keep a table of id=value set of entries in any languages you need, so it is easy to switch between XLanguage instance based on the required language needed.
@@ -130,12 +128,12 @@
 //
 // 1.1 The XML Format is:
 //
-//  <?xml version="1.0" encoding="UTF-8"?>
-//  <language id="NAMEOFTABLE" lang="LG">
-//    <entry id="ENTRYNAME" status="STATUSVALUE">ENTRYVALUE</entry>
-//    <entry id="ENTRYNAME" status="STATUSVALUE">ENTRYVALUE</entry>
-//    etc.
-//  </language>
+//	<?xml version="1.0" encoding="UTF-8"?>
+//	<language id="NAMEOFTABLE" lang="LG">
+//	  <entry id="ENTRYNAME" status="STATUSVALUE">ENTRYVALUE</entry>
+//	  <entry id="ENTRYNAME" status="STATUSVALUE">ENTRYVALUE</entry>
+//	  etc.
+//	</language>
 //
 // NAMEOFTABLE is the name of your table entry, for example "loginform", "user_report", etc.
 //
@@ -147,12 +145,11 @@
 //
 // STATUSVALUE is the status of the entry- You may put any value to control your translation over time and processes.
 //
-//
 // 1.2 The flat text format is:
 //
-//  ENTRYNAME=ENTRYVALUE
-//  ENTRYNAME=ENTRYVALUE
-//  etc.
+//	ENTRYNAME=ENTRYVALUE
+//	ENTRYNAME=ENTRYVALUE
+//	etc.
 //
 // ENTRYNAME is the ID of the entry, for example "greating", "yourname", "submitbutton".
 //
@@ -168,14 +165,14 @@
 //
 // To create a new XLanguage empty structure:
 //
-//  lang := NewXLanguage(id, language)
+//	lang := NewXLanguage(id, language)
 //
 // There are 4 functions to create the language from a file or string, flat text or XML text:
 //
-//  langfromxmlfile := NewXLanguageFromXMLFile("path/to/filename")
-//  langfromxmlstring := NewXLanguageFromXMLString("<xml>...")
-//  langfromtextfile := NewXLanguageFromFile("path/to/file")
-//  langfromtextstring := NewXLanguageFromString("entry=data\n...")
+//	langfromxmlfile := NewXLanguageFromXMLFile("path/to/filename")
+//	langfromxmlstring := NewXLanguageFromXMLString("<xml>...")
+//	langfromtextfile := NewXLanguageFromFile("path/to/file")
+//	langfromtextstring := NewXLanguageFromString("entry=data\n...")
 //
 // Then you can use the set of basic access functions:
 //
@@ -186,12 +183,10 @@
 //
 // To create am XML file from the objet, you can use the GetXML() function
 //
-//   langfromxmlfile := NewXLanguageFromXMLFile("path/to/filename")
-//   str := langfromxmlfile.GetXML()
+//	langfromxmlfile := NewXLanguageFromXMLFile("path/to/filename")
+//	str := langfromxmlfile.GetXML()
 //
-//
-//
-// XDataSet
+// # XDataSet
 //
 // 1. Overview:
 //
@@ -237,42 +232,41 @@
 //
 // Example:
 //
-//  import "github.com/webability-go/xcore/v2"
+//	import "github.com/webability-go/xcore/v2"
 //
-//  data := xcore.XDataset{}
-//  data["data1"] = "DATA1"
-//  data["data2"] = "DATA1"
-//  sm := xcore.XDataset{}
-//  sm["data31"] = "DATA31"
-//  data["data3"] = sm
-//  data["data4"] = 123
-//  data["data5"] = 123.432
-//  data["data6"] = true
-//  data["data7"] = func() string { return "ABC" }
+//	data := xcore.XDataset{}
+//	data["data1"] = "DATA1"
+//	data["data2"] = "DATA1"
+//	sm := xcore.XDataset{}
+//	sm["data31"] = "DATA31"
+//	data["data3"] = sm
+//	data["data4"] = 123
+//	data["data5"] = 123.432
+//	data["data6"] = true
+//	data["data7"] = func() string { return "ABC" }
 //
-//  d8_r1 := &xcore.XDataset{}
-//  d8_r1.Set("data81", "rec 1: Entry 8-1")
-//  d8_r1.Set("data82", "rec 1: Entry 8-2")
+//	d8_r1 := &xcore.XDataset{}
+//	d8_r1.Set("data81", "rec 1: Entry 8-1")
+//	d8_r1.Set("data82", "rec 1: Entry 8-2")
 //
-//  d8_r2 := &xcore.XDataset{}
-//  d8_r2.Set("data81", "rec 2: Entry 8-1")
-//  d8_r2.Set("data82", "rec 2: Entry 8-2")
-//  d8_r2.Set("data83", "rec 2: Entry 8-3")
+//	d8_r2 := &xcore.XDataset{}
+//	d8_r2.Set("data81", "rec 2: Entry 8-1")
+//	d8_r2.Set("data82", "rec 2: Entry 8-2")
+//	d8_r2.Set("data83", "rec 2: Entry 8-3")
 //
-//  d8_r3 := &xcore.XDataset{}
-//  d8_r3.Set("data81", "rec 3: Entry 8-1")
-//  d8_r3.Set("data82", "rec 3: Entry 8-2")
+//	d8_r3 := &xcore.XDataset{}
+//	d8_r3.Set("data81", "rec 3: Entry 8-1")
+//	d8_r3.Set("data82", "rec 3: Entry 8-2")
 //
-//  d := xcore.XDatasetCollection{}
-//  d.Push(d8_r1)
-//  d.Push(d8_r2)
-//  d.Push(d8_r3)
+//	d := xcore.XDatasetCollection{}
+//	d.Push(d8_r1)
+//	d.Push(d8_r2)
+//	d.Push(d8_r3)
 //
-//  data["data8"] = &d
-//  data["data9"] = "I exist"
+//	data["data8"] = &d
+//	data["data9"] = "I exist"
 //
 // Note that all references to XDataset and XDatasetCollection are pointers, always (to be able to modify the values of them).
-//
 //
 // 2. XDatasetDef interface:
 //
@@ -294,7 +288,7 @@
 //
 // The XDatasetCollection type is a simple []DatasetDef with all the implemented methods and should be enough to use for almost all required cases.
 //
-// XDataSetTS
+// # XDataSetTS
 //
 // 1. Overview:
 //
@@ -303,24 +297,23 @@
 //
 // Example:
 //
-//  import "github.com/webability-go/xcore/v2"
+//	import "github.com/webability-go/xcore/v2"
 //
-//  data := &xcore.XDatasetTS{} // data is a XDatasetDef
-//  data.Set("data1", "DATA1")
-//  data.Set("newkey", 123.45)
+//	data := &xcore.XDatasetTS{} // data is a XDatasetDef
+//	data.Set("data1", "DATA1")
+//	data.Set("newkey", 123.45)
 //
 // You may also build a XDatasetTS to encapsulate a XDatasetDef that is not thread safe, to use it safely
 //
-//  import "github.com/webability-go/xcore/v2"
+//	import "github.com/webability-go/xcore/v2"
 //
-//  datanots := xcore.NewXDataset()
-//  datats := xcore.NewXDatasetTS(datanots)
+//	datanots := xcore.NewXDataset()
+//	datats := xcore.NewXDatasetTS(datanots)
 //
 // Note that all references to XDatasetTS are pointers, always (to be able to modify the values of them).
 // The DatasetTS meet the XDatasetDef interface
 //
-//
-// XTemplate
+// # XTemplate
 //
 // 1. Overview:
 //
@@ -344,7 +337,7 @@
 //
 // A template can be as simple as a single character (no variables to inject) to a very complex nested, conditional and loops sub-templates.
 //
-//  Hello world!
+//	Hello world!
 //
 // Yes. this is a template, but a very simple one without need to inject any data.
 //
@@ -352,27 +345,26 @@
 //
 // Having an array of data, we want to paint it beautifull:
 //
-//  { "clientname": "Fred",
-//    "hobbies": [
-//       { "name": "Football" },
-//       { "name": "Ping-pong" },
-//       { "name": "Swimming" },
-//       { "name": "Videogames" }
-//    ]
-//  }
+//	{ "clientname": "Fred",
+//	  "hobbies": [
+//	     { "name": "Football" },
+//	     { "name": "Ping-pong" },
+//	     { "name": "Swimming" },
+//	     { "name": "Videogames" }
+//	  ]
+//	}
 //
 // We can create a template to inject this data into it:
 //
-//  %-- This is a comment. It will not appear in the final code. --%
-//  Let's put your name here: {{clientname}}<br />
-//  And lets put your hobbies here:<br />
-//  @@hobbies:hobby@@     %-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
+//	%-- This is a comment. It will not appear in the final code. --%
+//	Let's put your name here: {{clientname}}<br />
+//	And lets put your hobbies here:<br />
+//	@@hobbies:hobby@@     %-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
 //
-//  %-- And you need the template for each hobby:--%
-//  [[hobby]]
-//  I love {{name}}<br />
-//  [[]]
-//
+//	%-- And you need the template for each hobby:--%
+//	[[hobby]]
+//	I love {{name}}<br />
+//	[[]]
 //
 // 2. Create and use XTemplateData:
 //
@@ -380,44 +372,43 @@
 //
 // Creates the XTemplate from a string or a file or any other source:
 //
-//  package main
+//	package main
 //
-//  import (
-//    "fmt"
-//    "github.com/webability-go/xcore/v2"
-//  )
+//	import (
+//	  "fmt"
+//	  "github.com/webability-go/xcore/v2"
+//	)
 //
-//  func main() {
-//    tmpl, _ := xcore.NewXTemplateFromString(`
-//  %-- This is a comment. It will not appear in the final code. --%
-//  Let's put your name here: {{clientname}}<br />
-//  And lets put your hobbies here:<br />
-//  @@hobbies:hobby@@     %-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
+//	func main() {
+//	  tmpl, _ := xcore.NewXTemplateFromString(`
+//	%-- This is a comment. It will not appear in the final code. --%
+//	Let's put your name here: {{clientname}}<br />
+//	And lets put your hobbies here:<br />
+//	@@hobbies:hobby@@     %-- note the 1rst id is the entry into the data to inject and the second one is the name of the sub-template to use --%
 //
-//  %-- And you need the template for each hobby:--%
-//  [[hobby]]
-//  I love {{name}}<br />
-//  [[]]
-//  `)
-//    // The creation of the data is obviously tedious here, in real life it should come from a JSON, a Database, etc
-//    data := xcore.XDataset{
-//      "clientname": "Fred",
-//      "hobbies": &XDatasetCollection{
-//        &XDataset{"name":"Football"},
-//        &XDataset{"name":"Ping-pong"},
-//        &XDataset{"name":"Swimming"},
-//        &XDataset{"name":"Videogames"},
-//      },
-//    }
+//	%-- And you need the template for each hobby:--%
+//	[[hobby]]
+//	I love {{name}}<br />
+//	[[]]
+//	`)
+//	  // The creation of the data is obviously tedious here, in real life it should come from a JSON, a Database, etc
+//	  data := xcore.XDataset{
+//	    "clientname": "Fred",
+//	    "hobbies": &XDatasetCollection{
+//	      &XDataset{"name":"Football"},
+//	      &XDataset{"name":"Ping-pong"},
+//	      &XDataset{"name":"Swimming"},
+//	      &XDataset{"name":"Videogames"},
+//	    },
+//	  }
 //
-//    fmt.Println(tmpl.Execute(&data)
-//  }
+//	  fmt.Println(tmpl.Execute(&data)
+//	}
 //
 // Clone the XTemplate:
 //
-//  xtemplate := xcore.NewXTemplate()
-//  xtemplatecloned := xtemplate.Clone()
-//
+//	xtemplate := xcore.NewXTemplate()
+//	xtemplatecloned := xtemplate.Clone()
 //
 // 3. Metalanguage Reference:
 //
@@ -428,24 +419,23 @@
 //
 // Example:
 //
-//  %-- This is a comment. It will not appear in the final code. --%
+//	%-- This is a comment. It will not appear in the final code. --%
 //
-//  %--
-//  This subtemplate will not be compiled, usable or even visible since it is into a comment
-//  [[templateid]]
-//  Anything here
-//  [[]]
-//  --%
-//
+//	%--
+//	This subtemplate will not be compiled, usable or even visible since it is into a comment
+//	[[templateid]]
+//	Anything here
+//	[[]]
+//	--%
 //
 // 3.2 Nested Templates: [[...]] and [[]]
 //
 // You can define new nested templates into your main template
 // A nested template is defined by:
 //
-//  [[templateid]]
-//  your nested template here
-//  [[]]
+//	[[templateid]]
+//	your nested template here
+//	[[]]
 //
 // The templteid is any combination of lowers letters only (a-z), numbers (0-9), and 3 special chars: . (point) - (dash) and _ (underline).
 //
@@ -459,61 +449,59 @@
 //
 // Example:
 //
-//  &&header&&
-//  Welcome to my page
-//  &&footer&&
+//	&&header&&
+//	Welcome to my page
+//	&&footer&&
 //
-//  [[header]]
-//  <hr />
-//  [[]]
+//	[[header]]
+//	<hr />
+//	[[]]
 //
-//  [[footer]]
-//  <hr />
-//  &&copyright&&
+//	[[footer]]
+//	<hr />
+//	&&copyright&&
 //
-//    [[copyright]]
-//      © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
-//    [[]]
-//  [[]]
+//	  [[copyright]]
+//	    © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
+//	  [[]]
+//	[[]]
 //
 // You may use more than one id into the same template to avoid repetition of the same code.
 // The different id's are separated with a pipe |
 //
-//  [[looptemplate_first|looptemplate_last|looptemplate_odd]] %-- First element, last element and all odd elements will be red --%
-//    <div style="color: red;">{{data}}</div>
-//  [[]]
-//  [[looptemplate]] %-- All the other elements will be blue --%
-//    <div style="color: blue;">{{data}}</div>
-//  [[]]
+//	[[looptemplate_first|looptemplate_last|looptemplate_odd]] %-- First element, last element and all odd elements will be red --%
+//	  <div style="color: red;">{{data}}</div>
+//	[[]]
+//	[[looptemplate]] %-- All the other elements will be blue --%
+//	  <div style="color: blue;">{{data}}</div>
+//	[[]]
 //
 // Important note:
 // A template will be visible only on the same level of its declaration. For example, if you put a subtemplate "b" into a subtemplate "a", it will not be visible by &&b&& from the top level, but only into the subtemplate "a".
 //
-//  &&header&&
-//  Welcome to my page
-//  &&footer&&
-//  &&copyright&& %-- WILL NOT WORK, into a sub-template --%
+//	&&header&&
+//	Welcome to my page
+//	&&footer&&
+//	&&copyright&& %-- WILL NOT WORK, into a sub-template --%
 //
-//  [[header]]
-//  <hr />
-//  [[]]
+//	[[header]]
+//	<hr />
+//	[[]]
 //
-//  [[footer]]
-//  <hr />
-//  &&copyright&& %-- WILL WORK, same level --%
+//	[[footer]]
+//	<hr />
+//	&&copyright&& %-- WILL WORK, same level --%
 //
-//    [[copyright]]
-//      © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
-//    [[]]
-//  [[]]
-//
+//	  [[copyright]]
+//	    © 2012 Ing. Philippe Thomassigny, a project of the WebAbility® Network.
+//	  [[]]
+//	[[]]
 //
 // 3.3 Simple Elements: ##...## and {{...}}
 //
 // There are 2 types of simple elements. Language elements and Data injector elements (also called field elements).
 //
 // We "logically" define the 2 type of elements. The separation is only for human logic and template filling, however the language information can perfectly fit into the data to inject (and not use ## entries).
-//
 //
 // 3.3.1 Languages elements: ##entry##
 //
@@ -531,25 +519,24 @@
 //
 // Example:
 //
-//  <div style="background-color: blue;">
-//  ##welcome##<br />
-//  You may use the same parameter as many time you wish.<br />
+//	<div style="background-color: blue;">
+//	##welcome##<br />
+//	You may use the same parameter as many time you wish.<br />
 //
-//  <span onclick="alert('##hello##');" class="button">##clickme##!</span>
-//  <span onclick="alert('##helloagain##');" class="button">##clickme## ##again##!</span>
+//	<span onclick="alert('##hello##');" class="button">##clickme##!</span>
+//	<span onclick="alert('##helloagain##');" class="button">##clickme## ##again##!</span>
 //
-//  </div>
+//	</div>
 //
 // With data to inject:
 //
-//  {
-//    "#": {
-//      "welcome": "Bienvenue",
-//      "clickme": "Clique sur moi",
-//      "again": "de nouveau"
-//    }
-//  }
-//
+//	{
+//	  "#": {
+//	    "welcome": "Bienvenue",
+//	    "clickme": "Clique sur moi",
+//	    "again": "de nouveau"
+//	  }
+//	}
 //
 // 3.3.2 Field elements: {{fieldname}}
 //
@@ -559,20 +546,20 @@
 //
 // Example:
 //
-//  <div style="background-color: blue;">
-//  Welcome to my site<br />
-//  You may use the same parameter as many time you wish.<br />
+//	<div style="background-color: blue;">
+//	Welcome to my site<br />
+//	You may use the same parameter as many time you wish.<br />
 //
-//  Today's temperature is {{degres}} celsius<br />
-//  or {{fdegres}} farenheit<br />
+//	Today's temperature is {{degres}} celsius<br />
+//	or {{fdegres}} farenheit<br />
 //
-//  Is {{degres}} degres too cold ? Buy a pullover!<br />
+//	Is {{degres}} degres too cold ? Buy a pullover!<br />
 //
-//  </div>
+//	</div>
 //
 // You can access an element with its path into the data set to inject separating each field level with a > (greater than).
 //
-//  {{hobbies>1>name}}
+//	{{hobbies>1>name}}
 //
 // This will take the name of the second hobby in the dataset defined upper. (collections are 0 indexed).
 //
@@ -591,17 +578,17 @@
 //
 // Example:
 //
-//  {
-//    "detail": {
-//      "data1": {
-//        "data2": {
-//          "key1": {"appname": "Nested App", "name": "Juan", "status": 1},
-//          "key2": {"name": "José", "status": 2},
-//          "appname" => "DomCore"
-//        }
-//      }
-//    }
-//  }
+//	{
+//	  "detail": {
+//	    "data1": {
+//	      "data2": {
+//	        "key1": {"appname": "Nested App", "name": "Juan", "status": 1},
+//	        "key2": {"name": "José", "status": 2},
+//	        "appname" => "DomCore"
+//	      }
+//	    }
+//	  }
+//	}
 //
 // At the level of 'data2', using {{appname}} will get back 'DomCore'.
 //
@@ -611,7 +598,6 @@
 //
 // At the level of root, 'data1' or 'detail', using {{appname}} will get back an empty string.
 //
-//
 // 3.3.4 Path access: id>id>id>id
 //
 // At any level into the data array, you can access any entry into the subset array.
@@ -619,13 +605,11 @@
 // For instance, taking the previous array of data to inject,
 // let's suppose we are into a nested meta elements at the 'data1' level. You may want to access directly the 'Juan' entry. The path will be:
 //
-//  {{data2>key1>name}}
+//	{{data2>key1>name}}
 //
 // The José's status value from the root will be:
 //
-//  {{detail>data1>data2>key2>status}}
-//
-//
+//	{{detail>data1>data2>key2>status}}
 //
 // 3.4 Meta Elements
 //
@@ -639,25 +623,25 @@
 //
 // Example of a data array to inject:
 //
-//    data := xcore.XDataset{
-//      "clientname": "Fred",
-//      "clientpicture": "face.jpg",
-//      "hobbies": &XDatasetCollection{
-//        &XDataset{"name":"Football","sport":"yes"},
-//        &XDataset{"name":"Ping-pong","sport":"yes"},
-//        &XDataset{"name":"Swimming","sport":"yes"},
-//        &XDataset{"name":"Videogames","sport":"no"},
-//      },
-//      "preferredhobby": &XDataset{
-//        "name":"Baseball",
-//        "sport":"yes",
-//      },
-//      "metadata": &XDataset{
-//        "preferred-color": "blue",
-//        "Salary": 3568.65,
-//        "hiredate": time.Time("2020-01-01T12:00:00"),
-//      },
-//    }
+//	data := xcore.XDataset{
+//	  "clientname": "Fred",
+//	  "clientpicture": "face.jpg",
+//	  "hobbies": &XDatasetCollection{
+//	    &XDataset{"name":"Football","sport":"yes"},
+//	    &XDataset{"name":"Ping-pong","sport":"yes"},
+//	    &XDataset{"name":"Swimming","sport":"yes"},
+//	    &XDataset{"name":"Videogames","sport":"no"},
+//	  },
+//	  "preferredhobby": &XDataset{
+//	    "name":"Baseball",
+//	    "sport":"yes",
+//	  },
+//	  "metadata": &XDataset{
+//	    "preferred-color": "blue",
+//	    "Salary": 3568.65,
+//	    "hiredate": time.Time("2020-01-01T12:00:00"),
+//	  },
+//	}
 //
 // You can access directly any data into the array with its relative path (relative to the level you are when the metaelements are applied, see below).
 //
@@ -667,7 +651,6 @@
 //
 // The structure of the meta elements in the template must follow the structure of the data to inject.
 //
-//
 // 3.4.1 References to another template: &&order&&
 //
 // 3.4.1.1 When order is a single id (characters a-z0-9.-_), it will make a call to a sub template with the same set of data and replace the &&...&& with the result.
@@ -675,58 +658,56 @@
 //
 // Example based on previous array of Fred's data:
 //
-//  &&header&&
-//  &&body&&
+//	&&header&&
+//	&&body&&
 //
-//  [[header]]
-//  Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//  {{clientname}} Data:
-//  <img src="{{clientpicture}}" title="{{clientname}}" />
-//  [[]]
-//
+//	[[body]]
+//	{{clientname}} Data:
+//	<img src="{{clientpicture}}" title="{{clientname}}" />
+//	[[]]
 //
 // 3.4.1.2 When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
 // The level in the data set is changed to this sub set.
 //
 // Example based on previous array of Fred's data:
 //
-//  &&header&&
-//  &&body:metadata&&
+//	&&header&&
+//	&&body:metadata&&
 //
-//  [[header]]
-//  Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//  {{clientname}} Data:  %-- Taken from the root data --%
-//  Salary: {{salary}}<br /> %-- taken from the metadata subset --%
-//  Hire date: {{hiredate}}<br /> %-- taken from the metadata subset--%
-//  [[]]
+//	[[body]]
+//	{{clientname}} Data:  %-- Taken from the root data --%
+//	Salary: {{salary}}<br /> %-- taken from the metadata subset --%
+//	Hire date: {{hiredate}}<br /> %-- taken from the metadata subset--%
+//	[[]]
 //
 // 3.4.1.3 When order contains 3 parameters separated by a semicolumn :, the second and third parameters are used to search the name of the new template based on the data fields to inject.
 //
 // This is an indirect access to the template. The name of the subtemplate is build with parameter3 as prefix and the content of parameter2 value.
 // The third parameter must be empty.
 //
-//  &&header&&
-//  &&body:preferredhobby&&
+//	&&header&&
+//	&&body:preferredhobby&&
 //
-//  [[header]]
-//  Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//  {{clientname}} Preferred hobby:
-//  &&:sport:sport.&&  %-- will build sport_ + [yes/no] contained into the sport field. Be sure you have a template for each value ! --%
+//	[[body]]
+//	{{clientname}} Preferred hobby:
+//	&&:sport:sport.&&  %-- will build sport_ + [yes/no] contained into the sport field. Be sure you have a template for each value ! --%
 //
-//  [[sport.yes]]{{name}} - It's a sport, sell him things![[]]
-//  [[sport.no]]{{name}} - It's not a sport, recommend him next store.[[]]
-//  [[sport]]{{name}} - We do not know that it is.[[]]
-//  [[]]
-//
+//	[[sport.yes]]{{name}} - It's a sport, sell him things![[]]
+//	[[sport.no]]{{name}} - It's not a sport, recommend him next store.[[]]
+//	[[sport]]{{name}} - We do not know that it is.[[]]
+//	[[]]
 //
 // 3.4.2 Loops: @@order@@
 //
@@ -761,45 +742,44 @@
 //
 // Example based on previous array of Fred's data:
 //
-//  &&header&&
-//  &&body&&
+//	&&header&&
+//	&&body&&
 //
-//  [[header]]
-//  Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//  {{clientname}} Data:
-//  <img src="{{clientpicture}}" title="{{clientname}}" />
-//  Main hobby: {{preferredhobby>name}}<br />
-//  Other hobbies:<br />
-//  @@hobbies@@
-//  [[hobbies.none]]There is no hobby<br />[[]]
-//  [[hobbies]]{{name}}<br />[[]]
-//  [[]]
+//	[[body]]
+//	{{clientname}} Data:
+//	<img src="{{clientpicture}}" title="{{clientname}}" />
+//	Main hobby: {{preferredhobby>name}}<br />
+//	Other hobbies:<br />
+//	@@hobbies@@
+//	[[hobbies.none]]There is no hobby<br />[[]]
+//	[[hobbies]]{{name}}<br />[[]]
+//	[[]]
 //
 // 3.4.2.3 When order contains 2 parameters separated by a semicolumn :, then first parameter is used to change the level of the data of array, with the subset with this id, and the second one for the template to use.
 //
 // Example based on previous array of Fred's data:
 //
-//  &&header&&
-//  &&body&&
+//	&&header&&
+//	&&body&&
 //
-//  [[header]]
-//  Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//  {{clientname}} Data:
-//  <img src="{{clientpicture}}" title="{{clientname}}" />
-//  Main hobby: {{preferredhobby>name}}<br />
-//  Other hobbies:<br />
-//  @@hobbies:hobby@@ %-- will iterate over hobbies in the data, but with hobby sub template --%
-//  [[hobby.none]]There is no hobby<br />[[]]
-//  [[hobby.key.1]]<span style="color: red;">{{name}}<span><br /><hr>[[]] %-- Paint the second line red (0 indexed) --%
-//  [[hobby]]{{name}}<br />[[]]
-//  [[]]
-//
+//	[[body]]
+//	{{clientname}} Data:
+//	<img src="{{clientpicture}}" title="{{clientname}}" />
+//	Main hobby: {{preferredhobby>name}}<br />
+//	Other hobbies:<br />
+//	@@hobbies:hobby@@ %-- will iterate over hobbies in the data, but with hobby sub template --%
+//	[[hobby.none]]There is no hobby<br />[[]]
+//	[[hobby.key.1]]<span style="color: red;">{{name}}<span><br /><hr>[[]] %-- Paint the second line red (0 indexed) --%
+//	[[hobby]]{{name}}<br />[[]]
+//	[[]]
 //
 // 3.4.3 Conditional: ??order??
 //
@@ -813,54 +793,53 @@
 //
 // Example based on previous array of Fred's data:
 //
-//  &&header&&
-//  &&body&&
+//	&&header&&
+//	&&body&&
 //
-//  [[header]]
-//   Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	 Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//   {{clientname}} Data:
-//   ??clientpicture??
-//   [[clientpicture]]<img src="{{clientpicture}}" title="{{clientname}}" />[[]]
-//   [[clientpicture.none]]There is no photo<br />[[]]
-//  [[]]
+//	[[body]]
+//	 {{clientname}} Data:
+//	 ??clientpicture??
+//	 [[clientpicture]]<img src="{{clientpicture}}" title="{{clientname}}" />[[]]
+//	 [[clientpicture.none]]There is no photo<br />[[]]
+//	[[]]
 //
 // 3.4.3.2 When order contains 2 parameters separated by a semicolumn :, then second parameter is used to change the level of the data of array, with the subset with this id.
 //
 // Example based on previous array of Fred's data:
 //
-//  &&header&&
-//  &&body&&
+//	&&header&&
+//	&&body&&
 //
-//  [[header]]
-//   Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	 Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//   {{clientname}} Data:
-//   ??clientpicture:photo??
-//   [[photo]]<img src="{{clientpicture}}" title="{{clientname}}" />[[]]
-//   [[photo.none]]There is no photo<br />[[]]
-//  [[]]
+//	[[body]]
+//	 {{clientname}} Data:
+//	 ??clientpicture:photo??
+//	 [[photo]]<img src="{{clientpicture}}" title="{{clientname}}" />[[]]
+//	 [[photo.none]]There is no photo<br />[[]]
+//	[[]]
 //
 // If the asked field is a catalog, true/false, numbered, you may also use .[value] subtemplates
 //
-//  &&header&&
-//  &&body&&
+//	&&header&&
+//	&&body&&
 //
-//  [[header]]
-//   Sports shop<hr />
-//  [[]]
+//	[[header]]
+//	 Sports shop<hr />
+//	[[]]
 //
-//  [[body]]
-//   {{clientname}} Data:
-//   ??preferredhobby>sport:preferredhobby??
-//   [[preferredhobby.yes]]{{preferredhobby>name}}<br />[[]]
-//   [[preferredhobby|preferredhobby.no|preferredhobby.none]]There is no preferred sport<br />[[]]
-//  [[]]
-//
+//	[[body]]
+//	 {{clientname}} Data:
+//	 ??preferredhobby>sport:preferredhobby??
+//	 [[preferredhobby.yes]]{{preferredhobby>name}}<br />[[]]
+//	 [[preferredhobby|preferredhobby.no|preferredhobby.none]]There is no preferred sport<br />[[]]
+//	[[]]
 //
 // 3.5 Debug Tools: !!order!!
 //
@@ -874,12 +853,10 @@
 // 3.5.1 !!list!!
 //
 // Will show only the tree of parameters, values are not shown.
-//
-//
 package xcore
 
 // VERSION is the used version nombre of the XCore library.
-const VERSION = "2.2.2"
+const VERSION = "2.2.3"
 
 // LOG is the flag to activate logging on the library.
 // if LOG is set to TRUE, LOG indicates to the XCore libraries to log a trace of functions called, with most important parameters.

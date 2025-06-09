@@ -39,7 +39,8 @@ Meta elements:
 */
 
 // MetaString and other consts:
-//   type of elements present in the template
+//
+//	type of elements present in the template
 const (
 	MetaString  = 0 // a simple string to integrate into the code
 	MetaComment = 1 // Comment, ignore it

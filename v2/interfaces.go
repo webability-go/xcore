@@ -6,8 +6,9 @@ import (
 )
 
 // XDatasetDef is a special interface to implement a set of data that can be scanned recursively (by XTemplate for instance)
-//   to search data into it, Stringify it, and set/get/del entries of data
-//   The get* methods must accept a path id>id>id...
+//
+//	to search data into it, Stringify it, and set/get/del entries of data
+//	The get* methods must accept a path id>id>id...
 type XDatasetDef interface {
 	// Stringify will dump the content into a human readable string
 	fmt.Stringer   // please implement String()
