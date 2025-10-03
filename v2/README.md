@@ -31,6 +31,14 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.3.0 - 2025-10-03
+-----------------------
+- XTemplate has now the ability to use templates from upper levels. Example:
+[[a]]Template A[[]]
+&&b&&
+[[b]] Using template a: &&a&& [[]]
+This will insert the template A into the template B, since template A is accessible for any sub templates. Just be carefull of infinite recursivity.
+
 v2.2.3 - 2025-06-09
 -----------------------
 - Corrected a bug into xtemplate that made the conditional for sub templates with an array of dataset not working
