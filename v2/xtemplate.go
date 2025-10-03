@@ -79,6 +79,7 @@ type XTemplate struct {
 	Name         string
 	Root         *XTemplateData
 	SubTemplates map[string]*XTemplate
+	Father       *XTemplate
 	// mutex        sync.RWMutex
 }
 
@@ -276,6 +277,7 @@ func (t *XTemplate) AddTemplate(name string, tmpl *XTemplate) {
 	if t.SubTemplates == nil {
 		t.SubTemplates = make(map[string]*XTemplate)
 	}
+	tmpl.Father = t
 	t.SubTemplates[name] = tmpl
 }
 
@@ -284,7 +286,14 @@ func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	if t.SubTemplates == nil {
 		return nil
 	}
-	return t.SubTemplates[name]
+	tmp := t.SubTemplates[name]
+	if tmp != nil {
+		return tmp
+	}
+	if t.Father != nil {
+		return t.Father.GetTemplate(name)
+	}
+	return nil
 }
 
 // Execute will inject the Data into the template and creates the final string
