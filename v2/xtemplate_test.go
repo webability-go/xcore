@@ -238,6 +238,7 @@ func TestXTemplateCall(t *testing.T) {
 	if result != "ABC\nDA\nEAF\n\n" {
 		t.Errorf("The call templates are not called correctly")
 	}
+	fmt.Println(result)
 }
 
 func TestXTemplateSimple(t *testing.T) {

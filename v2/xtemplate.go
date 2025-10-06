@@ -494,6 +494,9 @@ func (t *XTemplate) injector(datacol XDatasetCollectionDef, language *XLanguage)
 // String will transform the XDataset into a readable string for humans
 func (t *XTemplate) String() string {
 	sdata := []string{}
+	if t.Root == nil {
+		return "xcore.XTemplate{}"
+	}
 	for _, val := range *t.Root {
 		sdata = append(sdata, fmt.Sprintf("%v", val))
 	}
@@ -504,6 +507,9 @@ func (t *XTemplate) String() string {
 // GoString will transform the XDataset into a readable string for humans with values indexes
 func (t *XTemplate) GoString() string {
 	sdata := []string{}
+	if t.Root == nil {
+		return "#xcore.XTemplate{}"
+	}
 	for _, val := range *t.Root {
 		sdata = append(sdata, fmt.Sprintf("%#v", val))
 	}
@@ -525,9 +531,11 @@ func (t *XTemplate) Clone() *XTemplate {
 		newsubtemplates := map[string]*XTemplate{}
 		for id, xt := range t.SubTemplates {
 			newsubtemplates[id] = xt.Clone()
+			xt.Father = cloned
 		}
 		cloned.SubTemplates = newsubtemplates
 	}
+	cloned.Father = t.Father
 
 	return cloned
 }

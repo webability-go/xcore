@@ -31,6 +31,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.3.2 - 2025-10-06
+-----------------------
+- Added missing Father copy into clonation of object. Added some protections on String and GoString functions for nil pointers.
+
 v2.3.1 - 2025-10-06
 -----------------------
 - Added missing case in template use from upper level. Now working.
