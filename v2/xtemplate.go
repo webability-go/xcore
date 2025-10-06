@@ -284,6 +284,9 @@ func (t *XTemplate) AddTemplate(name string, tmpl *XTemplate) {
 // GetTemplate gets a sub template existing into this template
 func (t *XTemplate) GetTemplate(name string) *XTemplate {
 	if t.SubTemplates == nil {
+		if t.Father != nil {
+			return t.Father.GetTemplate(name)
+		}
 		return nil
 	}
 	tmp := t.SubTemplates[name]
