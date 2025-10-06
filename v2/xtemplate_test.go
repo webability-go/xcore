@@ -225,6 +225,21 @@ func TestXTemplateLanguageParam(t *testing.T) {
 	}
 }
 
+func TestXTemplateCall(t *testing.T) {
+	tmpl, err := NewXTemplateFromFile("testunit/c.template")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	data := &XDataset{}
+	result := tmpl.Execute(data)
+
+	if result != "ABC\nDA\nEAF\n\n" {
+		t.Errorf("The call templates are not called correctly")
+	}
+}
+
 func TestXTemplateSimple(t *testing.T) {
 	tmpl, err := NewXTemplateFromFile("testunit/b.template")
 	if err != nil {

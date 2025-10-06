@@ -31,6 +31,10 @@ Some improvements to check, later:
 Version Changes Control
 =======================
 
+v2.3.1 - 2025-10-06
+-----------------------
+- Added missing case in template use from upper level. Now working.
+
 v2.3.0 - 2025-10-03
 -----------------------
 - XTemplate has now the ability to use templates from upper levels. Example:
