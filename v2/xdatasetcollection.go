@@ -43,8 +43,13 @@ func (d *XDatasetCollection) Unshift(data XDatasetDef) {
 	*d = append([]XDatasetDef{data}, (*d)...)
 }
 
-// Shift will remove the element at the beginning of the collection
+// Shift will remove the element at the beginning of the collection.
+// Returns nil if the collection is empty.
 func (d *XDatasetCollection) Shift() XDatasetDef {
+	// 5.1: guard against empty-collection panic
+	if len(*d) == 0 {
+		return nil
+	}
 	data := (*d)[0]
 	*d = (*d)[1:]
 	return data
@@ -55,8 +60,13 @@ func (d *XDatasetCollection) Push(data XDatasetDef) {
 	*d = append(*d, data)
 }
 
-// Pop will remove the element at the end of the collection
+// Pop will remove the element at the end of the collection.
+// Returns nil if the collection is empty.
 func (d *XDatasetCollection) Pop() XDatasetDef {
+	// 5.1: guard against empty-collection panic
+	if len(*d) == 0 {
+		return nil
+	}
 	data := (*d)[len(*d)-1]
 	*d = (*d)[:len(*d)-1]
 	return data
@@ -140,10 +150,8 @@ func (d *XDatasetCollection) GetDataTime(key string) (time.Time, bool) {
 // GetCollection will retrieve a collection from the XDatasetCollection
 func (d *XDatasetCollection) GetCollection(key string) (XDatasetCollectionDef, bool) {
 	v, ok := d.GetData(key)
-	// Verify v IS actually a XDatasetCollectionDef to avoid the error
 	if ok {
-		dsd, ok2 := v.(XDatasetCollectionDef)
-		if ok2 {
+		if dsd, ok2 := v.(XDatasetCollectionDef); ok2 {
 			return dsd, true
 		}
 	}

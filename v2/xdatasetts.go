@@ -143,7 +143,13 @@ func (ds *XDatasetTS) Del(key string) {
 	ds.mutex.Unlock()
 }
 
-// Clone will creates a totally new data memory cloned from this object
+// Clone will create a totally new data memory copy cloned from this object.
+//
+// 4.3: Clone is safe for concurrent use — it holds RLock while delegating to
+// the inner dataset's Clone, so the snapshot is consistent.  The returned
+// *XDatasetTS wraps a freshly allocated inner dataset and does not share any
+// memory with the original; callers may freely mutate either copy without
+// affecting the other.
 func (ds *XDatasetTS) Clone() XDatasetDef {
 	cloned := &XDatasetTS{}
 	ds.mutex.RLock()

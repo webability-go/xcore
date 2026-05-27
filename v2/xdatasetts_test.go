@@ -702,3 +702,48 @@ func TestXDatasetTS_Clone(t *testing.T) {
 }
 
 // Try race conditions
+
+// ---------------------------------------------------------------------------
+// 4.3 — Clone thread safety
+// ---------------------------------------------------------------------------
+
+func TestXDatasetTS_Clone_Independent(t *testing.T) {
+	// Verify that mutating the original after Clone does not affect the clone
+	original := &XDataset{
+		"name": "original",
+		"sub": &XDataset{
+			"value": 42,
+		},
+	}
+	ds := NewXDatasetTS(original)
+	cloned := ds.Clone()
+
+	// Mutate the original
+	ds.Set("name", "mutated")
+
+	v, ok := cloned.GetString("name")
+	if !ok || v != "original" {
+		t.Fatalf("4.3: clone not independent — got %q/%v", v, ok)
+	}
+}
+
+func TestXDatasetTS_Clone_ConcurrentSafe(t *testing.T) {
+	// 4.3 regression: Clone holds RLock so concurrent Set/Get don't race with it.
+	// Run with -race to detect data races.
+	ds := NewXDatasetTS(&XDataset{"n": 0})
+	done := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				ds.Set("n", 42)
+			}
+		}
+	}()
+	for i := 0; i < 50; i++ {
+		_ = ds.Clone()
+	}
+	close(done)
+}
