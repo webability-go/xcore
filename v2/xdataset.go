@@ -93,6 +93,10 @@ func (d *XDataset) Get(key string) (interface{}, bool) {
 			}
 			return ds.Get(strings.Join(xid[2:], ">"))
 		}
+		// 4.1: intermediate key exists but holds a scalar (non-traversable) value —
+		// the path cannot be resolved further, so return not-found rather than
+		// falling through to the flat key lookup below.
+		return nil, false
 	}
 	data, ok := (*d)[key]
 	if ok {

@@ -5,7 +5,7 @@ XCore v2 for GO
 [![GoDoc](https://godoc.org/github.com/webability-go/xcore/v2?status.png)](https://godoc.org/github.com/webability-go/xcore/v2)
 [![GolangCI](https://golangci.com/badges/github.com/webability-go/xcore.svg)](https://golangci.com)
 
-Minimum version of GO: 1.17 (for time.Time compatibility)
+Minimum version of GO: 1.20
 
 The XCore package is used to build basic object for programmation. for the WebAbility compatility code
 For GO, the actual existing code includes:
@@ -19,17 +19,40 @@ Manuals are available on godoc.org [![GoDoc](https://godoc.org/github.com/webabi
 
 TO DO, maybe:
 =============
-- XDataset.Set should accept path too > > >
-- Get*Collection should convert types too
 - XTemplate must concatenate strings after compilation
 - Implements functions as data entry for template Execute (simple data or loop functions, can get backs anything, creates an interface)
 Some improvements to check, later:
-- Adds mutex on XTemplate ?? (they should be used locally on every thread, or not ??), maybe adds a flag "thread safe" ?
 - XCache: activate persistant cache too (shared memory) ????? maybe not for go itself, but for instance to talk with other memory data used by other languages and apps, or to not loose the caches if the app is restarted.
 
 
 Version Changes Control
 =======================
+
+v2.4.0 - 2026-05-20
+- Minimum Go version is now 1.20
+* Security audit and enhance race, locks and security problems
+- xcache/Get funcion enhance to not race against rtime asignation of xcache entry
+- xcache/mClean now quits the elements from the pile with calculated num, not last value of i (it's the same but more elegant), and remove only perc items
+- xcache/Verify now use a snapshot to not lock many time the whole xache, and call the verify functions without locks
+- xcache/Flush forgot to empty the pile too
+- xcache/Set: Cleaning the cache after a Set if the are too much keys: only if more keys than the limit, not more or equal.
+- removed LOG and debug entries for XCache (just losing time on tests)
+- Generate new xcache_test with exhaustive tests of library including race
+- xlanguage/LoadXMLString, ensure all variables access are into the lock, also Get/Set Name, Language
+- xlanguage/Parse will not ignore anymore a wront language reading (Logged)
+- xlanguage/XML generation will encode tags and attributes as they should be, always
+- xlanguage/LoadString will lock the object only once, not for every value
+- xlanguage/Load will accept only files < 10MB for memory security (big limit for text files you should not have problems)
+- xlanguage/Load will check xml deep limits for security too
+- xlanguage/io used instead of ioutil (deprecated)
+- xlanguage/Load will defer file close
+- xdataset: that path a>b>c now works even if the variables are not subsets (return nil)
+- xdataset: convert values if possible
+- xdataset: do not panic if collections are empty (Shift and Pop)
+- xdataset: Clone now is really thread safe in case of recursivity
+- xdataset/GetData race is fixed
+- xdataset/String race is fixed (possible deadlock)
+- All the code pass tests and race tests:  go test -race -run -v .
 
 v2.3.2 - 2025-10-06
 -----------------------
